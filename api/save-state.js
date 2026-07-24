@@ -27,7 +27,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ ok: false, error: "KV env is not configured" });
     }
 
-    const key = `pnc:wallet:${String(walletAddress).toLowerCase()}`;
+    const key = `jpyc:wallet:${String(walletAddress).toLowerCase()}`;
 
     const kvRes = await fetch(`${url}/set/${encodeURIComponent(key)}`, {
       method: "POST",
