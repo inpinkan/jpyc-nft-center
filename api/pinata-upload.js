@@ -5,9 +5,10 @@ export const config = {
 };
 
 const MAX_UPLOAD_BYTES = 100 * 1024 * 1024; // 100 MB foundation limit
+const JPYC_GROUP_ID = "29ef10a8-6d40-4b1b-9e63-fdb0a717f206";
 
 function safeFileName(value) {
-  return String(value || "pnc-upload")
+  return String(value || "jpyc-upload")
     .replace(/[^\w.\-() ]+/g, "_")
     .slice(0, 180);
 }
@@ -20,6 +21,7 @@ async function readMultipartForm(req) {
     body: req,
     duplex: "half"
   });
+
   return await request.formData();
 }
 
@@ -33,11 +35,15 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, error: "Method not allowed" });
+    return res.status(405).json({
+      ok: false,
+      error: "Method not allowed"
+    });
   }
 
   try {
     const jwt = process.env.PINATA_JWT;
+
     if (!jwt) {
       return res.status(500).json({
         ok: false,
@@ -46,6 +52,7 @@ export default async function handler(req, res) {
     }
 
     const contentType = String(req.headers["content-type"] || "");
+
     if (!contentType.toLowerCase().includes("multipart/form-data")) {
       return res.status(415).json({
         ok: false,
@@ -78,20 +85,25 @@ export default async function handler(req, res) {
     }
 
     const requestedName = incoming.get("name");
-    const fileName = safeFileName(requestedName || file.name || "pnc-upload");
+    const fileName = safeFileName(
+      requestedName || file.name || "jpyc-upload"
+    );
 
     const pinataForm = new FormData();
+    pinataForm.append("network", "public");
     pinataForm.append("file", file, fileName);
-    pinataForm.append("pinataMetadata", JSON.stringify({
-      name: fileName,
-      keyvalues: {
-        app: "Pi NFT Center",
-        uploader: "PNC Media Foundation"
-      }
-    }));
+    pinataForm.append("name", fileName);
+    pinataForm.append("group_id", JPYC_GROUP_ID);
+    pinataForm.append(
+      "keyvalues",
+      JSON.stringify({
+        app: "JPYC NFT Center",
+        uploader: "JPYC Media Foundation"
+      })
+    );
 
     const pinataRes = await fetch(
-      "https://api.pinata.cloud/pinning/pinFileToIPFS",
+      "https://uploads.pinata.cloud/v3/files",
       {
         method: "POST",
         headers: {
@@ -122,10 +134,12 @@ export default async function handler(req, res) {
       });
     }
 
+    const uploadData = pinataJson?.data || pinataJson;
+
     const hash =
-      pinataJson.IpfsHash ||
-      pinataJson.cid ||
-      pinataJson.ipfsHash;
+      uploadData?.cid ||
+      uploadData?.IpfsHash ||
+      uploadData?.ipfsHash;
 
     if (!hash) {
       return res.status(502).json({
@@ -142,13 +156,19 @@ export default async function handler(req, res) {
       ipfsHash: hash,
       uri: `ipfs://${hash}`,
       fileUri: `ipfs://${hash}`,
-      fileName,
-      mimeType: file.type || "application/octet-stream",
-      size: file.size,
+      fileName: uploadData?.name || fileName,
+      mimeType:
+        uploadData?.mime_type ||
+        file.type ||
+        "application/octet-stream",
+      size: uploadData?.size ?? file.size,
+      groupId: uploadData?.group_id || JPYC_GROUP_ID,
+      fileId: uploadData?.id || null,
       raw: pinataJson
     });
   } catch (err) {
-    console.error("PNC Pinata upload error:", err);
+    console.error("JPYC Pinata upload error:", err);
+
     return res.status(500).json({
       ok: false,
       error: "Server error",
