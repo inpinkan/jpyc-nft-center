@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JPYC NFT Center v2.1.3 Phase 5 Final Audit Edition</title>
+<title>JPYC NFT Center v2.1.4 Initial Load Fix Edition</title>
 <style>
 :root{
   --jpyc-primary:#174f9b;
@@ -517,7 +517,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
   <div class="menu" id="menu" aria-hidden="true"><div class="menu-inner"><div class="menu-title" data-i18n="nav.title"></div><button onclick="showPage('homePage')">🏠 <span data-i18n="nav.home"></span></button><button onclick="showPage('collectionsPage')">🏪 <span data-i18n="nav.collections"></span></button><button onclick="showPage('vaultPage')">🏦 <span data-i18n="nav.vault"></span></button><button onclick="showPage('creatorPage')">🎨 <span data-i18n="nav.creator"></span></button><div class="menu-title" data-i18n="appearance.title"></div><button onclick="setTheme('light')">☀️ <span data-i18n="appearance.light"></span></button><button onclick="setTheme('dark')">🌙 <span data-i18n="appearance.dark"></span></button><div class="menu-title" data-i18n="language.title"></div><div class="language-panel"><div class="language-current-summary"><span data-i18n="language.currentLanguage"></span><strong id="currentLanguageName">English</strong></div><div class="language-list" role="group"><button class="language-option" type="button" data-language="en" onclick="selectLanguage('en')"><span class="language-option-main"><span aria-hidden="true">🇺🇸</span><span class="language-option-label">English</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ja" onclick="selectLanguage('ja')"><span class="language-option-main"><span aria-hidden="true">🇯🇵</span><span class="language-option-label">日本語</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ko" onclick="selectLanguage('ko')"><span class="language-option-main"><span aria-hidden="true">🇰🇷</span><span class="language-option-label">한국어</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ru" onclick="selectLanguage('ru')"><span class="language-option-main"><span aria-hidden="true">🇷🇺</span><span class="language-option-label">Русский</span></span><span class="language-option-status"></span></button></div></div></div></div>
 </header>
 <main>
-  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.1.3</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
+  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.1.4</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
   <div class="page" id="collectionsPage"><div class="hero"><h1 data-i18n="nav.collections"></h1><p data-i18n="collections.hero"></p></div><section class="section"><div class="grid" id="allCollections"></div></section></div>
   <div class="page" id="collectionPage"><div id="collectionDetail"></div></div>
   <div class="page" id="vaultPage"><div class="hero vault-hero"><h1 data-i18n="nav.vault"></h1><p id="vaultStats"></p><div class="vault-tabs" role="tablist"><button class="vault-tab active" id="vaultTabOwned" type="button" onclick="setVaultTab('owned')"></button><button class="vault-tab" id="vaultTabSend" type="button" onclick="setVaultTab('send')"></button><button class="vault-tab" id="vaultTabReceive" type="button" onclick="setVaultTab('receive')"></button></div></div><section class="section"><div id="vaultContent"></div></section></div>
@@ -533,10 +533,10 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 'use strict';
 
 /* =========================================================
-   JNC v2.1.3 — PHASE 5 FINAL AUDIT EDITION
+   JNC v2.1.4 — INITIAL LOAD FIX EDITION
    ---------------------------------------------------------
-   JPYC visual identity uses one JPYC logo registry, restrained check textures, and unified glass surfaces.
-   Official links are consolidated to the JPYC official portal and JPYC EX; obsolete social links are removed.
+   The v2.1.3 branding and Phase 5 audit remain intact.
+   Public KV data now loads and renders before configured-chain reads, so first-time visitors can view the marketplace without connecting a wallet or switching networks.
    Appearance selection closes the navigation menu through the existing single menu path.
    English remains the fallback language; Japanese, Korean and Russian remain available.
    Wallet, storage, marketplace, network validation and transaction architecture remain unchanged.
@@ -759,7 +759,7 @@ function emptyStateHtml(icon,title,body){return`<div class="empty-state"><span c
 
 
 
-const PNC_CONFIG={app:{version:'v2.1.3-phase5-final-audit-edition'},network:{chainId:'0xaa36a7',name:'Sepolia Testnet'},contracts:{nft:'0x621AEECB9374E2A57F767564E1dc999478d440c7',marketplace:'0xAdAcd3ceef3629f4031E9d4F189Fbd198691f044',feeWallet:'0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5'},pinata:{gateway:'https://gateway.pinata.cloud/ipfs/'},currency:{activeSymbol:'SepoliaETH',futureSymbol:'JPYC'},marketRules:{initialSale:{seller:95,pncFee:5},resale:{seller:85,creatorRoyalty:10,pncFee:5},examplePrice:1000},links:{officialWebsite:'https://linktr.ee/jpyc_official',jpycEx:'https://ex.jpyc.co.jp/login/'},performance:{readChainBeforeWalletConnect:true}};
+const PNC_CONFIG={app:{version:'v2.1.4-initial-load-fix-edition'},network:{chainId:'0xaa36a7',name:'Sepolia Testnet'},contracts:{nft:'0x621AEECB9374E2A57F767564E1dc999478d440c7',marketplace:'0xAdAcd3ceef3629f4031E9d4F189Fbd198691f044',feeWallet:'0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5'},pinata:{gateway:'https://gateway.pinata.cloud/ipfs/'},currency:{activeSymbol:'SepoliaETH',futureSymbol:'JPYC'},marketRules:{initialSale:{seller:95,pncFee:5},resale:{seller:85,creatorRoyalty:10,pncFee:5},examplePrice:1000},links:{officialWebsite:'https://linktr.ee/jpyc_official',jpycEx:'https://ex.jpyc.co.jp/login/'},performance:{readChainBeforeWalletConnect:true}};
 const PNC_FOOTER={
   marketplace:{titleKey:'footer.marketplace',items:[
     {labelKey:'nav.home',kind:'page',target:'homePage'},
@@ -1530,10 +1530,9 @@ async function loadBlockchainState(){
   const walletSnapshot=PNC_STATE.wallet||null;
   const creatorSnapshot=structuredCopy(PNC_STATE.creator||emptyCreatorState());
   const chainSnapshot=window.ethereum?await getActiveChainId():'';
-  if(window.ethereum&&!isConfiguredChain(chainSnapshot))return PNC_STATE;
-  const nextState=await createMarketState(walletSnapshot,creatorSnapshot);
+  const nextState=await createMarketState(walletSnapshot,creatorSnapshot,chainSnapshot);
   const chainNow=window.ethereum?await getActiveChainId():'';
-  if(generation!==PNC_REFRESH_GENERATION||lc(PNC_STATE.wallet)!==lc(walletSnapshot)||chainNow!==chainSnapshot||!isConfiguredChain(chainNow)){
+  if(generation!==PNC_REFRESH_GENERATION||lc(PNC_STATE.wallet)!==lc(walletSnapshot)||chainNow!==chainSnapshot){
     PNC_REFRESH_QUEUED=true;
     return null;
   }
@@ -1541,8 +1540,9 @@ async function loadBlockchainState(){
   renderAll(PNC_STATE);
   return PNC_STATE;
 }
-async function createMarketState(walletSnapshot,creatorSnapshot){
+async function createMarketState(walletSnapshot,creatorSnapshot,chainSnapshot=''){
   const state={wallet:walletSnapshot||null,collections:[],nfts:[],market:{listings:[],offers:[],auctions:[],minimumNativeWei:'0',pendingBidRefundWei:'0',storageReads:[]},creator:structuredCopy(creatorSnapshot||emptyCreatorState()),errors:[],resolving:false};
+  const canReadConfiguredChain=!!window.ethereum&&isConfiguredChain(chainSnapshot);
   const globalState=await loadRemoteKVState(PNC_GLOBAL_MARKET_KEY);
   if(globalState)applyKVCreatorState(state,globalState,{requireWalletMatch:false});
   if(state.wallet){
@@ -1552,7 +1552,7 @@ async function createMarketState(walletSnapshot,creatorSnapshot){
 
   applyCreatorRegisteredShops(state);
   applyCreatorMintedNFTs(state);
-  if(window.ethereum){
+  if(canReadConfiguredChain){
     try{state.market.minimumNativeWei=await readMinimumNativeWei();}catch(e){state.errors.push('minimumNativeWei read failed');}
     if(state.wallet){
       try{state.market.pendingBidRefundWei=await readPendingBidRefund(state.wallet);}catch(e){state.errors.push('pendingBidRefunds read failed');}
@@ -1561,7 +1561,7 @@ async function createMarketState(walletSnapshot,creatorSnapshot){
     await Promise.all(state.nfts.map(async nft=>{
     nft.status=nft.status||'not_for_sale';
     applyCachedMetadata(nft);
-    if(lc(nft.contractAddress)===lc(PNC_CONFIG.contracts.nft)&&nft.tokenId&&window.ethereum&&(state.wallet||PNC_CONFIG.performance.readChainBeforeWalletConnect)){
+    if(lc(nft.contractAddress)===lc(PNC_CONFIG.contracts.nft)&&nft.tokenId&&canReadConfiguredChain&&(state.wallet||PNC_CONFIG.performance.readChainBeforeWalletConnect)){
       try{const owner=await readOwnerOf(nft.tokenId);if(owner)nft.owner=owner;}catch(e){state.errors.push((nft.name||nft.id)+' ownerOf failed');}
       try{const uri=await readTokenURI(nft.tokenId);if(uri){nft.tokenURI=uri;nft.metadataUrl=nft.metadataUrl||uri;}}catch(e){state.errors.push((nft.name||nft.id)+' tokenURI failed');}
       await hydrateMetadata(nft);
