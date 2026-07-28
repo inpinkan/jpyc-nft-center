@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JPYC NFT Center v2.2.1 ERC20 Engine & Polygon Foundation Edition</title>
+<title>JPYC NFT Center v2.2.2 Payment Router Edition</title>
 <style>
 :root{
   --jpyc-primary:#174f9b;
@@ -517,7 +517,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
   <div class="menu" id="menu" aria-hidden="true"><div class="menu-inner"><div class="menu-title" data-i18n="nav.title"></div><button onclick="showPage('homePage')">🏠 <span data-i18n="nav.home"></span></button><button onclick="showPage('collectionsPage')">🏪 <span data-i18n="nav.collections"></span></button><button onclick="showPage('vaultPage')">🏦 <span data-i18n="nav.vault"></span></button><button onclick="showPage('creatorPage')">🎨 <span data-i18n="nav.creator"></span></button><div class="menu-title" data-i18n="appearance.title"></div><button onclick="setTheme('light')">☀️ <span data-i18n="appearance.light"></span></button><button onclick="setTheme('dark')">🌙 <span data-i18n="appearance.dark"></span></button><div class="menu-title" data-i18n="language.title"></div><div class="language-panel"><div class="language-current-summary"><span data-i18n="language.currentLanguage"></span><strong id="currentLanguageName">English</strong></div><div class="language-list" role="group"><button class="language-option" type="button" data-language="en" onclick="selectLanguage('en')"><span class="language-option-main"><span aria-hidden="true">🇺🇸</span><span class="language-option-label">English</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ja" onclick="selectLanguage('ja')"><span class="language-option-main"><span aria-hidden="true">🇯🇵</span><span class="language-option-label">日本語</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ko" onclick="selectLanguage('ko')"><span class="language-option-main"><span aria-hidden="true">🇰🇷</span><span class="language-option-label">한국어</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ru" onclick="selectLanguage('ru')"><span class="language-option-main"><span aria-hidden="true">🇷🇺</span><span class="language-option-label">Русский</span></span><span class="language-option-status"></span></button></div></div></div></div>
 </header>
 <main>
-  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.2.1</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
+  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.2.2</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
   <div class="page" id="collectionsPage"><div class="hero"><h1 data-i18n="nav.collections"></h1><p data-i18n="collections.hero"></p></div><section class="section"><div class="grid" id="allCollections"></div></section></div>
   <div class="page" id="collectionPage"><div id="collectionDetail"></div></div>
   <div class="page" id="vaultPage"><div class="hero vault-hero"><h1 data-i18n="nav.vault"></h1><p id="vaultStats"></p><div class="vault-tabs" role="tablist"><button class="vault-tab active" id="vaultTabOwned" type="button" onclick="setVaultTab('owned')"></button><button class="vault-tab" id="vaultTabSend" type="button" onclick="setVaultTab('send')"></button><button class="vault-tab" id="vaultTabReceive" type="button" onclick="setVaultTab('receive')"></button></div></div><section class="section"><div id="vaultContent"></div></section></div>
@@ -533,21 +533,21 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 'use strict';
 
 /* =========================================================
-   JNC v2.2.1 — ERC20 ENGINE & POLYGON FOUNDATION
+   JNC v2.2.2 — PAYMENT ROUTER
    ---------------------------------------------------------
-   Phase 2 now adds a reusable ERC20 read/approval engine and the first
-   Polygon-first multi-chain interface foundation. The active blockchain
-   transaction deployment remains Sepolia until Polygon NFT and Marketplace
-   contracts are verified and deployed. Existing Mint and Marketplace actions
-   therefore keep their approved Sepolia transaction path in this version.
+   Phase 2 now introduces one payment-routing path for Marketplace actions.
+   Buy, Offer, Bid and Auction Buy Now no longer construct native-payment
+   transactions independently. They delegate settlement preparation and
+   submission to executeMarketplacePayment().
 
-   Polygon (POL) is exposed as JNC's launch-chain target in the Create NFT
-   interface. NFT records now retain explicit chain identity, and NFT cards
-   use the shared chain-visual path. The user-provided Polygon round logo is
-   stored once in JPYC_UI_ICONS and is never duplicated across renderers.
+   The active Sepolia deployment continues to use its approved native payment
+   contract, so visible behavior remains unchanged. The same router also owns
+   the ERC20 approval path for a future Polygon + JPYC deployment. Disabled or
+   incomplete ERC20 registry entries cannot be used accidentally.
 
-   ERC20 balanceOf, allowance and approve encoding/read helpers are introduced
-   but are not yet connected to Buy, Offer, Bid or Auction settlement.
+   Chain, deployment, payment asset and Marketplace responsibilities remain
+   separate. No obsolete parallel payment path is retained for the migrated
+   actions.
    ========================================================= */
 
 
@@ -762,7 +762,7 @@ function emptyStateHtml(icon,title,body){return`<div class="empty-state"><span c
 
 
 /* =========================================================
-   JNC v2.2.1 — CHAIN / DEPLOYMENT / PAYMENT REGISTRIES
+   JNC v2.2.2 — CHAIN / DEPLOYMENT / PAYMENT ROUTER
    ---------------------------------------------------------
    Registry rules:
    1. A chain describes the EVM network itself.
@@ -771,8 +771,10 @@ function emptyStateHtml(icon,title,body){return`<div class="empty-state"><span c
    4. Only an enabled deployment + enabled payment asset may be selected.
    5. Empty addresses are intentional placeholders and must never be used.
 
-   v2.2.1 keeps the approved Sepolia native-payment path active while exposing Polygon as the launch-chain UI target.
-   Polygon + JPYC is architecture-only and disabled until later Phase 2 work.
+   v2.2.2 keeps the approved Sepolia native-payment deployment active while
+   routing value-bearing Marketplace actions through one payment engine.
+   Polygon + JPYC remains disabled until verified contracts and token settings
+   are supplied.
    ========================================================= */
 const JNC_CHAIN_REGISTRY=Object.freeze({
   sepolia:Object.freeze({
@@ -894,11 +896,75 @@ async function ensureERC20Allowance({tokenAddress,owner,spender,requiredAmount})
   return{approved:true,allowance:await readERC20Allowance(tokenAddress,owner,spender),txHash};
 }
 
-/* Compatibility view for the existing v2.1.4 runtime.
-   Later Phase 2 versions will migrate transaction functions to the registries
-   directly; v2.2.1 deliberately preserves the current native-payment path. */
+const JNC_PAYMENT_ENGINES=Object.freeze({
+  native:Object.freeze({id:'native'}),
+  erc20:Object.freeze({id:'erc20'})
+});
+
+function getActivePaymentEngine(){
+  const asset=getActivePaymentAsset();
+  const engine=JNC_PAYMENT_ENGINES[asset.type];
+  if(!engine)throw new Error(`Unsupported payment engine: ${asset.type}`);
+  return Object.freeze({engine,asset,deployment:getActiveDeployment(),chain:getActiveChainConfig()});
+}
+
+function normalizeMarketplacePaymentRequest(request={}){
+  const from=String(request.from||'').trim();
+  const to=String(request.to||getActiveDeployment().contracts.marketplace||'').trim();
+  const data=String(request.data||'0x').trim();
+  const amount=BigInt(request.amount??request.requiredAmount??0);
+  const label=String(request.label||'Marketplace payment');
+  if(!/^0x[a-fA-F0-9]{40}$/.test(from))throw new Error('Payment sender is invalid.');
+  if(!/^0x[a-fA-F0-9]{40}$/.test(to))throw new Error('Payment target is invalid.');
+  if(!/^0x[a-fA-F0-9]*$/.test(data))throw new Error('Payment calldata is invalid.');
+  if(amount<0n)throw new Error('Payment amount cannot be negative.');
+  return Object.freeze({from,to,data,amount,label});
+}
+
+async function payNative(request){
+  const payment=normalizeMarketplacePaymentRequest(request);
+  const txHash=await sendTx({
+    from:payment.from,
+    to:payment.to,
+    data:payment.data,
+    value:weiToTxValue(payment.amount)
+  });
+  return Object.freeze({engine:'native',txHash,approval:null});
+}
+
+async function payERC20(request,context=getActivePaymentEngine()){
+  const payment=normalizeMarketplacePaymentRequest(request);
+  const {asset,deployment}=context;
+  if(asset.type!=='erc20')throw new Error('The active payment asset is not ERC20.');
+  if(!asset.enabled)throw new Error(`ERC20 payment asset is disabled: ${asset.id}`);
+  if(!/^0x[a-fA-F0-9]{40}$/.test(String(asset.contractAddress||''))){
+    throw new Error('ERC20 payment token is not configured.');
+  }
+  if(payment.to.toLowerCase()!==String(deployment.contracts.marketplace||'').toLowerCase()){
+    throw new Error('ERC20 Marketplace payment target does not match the active deployment.');
+  }
+  const approval=await ensureERC20Allowance({
+    tokenAddress:asset.contractAddress,
+    owner:payment.from,
+    spender:payment.to,
+    requiredAmount:payment.amount
+  });
+  const txHash=await sendTx({from:payment.from,to:payment.to,data:payment.data});
+  return Object.freeze({engine:'erc20',txHash,approval});
+}
+
+async function executeMarketplacePayment(request){
+  const context=getActivePaymentEngine();
+  if(context.engine.id==='native')return payNative(request);
+  if(context.engine.id==='erc20')return payERC20(request,context);
+  throw new Error(`No Marketplace payment route for: ${context.engine.id}`);
+}
+
+/* Compatibility view for the existing runtime.
+   v2.2.2 keeps non-payment transaction code stable while value-bearing
+   Marketplace actions resolve payment through the active registries. */
 const PNC_CONFIG={
-  app:{version:'v2.2.1-erc20-engine-polygon-foundation'},
+  app:{version:'v2.2.2-payment-router'},
   network:{
     key:JNC_ACTIVE_ARCHITECTURE.chain.id,
     chainId:JNC_ACTIVE_ARCHITECTURE.chain.chainId,
@@ -2006,7 +2072,7 @@ async function handleCreateOffer(id){
   }catch(e){alert(e.message||e);return;}
   if(!confirm(t('marketTx.offerConfirm',{amount,currency:currencyUnit()})))return;
   try{
-    const txHash=await sendTx({from:PNC_STATE.wallet,to:PNC_CONFIG.contracts.marketplace,data:encodeCreateOfferCall(n.contractAddress,n.tokenId,expiresAt),value:weiToTxValue(amountWei)});
+    const {txHash}=await executeMarketplacePayment({from:PNC_STATE.wallet,to:PNC_CONFIG.contracts.marketplace,data:encodeCreateOfferCall(n.contractAddress,n.tokenId,expiresAt),amount:amountWei,label:'Create offer'});
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Create offer transaction');
     await refreshPlatform();
     const refreshed=PNC_STATE.nfts.find(x=>nftKey(x)===nftKey(n));
@@ -2133,7 +2199,7 @@ async function handleBidAuction(id){
   }catch(e){alert(e.message||e);return;}
   if(!confirm(t('marketTx.bidConfirm',{amount,currency:currencyUnit()})))return;
   try{
-    const txHash=await sendTx({from:PNC_STATE.wallet,to:PNC_CONFIG.contracts.marketplace,data:encodeBidCall(a.auctionId),value:weiToTxValue(amountWei)});
+    const {txHash}=await executeMarketplacePayment({from:PNC_STATE.wallet,to:PNC_CONFIG.contracts.marketplace,data:encodeBidCall(a.auctionId),amount:amountWei,label:'Bid'});
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Bid transaction');
     await refreshPlatform();
     const refreshed=PNC_STATE.nfts.find(x=>nftKey(x)===nftKey(n));
@@ -2154,11 +2220,12 @@ async function handleBuyNowAuction(id){
   const refundNote=BigInt(a.highestBidWei||'0')>0n?t('marketTx.highestBidRefundNote'):'';
   if(!confirm(t('marketTx.buyNowConfirm',{amount:a.buyNowPriceEth,currency:currencyUnit(),refundNote})))return;
   try{
-    const txHash=await sendTx({
+    const {txHash}=await executeMarketplacePayment({
       from:PNC_STATE.wallet,
       to:PNC_CONFIG.contracts.marketplace,
       data:encodeBuyNowAuctionCall(a.auctionId),
-      value:weiToTxValue(a.buyNowPriceWei)
+      amount:a.buyNowPriceWei,
+      label:'Auction Buy Now'
     });
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Auction Buy Now transaction');
     await refreshPlatform();
@@ -2313,7 +2380,7 @@ async function handleBuy(id){
   if(lc(n.owner)===lc(PNC_STATE.wallet)){alert(t('marketTx.ownerCannotBuy'));return;}
   if(!confirm(t('marketTx.buyConfirm')))return;
   try{
-    const txHash=await sendTx({from:PNC_STATE.wallet,to:PNC_CONFIG.contracts.marketplace,data:encodeBuyCall(n.listingId),value:weiToTxValue(n.priceWei)});
+    const {txHash}=await executeMarketplacePayment({from:PNC_STATE.wallet,to:PNC_CONFIG.contracts.marketplace,data:encodeBuyCall(n.listingId),amount:n.priceWei,label:'Buy'});
     const receipt=await waitForReceipt(txHash);
     assertSuccessfulReceipt(receipt,'Buy transaction');
     await refreshPlatform();
