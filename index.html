@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JPYC NFT Center v2.3.10 Wallet Connection Restoration</title>
+<title>JPYC NFT Center v2.3.11 Buy Transaction Fix</title>
 <style>
 :root{
   --jpyc-primary:#174f9b;
@@ -811,7 +811,7 @@ function emptyStateHtml(icon,title,body){return`<div class="empty-state"><span c
    Polygon + JPYC is active only because the NFT, Marketplace, fee-wallet,
    JPYC token, decimals and production minimum-price units are configured.
    ========================================================= */
-const JNC_CONFIGURATION_VERSION='2.3.10';
+const JNC_CONFIGURATION_VERSION='2.3.11';
 const JNC_ENVIRONMENT_REGISTRY=Object.freeze({
   development:Object.freeze({
     id:'development',label:'Development',production:false,enabled:true,
@@ -1054,6 +1054,14 @@ async function ensureERC20Allowance({tokenAddress,owner,spender,requiredAmount})
   return{approved:true,allowance,txHash};
 }
 
+/* =========================================================
+   JNC v2.3.11 — BUY TRANSACTION FIX
+   ---------------------------------------------------------
+   BUY now resolves the active listing from the Marketplace immediately before
+   approval/payment. Cached listingId, seller and price values are not trusted
+   for transaction construction. The confirmed owner is verified on-chain
+   before the interface is refreshed.
+   ========================================================= */
 const JNC_PAYMENT_ENGINES=Object.freeze({
   native:Object.freeze({id:'native'}),
   erc20:Object.freeze({id:'erc20'})
@@ -1191,7 +1199,7 @@ function assertMarketplaceIntegration(){
    productionReady becomes true only after verified Polygon contracts and JPYC
    token units are supplied. Polygon production is now deliberately active.
    ========================================================= */
-const JNC_PRODUCTION_AUDIT_VERSION='2.3.10';
+const JNC_PRODUCTION_AUDIT_VERSION='2.3.11';
 function runProductionArchitectureAudit(){
   const checks=[];
   const activeDeployment=getActiveDeployment();
@@ -1323,7 +1331,7 @@ async function executeMarketplaceTransaction(request={}){
    units before Marketplace writes are allowed. Disabled future deployments
    may retain placeholders, but the active deployment may not.
    ========================================================= */
-const JNC_PAYMENT_AUDIT_VERSION='2.3.10';
+const JNC_PAYMENT_AUDIT_VERSION='2.3.11';
 function paymentAuditCheck(id,ok,detail=''){
   return Object.freeze({id,ok:!!ok,detail:String(detail||'')});
 }
@@ -2974,23 +2982,66 @@ async function handleUnlist(id){
     alert(t('marketTx.transactionFailed')+'\n'+(e.message||e));
   }
 }
+async function readFreshBuyListing(nft){
+  const deployment=getActiveDeployment();
+  const nftContract=String(nft?.contractAddress||deployment.contracts.nft||'');
+  const tokenId=String(nft?.tokenId??'');
+  if(!isValidEvmAddress(nftContract)||!tokenId)throw new Error('BUY target NFT is invalid.');
+
+  const listingId=await readListingIdByNFT(nftContract,tokenId);
+  if(!listingId||listingId==='0')throw new Error(t('marketTx.notListed'));
+
+  const listing=await readMarketplaceListing(listingId);
+  if(!listing.active)throw new Error(t('marketTx.notListed'));
+  if(lc(listing.nftContract)!==lc(nftContract)||String(listing.tokenId)!==tokenId){
+    throw new Error('The active Marketplace listing does not match this NFT. Refresh and try again.');
+  }
+  if(lc(listing.seller)===lc(PNC_STATE.wallet))throw new Error(t('marketTx.ownerCannotBuy'));
+  if(BigInt(listing.priceWei||0)<=0n)throw new Error('The active Marketplace listing price is invalid.');
+  return Object.freeze(listing);
+}
 async function handleBuy(id){
   if(!requireWallet())return;
   const n=resolveNftReference(id);
   if(!n)return;
-  if(n.status!=='listed'||!n.listingId||n.listingId==='0'){alert(t('marketTx.notListed'));return;}
   if(lc(n.owner)===lc(PNC_STATE.wallet)){alert(t('marketTx.ownerCannotBuy'));return;}
   if(!confirm(t('marketTx.buyConfirm')))return;
+
+  const walletAtSubmit=PNC_STATE.wallet;
+  const nftKeyAtSubmit=nftKey(n);
   try{
-    const {txHash}=await executeMarketplaceTransaction({action:'buy',from:PNC_STATE.wallet,data:encodeBuyCall(n.listingId),amount:n.priceWei,label:'Buy'});
+    const listing=await readFreshBuyListing(n);
+    const {txHash}=await executeMarketplaceTransaction({
+      action:'buy',
+      from:walletAtSubmit,
+      data:encodeBuyCall(listing.listingId),
+      amount:listing.priceWei,
+      label:'Buy'
+    });
     const receipt=await waitForReceipt(txHash);
     assertSuccessfulReceipt(receipt,'Buy transaction');
-    await refreshPlatform();
-    const refreshed=PNC_STATE.nfts.find(x=>nftKey(x)===nftKey(n));
-    if(!refreshed||lc(refreshed.owner)!==lc(PNC_STATE.wallet))throw new Error(t('marketTx.buyOwnerVerifyFailed'));
+
+    let verified=false;
+    for(const delayMs of [800,1600,2600,4000]){
+      await new Promise(resolve=>setTimeout(resolve,delayMs));
+      try{
+        const owner=await ownerOf(n.tokenId);
+        if(lc(owner)===lc(walletAtSubmit)){verified=true;break;}
+      }catch(error){console.warn('BUY owner verification retry failed:',error);}
+    }
+    if(!verified)throw new Error(t('marketTx.buyOwnerVerifyFailed'));
+
+    if(lc(PNC_STATE.wallet)===lc(walletAtSubmit)){
+      await refreshPlatform();
+      const refreshed=PNC_STATE.nfts.find(x=>nftKey(x)===nftKeyAtSubmit);
+      if(refreshed&&lc(refreshed.owner)!==lc(walletAtSubmit)){
+        console.warn('BUY succeeded on-chain; interface refresh is still catching up.');
+      }
+    }
+    closeNftDetail();
     alert(t('marketTx.buyComplete'));
   }catch(e){
-    console.warn(e);
+    console.warn('BUY transaction failed:',e);
     alert(t('marketTx.transactionFailed')+'\n'+(e.message||e));
   }
 }
