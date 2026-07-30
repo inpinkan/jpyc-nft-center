@@ -1043,40 +1043,15 @@ function encodeERC20AllowanceCall(owner,spender){return '0xdd62ed3e'+addrWord(ow
 function encodeERC20ApproveCall(spender,amount){return '0x095ea7b3'+addrWord(spender)+toHex(amount).slice(2);}
 async function readERC20Balance(tokenAddress,account){return BigInt(await ethCall(tokenAddress,encodeERC20BalanceOfCall(account))||'0x0');}
 async function readERC20Allowance(tokenAddress,owner,spender){return BigInt(await ethCall(tokenAddress,encodeERC20AllowanceCall(owner,spender))||'0x0');}
-async function readERC20AllowanceWithRetry(tokenAddress,owner,spender,requiredAmount,attempts=10,delayMs=750){
-  const required=BigInt(requiredAmount||0);
-  let allowance=0n;
-  for(let attempt=0;attempt<attempts;attempt++){
-    allowance=await readERC20Allowance(tokenAddress,owner,spender);
-    if(allowance>=required)return allowance;
-    if(attempt<attempts-1)await sleep(delayMs);
-  }
-  return allowance;
-}
-async function sendERC20Approval(tokenAddress,owner,spender,amount,label){
-  const txHash=await sendTx({from:owner,to:tokenAddress,data:encodeERC20ApproveCall(spender,amount)});
-  const receipt=await waitForReceipt(txHash);
-  assertSuccessfulReceipt(receipt,label);
-  return txHash;
-}
 async function ensureERC20Allowance({tokenAddress,owner,spender,requiredAmount}){
   const required=BigInt(requiredAmount||0);
   const current=await readERC20Allowance(tokenAddress,owner,spender);
-  if(current>=required)return{approved:false,allowance:current,txHash:null};
-
-  let resetTxHash=null;
-  if(current>0n){
-    resetTxHash=await sendERC20Approval(tokenAddress,owner,spender,0n,'ERC20 allowance reset');
-    const resetAllowance=await readERC20AllowanceWithRetry(tokenAddress,owner,spender,0n,6,500);
-    if(resetAllowance!==0n)throw new Error('ERC20 allowance reset was not reflected.');
-  }
-
-  const txHash=await sendERC20Approval(tokenAddress,owner,spender,required,'ERC20 approve');
-  const allowance=await readERC20AllowanceWithRetry(tokenAddress,owner,spender,required,12,750);
-  if(allowance<required){
-    throw new Error(`ERC20 allowance verification timed out. required=${required} actual=${allowance}`);
-  }
-  return{approved:true,allowance,txHash,resetTxHash};
+  if(current>=required)return{approved:false,allowance:current};
+  const txHash=await sendTx({from:owner,to:tokenAddress,data:encodeERC20ApproveCall(spender,required)});
+  const receipt=await waitForReceipt(txHash);assertSuccessfulReceipt(receipt,'ERC20 approve');
+  const allowance=await readERC20Allowance(tokenAddress,owner,spender);
+  if(allowance<required)throw new Error('ERC20 allowance is still below the required amount after approval.');
+  return{approved:true,allowance,txHash};
 }
 
 const JNC_PAYMENT_ENGINES=Object.freeze({
@@ -1348,7 +1323,7 @@ async function executeMarketplaceTransaction(request={}){
    units before Marketplace writes are allowed. Disabled future deployments
    may retain placeholders, but the active deployment may not.
    ========================================================= */
-const JNC_PAYMENT_AUDIT_VERSION='2.3.11-1-allowance-retry';
+const JNC_PAYMENT_AUDIT_VERSION='2.3.11-1';
 function paymentAuditCheck(id,ok,detail=''){
   return Object.freeze({id,ok:!!ok,detail:String(detail||'')});
 }
