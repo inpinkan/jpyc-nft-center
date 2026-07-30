@@ -1038,9 +1038,9 @@ function chainBadgeHtml(nft){
   const visual=getChainVisual(getNFTChainKey(nft));
   return `<span class="chain-badge">${visual.logo?`<img class="chain-logo" src="${visual.logo}" alt="">`:''}<span>${esc(visual.name)}</span></span>`;
 }
-function encodeERC20BalanceOfCall(account){return '0x70a08231'+encodeAddressWord(account);}
-function encodeERC20AllowanceCall(owner,spender){return '0xdd62ed3e'+encodeAddressWord(owner)+encodeAddressWord(spender);}
-function encodeERC20ApproveCall(spender,amount){return '0x095ea7b3'+encodeAddressWord(spender)+encodeUintWord(amount);}
+function encodeERC20BalanceOfCall(account){return '0x70a08231'+addrWord(account);}
+function encodeERC20AllowanceCall(owner,spender){return '0xdd62ed3e'+addrWord(owner)+addrWord(spender);}
+function encodeERC20ApproveCall(spender,amount){return '0x095ea7b3'+addrWord(spender)+toHex(amount).slice(2);}
 async function readERC20Balance(tokenAddress,account){return BigInt(await ethCall(tokenAddress,encodeERC20BalanceOfCall(account))||'0x0');}
 async function readERC20Allowance(tokenAddress,owner,spender){return BigInt(await ethCall(tokenAddress,encodeERC20AllowanceCall(owner,spender))||'0x0');}
 async function ensureERC20Allowance({tokenAddress,owner,spender,requiredAmount}){
