@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JPYC NFT Center v2.3.11-1 BUY Recovery</title>
+<title>JPYC NFT Center v2.3.11-2 BUY BID Recovery</title>
 <style>
 :root{
   --jpyc-primary:#174f9b;
@@ -541,7 +541,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
   <div class="menu" id="menu" aria-hidden="true"><div class="menu-inner"><div class="menu-title" data-i18n="nav.title"></div><button onclick="showPage('homePage')">🏠 <span data-i18n="nav.home"></span></button><button onclick="showPage('collectionsPage')">🏪 <span data-i18n="nav.collections"></span></button><button onclick="showPage('vaultPage')">🏦 <span data-i18n="nav.vault"></span></button><button onclick="showPage('creatorPage')">🎨 <span data-i18n="nav.creator"></span></button><div class="menu-title" data-i18n="appearance.title"></div><button onclick="setTheme('light')">☀️ <span data-i18n="appearance.light"></span></button><button onclick="setTheme('dark')">🌙 <span data-i18n="appearance.dark"></span></button><div class="menu-title" data-i18n="language.title"></div><div class="language-panel"><div class="language-current-summary"><span data-i18n="language.currentLanguage"></span><strong id="currentLanguageName">English</strong></div><div class="language-list" role="group"><button class="language-option" type="button" data-language="en" onclick="selectLanguage('en')"><span class="language-option-main"><span aria-hidden="true">🇺🇸</span><span class="language-option-label">English</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ja" onclick="selectLanguage('ja')"><span class="language-option-main"><span aria-hidden="true">🇯🇵</span><span class="language-option-label">日本語</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ko" onclick="selectLanguage('ko')"><span class="language-option-main"><span aria-hidden="true">🇰🇷</span><span class="language-option-label">한국어</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ru" onclick="selectLanguage('ru')"><span class="language-option-main"><span aria-hidden="true">🇷🇺</span><span class="language-option-label">Русский</span></span><span class="language-option-status"></span></button></div></div></div></div>
 </header>
 <main>
-  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.3.11-1</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
+  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.3.11-2</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
   <div class="page" id="collectionsPage"><div class="hero"><h1 data-i18n="nav.collections"></h1><p data-i18n="collections.hero"></p></div><section class="section"><div class="grid" id="allCollections"></div></section></div>
   <div class="page" id="collectionPage"><div id="collectionDetail"></div></div>
   <div class="page" id="vaultPage"><div class="hero vault-hero"><h1 data-i18n="nav.vault"></h1><p id="vaultStats"></p><div class="vault-tabs" role="tablist"><button class="vault-tab active" id="vaultTabOwned" type="button" onclick="setVaultTab('owned')"></button><button class="vault-tab" id="vaultTabSend" type="button" onclick="setVaultTab('send')"></button><button class="vault-tab" id="vaultTabReceive" type="button" onclick="setVaultTab('receive')"></button></div></div><section class="section"><div id="vaultContent"></div></section></div>
@@ -555,6 +555,12 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 
 <script>
 'use strict';
+
+/* =========================================================
+   JNC v2.3.11-2 — BUY / BID RECOVERY
+   BUY and BID both re-read authoritative Marketplace state before ERC20
+   approval/payment and verify the resulting on-chain state after receipt.
+   ========================================================= */
 
 /* =========================================================
    JNC v2.3.10 — AUCTION TRANSACTION VERIFICATION
@@ -811,7 +817,7 @@ function emptyStateHtml(icon,title,body){return`<div class="empty-state"><span c
    Polygon + JPYC is active only because the NFT, Marketplace, fee-wallet,
    JPYC token, decimals and production minimum-price units are configured.
    ========================================================= */
-const JNC_CONFIGURATION_VERSION='2.3.11-1';
+const JNC_CONFIGURATION_VERSION='2.3.11-2';
 const JNC_ENVIRONMENT_REGISTRY=Object.freeze({
   development:Object.freeze({
     id:'development',label:'Development',production:false,enabled:true,
@@ -1216,7 +1222,7 @@ function assertMarketplaceIntegration(){
    productionReady becomes true only after verified Polygon contracts and JPYC
    token units are supplied. Polygon production is now deliberately active.
    ========================================================= */
-const JNC_PRODUCTION_AUDIT_VERSION='2.3.11-1';
+const JNC_PRODUCTION_AUDIT_VERSION='2.3.11-2';
 function runProductionArchitectureAudit(){
   const checks=[];
   const activeDeployment=getActiveDeployment();
@@ -1348,7 +1354,7 @@ async function executeMarketplaceTransaction(request={}){
    units before Marketplace writes are allowed. Disabled future deployments
    may retain placeholders, but the active deployment may not.
    ========================================================= */
-const JNC_PAYMENT_AUDIT_VERSION='2.3.11-1-allowance-retry';
+const JNC_PAYMENT_AUDIT_VERSION='2.3.11-2-buy-bid-recovery';
 function paymentAuditCheck(id,ok,detail=''){
   return Object.freeze({id,ok:!!ok,detail:String(detail||'')});
 }
@@ -2363,9 +2369,9 @@ async function switchToConfiguredChain(){
   return confirmed;
 }
 /* =========================================================
-   JNC v2.3.11-1 — BUY RECOVERY
+   JNC v2.3.11-2 — WALLET CONNECTION RESTORATION
    ---------------------------------------------------------
-   Restore the confirmed v2.3.7 MetaMask account-selection flow:
+   Preserve the confirmed v2.3.7 MetaMask account-selection flow:
    revoke the site's existing eth_accounts permission, request account access,
    read the selected account, then switch/add the configured chain.
    One connection path is retained; the v2.3.8 standardization path is removed.
@@ -2776,31 +2782,74 @@ async function handleCreateAuction(id){
     alert(t('marketTx.transactionFailed')+'\n'+(e.message||e));
   }
 }
+/* =========================================================
+   JNC v2.3.11-2 — BID RECOVERY
+   ---------------------------------------------------------
+   BID no longer trusts the cached auction ID, highest bid, reserve price,
+   seller, phase or minimum increment. The active auction and the deployed
+   Marketplace minimum are read again immediately before prompting and again
+   before payment submission. The confirmed amount then uses the same single
+   ERC20 approval/payment route as BUY. No legacy BID payment fallback remains.
+   ========================================================= */
+async function prepareActiveAuctionBid(nft,bidder){
+  if(!nft||!isOnChainNFT(nft))throw new Error(t('marketTx.notActiveAuction'));
+  const auction=await readAuthoritativeAuctionForAction(nft);
+  const now=Math.floor(Date.now()/1000);
+  if(now<auction.startAt)throw new Error(t('marketTx.notActiveAuction'));
+  if(now>=auction.endsAt)throw new Error(t('marketTx.auctionEndedFinalize'));
+  if(lc(auction.seller)===lc(bidder))throw new Error(t('marketTx.sellerCannotBid'));
+  const increment=BigInt(await readMinimumNativeWei());
+  if(increment<=0n)throw new Error(t('marketTx.minimumPrice'));
+  const highest=BigInt(auction.highestBidWei||'0');
+  const reserve=BigInt(auction.reservePriceWei||'0');
+  const minimumBid=highest===0n?reserve:highest+increment;
+  if(minimumBid<=0n)throw new Error(t('marketTx.minimumPrice'));
+  return Object.freeze({auction,minimumBid,increment});
+}
 async function handleBidAuction(id){
   if(!requireWallet())return;
-  const n=resolveNftReference(id),a=n&&n.auction;
-  if(!n||!a||!a.active){alert(t('marketTx.notActiveAuction'));return;}
-  if(a.ended){alert(t('marketTx.auctionEndedFinalize'));return;}
-  if(lc(a.seller)===lc(PNC_STATE.wallet)){alert(t('marketTx.sellerCannotBid'));return;}
-  const minimumWei=BigInt(a.highestBidWei||'0')===0n?BigInt(a.reservePriceWei):BigInt(a.highestBidWei)+BigInt(PNC_STATE.market.minimumNativeWei||'0');
-  const minimumEth=weiToEth(minimumWei.toString());
-  const amount=prompt(t('marketTx.bidPrompt',{minimum:minimumEth,currency:currencyUnit()}),minimumEth);
-  if(amount===null)return;
-  let amountWei;
+  const n=resolveNftReference(id);
+  if(!n)return;
+  const walletAtSubmit=PNC_STATE.wallet;
+  const nftKeyAtSubmit=nftKey(n);
   try{
-    amountWei=ethToWei(amount);
-    if(BigInt(amountWei)<minimumWei)throw new Error(t('marketTx.bidBelowMinimum'));
-  }catch(e){alert(e.message||e);return;}
-  if(!confirm(t('marketTx.bidConfirm',{amount,currency:currencyUnit()})))return;
-  try{
-    const {txHash}=await executeMarketplaceTransaction({action:'bid',from:PNC_STATE.wallet,data:encodeBidCall(a.auctionId,amountWei),amount:amountWei,label:'Bid'});
-    assertSuccessfulReceipt(await waitForReceipt(txHash),'Bid transaction');
+    const prepared=await prepareActiveAuctionBid(n,walletAtSubmit);
+    const minimumDisplay=weiToEth(prepared.minimumBid.toString());
+    const amount=prompt(t('marketTx.bidPrompt',{minimum:minimumDisplay,currency:currencyUnit()}),minimumDisplay);
+    if(amount===null)return;
+    let amountWei;
+    try{
+      amountWei=ethToWei(amount);
+      if(BigInt(amountWei)<prepared.minimumBid)throw new Error(t('marketTx.bidBelowMinimum'));
+    }catch(error){alert(error.message||error);return;}
+    if(!confirm(t('marketTx.bidConfirm',{amount,currency:currencyUnit()})))return;
+
+    const current=await prepareActiveAuctionBid(n,walletAtSubmit);
+    if(String(current.auction.auctionId)!==String(prepared.auction.auctionId))throw new Error(t('marketTx.notActiveAuction'));
+    if(BigInt(amountWei)<current.minimumBid)throw new Error(t('marketTx.bidBelowMinimum'));
+
+    const result=await executeMarketplaceTransaction({
+      action:'bid',
+      from:walletAtSubmit,
+      data:encodeBidCall(current.auction.auctionId,amountWei),
+      amount:amountWei,
+      label:'Bid'
+    });
+    const receipt=await waitForReceipt(result.txHash);
+    assertSuccessfulReceipt(receipt,'Bid transaction');
+
+    const confirmed=await readMarketplaceAuction(current.auction.auctionId);
+    if(!confirmed.active||lc(confirmed.highestBidder)!==lc(walletAtSubmit)||BigInt(confirmed.highestBidWei||'0')!==BigInt(amountWei)){
+      throw new Error(t('marketTx.bidVerifyFailed'));
+    }
     await refreshPlatform();
-    const refreshed=PNC_STATE.nfts.find(x=>nftKey(x)===nftKey(n));
-    if(!refreshed||!refreshed.auction||lc(refreshed.auction.highestBidder)!==lc(PNC_STATE.wallet))throw new Error(t('marketTx.bidVerifyFailed'));
+    const refreshed=PNC_STATE.nfts.find(x=>nftKey(x)===nftKeyAtSubmit);
+    if(refreshed&&refreshed.auction&&lc(refreshed.auction.highestBidder)!==lc(walletAtSubmit)){
+      console.warn('BID receipt and on-chain auction verification succeeded, but refreshed UI state is delayed.');
+    }
     alert(t('marketTx.bidAccepted'));
   }catch(e){
-    console.warn(e);
+    console.warn('BID recovery transaction failed:',e);
     alert(t('marketTx.transactionFailed')+'\n'+(e.message||e));
   }
 }
@@ -3000,7 +3049,7 @@ async function handleUnlist(id){
   }
 }
 /* =========================================================
-   JNC v2.3.11-1 — BUY RECOVERY
+   JNC v2.3.11-2 — BUY RECOVERY
    ---------------------------------------------------------
    BUY never trusts cached listing price or listing identity. Immediately
    before approval/payment, the active listing is read again from the
