@@ -8,44 +8,65 @@ function setCors(res) {
 }
 
 function isAdmin(req) {
-  const expected = process.env.JNC_ADMIN_KEY;
+  const expected = String(process.env.JNC_ADMIN_KEY || "");
   const received = String(req.headers["x-admin-key"] || "");
   return Boolean(expected) && received === expected;
 }
 
+function safeText(value, maxLength) {
+  return String(value || "").trim().slice(0, maxLength);
+}
+
 function normalizeAddress(value) {
-  return String(value || "").trim();
+  return safeText(value, 42);
 }
 
 function isEvmAddress(value) {
   return /^0x[a-fA-F0-9]{40}$/.test(value);
 }
 
-function safeText(value, max) {
-  return String(value || "").trim().slice(0, max);
+function parseRegistry(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw !== "string" || !raw.trim()) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
-async function kvGet(url, token, key) {
-  const response = await fetch(`${url}/get/${encodeURIComponent(key)}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(`KV get failed: ${JSON.stringify(data)}`);
-  return data.result || null;
-}
-
-async function kvSet(url, token, key, value) {
-  const response = await fetch(`${url}/set/${encodeURIComponent(key)}`, {
+async function runKvCommand(url, token, command) {
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(value)
+    body: JSON.stringify(command)
   });
+
   const data = await response.json();
-  if (!response.ok) throw new Error(`KV set failed: ${JSON.stringify(data)}`);
-  return data;
+  if (!response.ok || data.error) {
+    throw new Error(`KV command failed: ${JSON.stringify(data)}`);
+  }
+  return data.result;
+}
+
+async function readRegistry(url, token) {
+  const result = await runKvCommand(url, token, ["GET", REGISTRY_KEY]);
+  return parseRegistry(result);
+}
+
+async function writeRegistry(url, token, registry) {
+  const serialized = JSON.stringify(registry);
+  await runKvCommand(url, token, ["SET", REGISTRY_KEY, serialized]);
+
+  const verified = await readRegistry(url, token);
+  if (JSON.stringify(verified) !== serialized) {
+    throw new Error("KV write verification failed.");
+  }
+  return verified;
 }
 
 export default async function handler(req, res) {
@@ -60,8 +81,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url = process.env.KV_REST_API_URL;
-    const token = process.env.KV_REST_API_TOKEN;
+    const url = String(process.env.KV_REST_API_URL || "").replace(/\/+$/, "");
+    const token = String(process.env.KV_REST_API_TOKEN || "");
+
     if (!url || !token) {
       return res.status(500).json({ ok: false, error: "KV env is not configured" });
     }
@@ -70,10 +92,19 @@ export default async function handler(req, res) {
     const chain = input.chain || {};
     const paymentToken = input.paymentToken || {};
 
-    const address = normalizeAddress(paymentToken.address);
+    const chainKey = safeText(chain.key, 30).toLowerCase();
+    const chainName = safeText(chain.name, 60);
+    const chainId = Number(chain.chainId);
+    const nativeSymbol = safeText(chain.nativeSymbol, 16).toUpperCase();
+
+    const tokenName = safeText(paymentToken.name, 60);
     const symbol = safeText(paymentToken.symbol, 16).toUpperCase();
+    const address = normalizeAddress(paymentToken.address);
+    const logoUrl = safeText(paymentToken.logoUrl, 1000);
+    const logoCid = safeText(paymentToken.logoCid, 200);
+
     const projectId = safeText(
-      input.projectId || `${chain.key || "chain"}-${symbol || "token"}`,
+      input.projectId || `${chainKey || "chain"}-${symbol || "token"}`,
       80
     )
       .toLowerCase()
@@ -83,60 +114,70 @@ export default async function handler(req, res) {
     if (!projectId) {
       return res.status(400).json({ ok: false, error: "projectId is required" });
     }
-    if (!chain.key || !chain.name || !Number.isInteger(Number(chain.chainId))) {
+    if (!chainKey || !chainName || !Number.isInteger(chainId) || chainId <= 0) {
       return res.status(400).json({ ok: false, error: "Valid chain is required" });
     }
-    if (!safeText(paymentToken.name, 60) || !symbol) {
+    if (!tokenName || !symbol) {
       return res.status(400).json({ ok: false, error: "Token name and symbol are required" });
     }
     if (!isEvmAddress(address)) {
       return res.status(400).json({ ok: false, error: "Invalid token contract address" });
     }
-    if (!safeText(paymentToken.logoUrl, 1000)) {
+    if (!logoUrl) {
       return res.status(400).json({ ok: false, error: "Token logo URL is required" });
     }
 
-    const now = new Date().toISOString();
-    const registry = (await kvGet(url, token, REGISTRY_KEY)) || [];
-    const list = Array.isArray(registry) ? registry : [];
+    const registry = await readRegistry(url, token);
+    const duplicate = registry.find(item =>
+      item.projectId !== projectId &&
+      String(item.chain?.key || "").toLowerCase() === chainKey &&
+      String(item.paymentToken?.address || "").toLowerCase() === address.toLowerCase()
+    );
 
-    const previous = list.find((item) => item.projectId === projectId);
+    if (duplicate) {
+      return res.status(409).json({
+        ok: false,
+        error: "The same chain and token contract are already registered"
+      });
+    }
+
+    const now = new Date().toISOString();
+    const previous = registry.find(item => item.projectId === projectId);
+
     const record = {
       schemaVersion: 1,
-      projectType: "jnc-collaboration-token",
+      projectType: "jnc-payment-token",
       projectId,
       enabled: input.enabled !== false,
       chain: {
-        key: safeText(chain.key, 30),
-        name: safeText(chain.name, 60),
-        chainId: Number(chain.chainId),
-        nativeSymbol: safeText(chain.nativeSymbol, 16).toUpperCase()
+        key: chainKey,
+        name: chainName,
+        chainId,
+        nativeSymbol
       },
       paymentToken: {
-        name: safeText(paymentToken.name, 60),
+        name: tokenName,
         symbol,
         displaySymbol: `$${symbol}`,
         address,
-        logoUrl: safeText(paymentToken.logoUrl, 1000),
-        logoCid: safeText(paymentToken.logoCid, 200),
-        otherImageUrl: safeText(paymentToken.otherImageUrl, 1000),
-        otherImageCid: safeText(paymentToken.otherImageCid, 200)
+        logoUrl,
+        logoCid
       },
       createdAt: previous?.createdAt || now,
       updatedAt: now
     };
 
-    const next = list.filter((item) => item.projectId !== projectId);
+    const next = registry.filter(item => item.projectId !== projectId);
     next.push(record);
     next.sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
 
-    await kvSet(url, token, REGISTRY_KEY, next);
+    const verified = await writeRegistry(url, token, next);
 
     return res.status(200).json({
       ok: true,
       key: REGISTRY_KEY,
       collaboration: record,
-      count: next.length
+      count: verified.length
     });
   } catch (error) {
     console.error("save-collaboration error:", error);
