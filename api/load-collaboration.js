@@ -8,9 +8,37 @@ function setCors(res) {
 }
 
 function isAdmin(req) {
-  const expected = process.env.JNC_ADMIN_KEY;
+  const expected = String(process.env.JNC_ADMIN_KEY || "");
   const received = String(req.headers["x-admin-key"] || "");
   return Boolean(expected) && received === expected;
+}
+
+function parseRegistry(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw !== "string" || !raw.trim()) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+async function runKvCommand(url, token, command) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(command)
+  });
+
+  const data = await response.json();
+  if (!response.ok || data.error) {
+    throw new Error(`KV command failed: ${JSON.stringify(data)}`);
+  }
+  return data.result;
 }
 
 export default async function handler(req, res) {
@@ -22,36 +50,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url = process.env.KV_REST_API_URL;
-    const token = process.env.KV_REST_API_TOKEN;
+    const url = String(process.env.KV_REST_API_URL || "").replace(/\/+$/, "");
+    const token = String(process.env.KV_REST_API_TOKEN || "");
 
     if (!url || !token) {
       return res.status(500).json({ ok: false, error: "KV env is not configured" });
     }
 
-    const response = await fetch(`${url}/get/${encodeURIComponent(REGISTRY_KEY)}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        ok: false,
-        error: "KV get failed",
-        detail: data
-      });
-    }
-
-    const registry = Array.isArray(data.result) ? data.result : [];
     const adminMode = String(req.query?.admin || "") === "1";
-
     if (adminMode && !isAdmin(req)) {
       return res.status(401).json({ ok: false, error: "Unauthorized" });
     }
 
+    const raw = await runKvCommand(url, token, ["GET", REGISTRY_KEY]);
+    const registry = parseRegistry(raw);
     const collaborations = adminMode
       ? registry
-      : registry.filter((item) => item && item.enabled === true);
+      : registry.filter(item => item?.enabled === true);
 
     return res.status(200).json({
       ok: true,
