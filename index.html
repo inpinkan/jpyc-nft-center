@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JPYC NFT Center v2.4.3 Wallet Session Stability</title>
+<title>JPYC NFT Center v2.4.3 Wallet Authorization Recovery</title>
 <style>
 :root{
   --jpyc-primary:#174f9b;
@@ -586,7 +586,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 'use strict';
 
 /* =========================================================
-   JNC v2.4.3 — WALLET SESSION STABILITY
+   JNC v2.4.3 — WALLET AUTHORIZATION RECOVERY
    - A successful transaction receipt is the single on-chain success boundary.
    - RPC/UI readback errors after a successful receipt are synchronization-pending, not transaction failures.
    - Failed/reverted receipts remain true transaction failures.
@@ -1417,7 +1417,7 @@ async function executeMarketplaceTransaction(request={}){
    units before Marketplace writes are allowed. Disabled future deployments
    may retain placeholders, but the active deployment may not.
    ========================================================= */
-const JNC_PAYMENT_AUDIT_VERSION='2.4.3-wallet-session-stability';
+const JNC_PAYMENT_AUDIT_VERSION='2.4.2-storage-help-cleanup';
 function paymentAuditCheck(id,ok,detail=''){
   return Object.freeze({id,ok:!!ok,detail:String(detail||'')});
 }
@@ -1978,7 +1978,7 @@ let PNC_STATE={wallet:null,collections:[],nfts:[],market:{listings:[],offers:[],
 let PNC_CREATOR_TAB='dashboard';
 let PNC_VAULT_TAB='owned';
 let PNC_EDIT_SHOP_ID='';let PNC_WALLET_CONNECTING=false;
-let PNC_REFRESHING=false;let PNC_REFRESH_QUEUED=false;let PNC_REFRESH_PROMISE=null;let PNC_REFRESH_GENERATION=0;let PNC_WALLET_EVENT_TIMER=null;
+let PNC_REFRESHING=false;let PNC_REFRESH_QUEUED=false;let PNC_REFRESH_PROMISE=null;let PNC_REFRESH_GENERATION=0;let PNC_WALLET_EVENT_TIMER=null;let PNC_WALLET_RECOVERY_TIMER=null;let PNC_WALLET_RECOVERING=false;
 
 const PNC_METADATA_CACHE_KEY='PNC_METADATA_CACHE_V1';const PNC_GLOBAL_MARKET_KEY='PNC_GLOBAL_MARKET';
 const $=id=>document.getElementById(id);const lc=v=>String(v||'').toLowerCase();const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const short=a=>/^0x[a-fA-F0-9]{40}$/.test(String(a||''))?a.slice(0,4)+'...'+a.slice(-4):(a||'-');const displayAddress=a=>/^0x[a-fA-F0-9]{40}$/.test(String(a||''))?short(a):(a||'-');
@@ -2502,32 +2502,42 @@ async function resetMetaMaskAccountPermission(){if(!window.ethereum)throw new Er
 async function requestSelectedMetaMaskAccount(){if(!window.ethereum)throw new Error(t('systemTx.metamaskNotFound'));await resetMetaMaskAccountPermission();await ethereum.request({method:'wallet_requestPermissions',params:[{eth_accounts:{}}]});const accounts=await ethereum.request({method:'eth_accounts'});if(accounts&&accounts[0])return accounts[0];const requested=await ethereum.request({method:'eth_requestAccounts'});return requested&&requested[0]?requested[0]:null;}
 async function connectMetaMask(){if(!window.ethereum){alert(t('walletTx.metamaskNotFound'));return;}if(PNC_WALLET_CONNECTING)return;PNC_WALLET_CONNECTING=true;try{const selected=await requestSelectedMetaMaskAccount();if(!selected)throw new Error(t('walletTx.noAccountSelected'));await switchToConfiguredChain();const accounts=await ethereum.request({method:'eth_accounts'});const confirmed=accounts&&accounts[0]?accounts[0]:selected;applyWalletIdentity(confirmed);renderAll(PNC_STATE);closeWalletModal();await refreshPlatform();}catch(e){if(isMetaMaskPendingError(e))alert(t('walletTx.metamaskPending'));else if(!isMetaMaskUserRejected(e))alert(t('walletTx.connectFailed')+'\n'+(e.message||e));console.warn(e);}finally{PNC_WALLET_CONNECTING=false;}}
 async function disconnectWallet(){applyWalletIdentity(null);renderAll(PNC_STATE);closeWalletModal();await refreshPlatform();}
-function scheduleWalletStateRefresh(){
-  clearTimeout(PNC_WALLET_EVENT_TIMER);
-  PNC_WALLET_EVENT_TIMER=setTimeout(async()=>{
-    try{
-      const chain=await getActiveChainId();
-      const accounts=await ethereum.request({method:'eth_accounts'});
-      const nextWallet=accounts&&accounts[0]?accounts[0]:null;
-
-      /*
-       * MetaMask Mobile may briefly return an empty account list while the app
-       * is backgrounded or locked for biometric authentication. That temporary
-       * state must not be treated as a JNC logout. Only the explicit Logout
-       * action clears PNC_STATE.wallet. A real account change still switches
-       * identity normally and clears drafts belonging to the previous wallet.
-       */
-      if(!nextWallet&&PNC_STATE.wallet)return;
-
-      applyWalletIdentity(nextWallet);
-      renderAll(PNC_STATE);
-      if(isConfiguredChain(chain))await refreshPlatform();
-    }catch(e){
-      console.warn('Wallet state refresh failed:',e);
+function scheduleWalletStateRefresh(){clearTimeout(PNC_WALLET_EVENT_TIMER);PNC_WALLET_EVENT_TIMER=setTimeout(async()=>{try{const chain=await getActiveChainId();const accounts=await ethereum.request({method:'eth_accounts'});applyWalletIdentity(accounts&&accounts[0]?accounts[0]:null);renderAll(PNC_STATE);if(isConfiguredChain(chain))await refreshPlatform();}catch(e){console.warn('Wallet state refresh failed:',e);}},180);}
+async function recoverAuthorizedWallet(options={}){
+  if(!window.ethereum||PNC_WALLET_CONNECTING||PNC_WALLET_RECOVERING)return false;
+  PNC_WALLET_RECOVERING=true;
+  try{
+    const accounts=await ethereum.request({method:'eth_accounts'});
+    const authorized=accounts&&accounts[0]?accounts[0]:null;
+    if(!authorized)return false;
+    const changed=lc(PNC_STATE.wallet)!==lc(authorized);
+    if(changed){
+      applyWalletIdentity(authorized);
+      if(options.render!==false)renderAll(PNC_STATE);
     }
-  },180);
+    if(options.refresh===true){
+      const chain=await getActiveChainId();
+      if(isConfiguredChain(chain))await refreshPlatform();
+    }
+    return true;
+  }catch(e){
+    console.warn('Authorized wallet recovery skipped:',e);
+    return false;
+  }finally{PNC_WALLET_RECOVERING=false;}
 }
-function installWalletListeners(){if(!window.ethereum||window.__PNC_WALLET_LISTENERS__)return;window.__PNC_WALLET_LISTENERS__=true;ethereum.on?.('accountsChanged',scheduleWalletStateRefresh);ethereum.on?.('chainChanged',scheduleWalletStateRefresh);}
+function scheduleAuthorizedWalletRecovery(){
+  clearTimeout(PNC_WALLET_RECOVERY_TIMER);
+  PNC_WALLET_RECOVERY_TIMER=setTimeout(()=>recoverAuthorizedWallet({render:true,refresh:true}),220);
+}
+function installWalletListeners(){
+  if(!window.ethereum||window.__PNC_WALLET_LISTENERS__)return;
+  window.__PNC_WALLET_LISTENERS__=true;
+  ethereum.on?.('accountsChanged',scheduleWalletStateRefresh);
+  ethereum.on?.('chainChanged',scheduleWalletStateRefresh);
+  window.addEventListener('pageshow',scheduleAuthorizedWalletRecovery);
+  window.addEventListener('focus',scheduleAuthorizedWalletRecovery);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')scheduleAuthorizedWalletRecovery();});
+}
 function setRefreshButtonState(mode){
   const btn=$('platformRefreshBtn');
   if(!btn)return;
@@ -3807,6 +3817,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     initLanguageEngine();
     applyJPYCBrandIcon();
     installWalletListeners();
+    await recoverAuthorizedWallet({render:false,refresh:false});
     console.info('[JNC Payment Audit]',JNC_PAYMENT_AUDIT_REPORT);
     await refreshPlatform();
   }catch(e){
