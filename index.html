@@ -2699,6 +2699,7 @@ function shopDraftToCollection(draft){
   };
 }
 
+function nftKey(n){return getNFTChainKey(n)+':'+lc(n&&n.contractAddress)+':'+String(n&&n.tokenId||'');}
 function nftReference(n){return nftKey(n);}
 function normalizeNFTIdentity(value){
   const id=String(value||'').trim();
