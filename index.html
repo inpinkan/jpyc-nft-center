@@ -2615,7 +2615,6 @@ async function saveStateForWalletKey(walletKey,creatorState){
 async function saveKVState(){
   try{
     const creator=publicCreatorStateForSave();
-    if(PNC_STATE.wallet)await saveStateForWalletKey(PNC_STATE.wallet,creator);
     await saveStateForWalletKey(PNC_GLOBAL_MARKET_KEY,creator);
   }catch(e){console.warn(e);}
 }
@@ -2665,7 +2664,8 @@ function applyKVCreatorState(state,kv,options={}){
   if(!state.market.storageReads)state.market.storageReads=[];
   state.market.storageReads.push({shops:afterShops-beforeShops,nfts:afterNfts-beforeNfts});
   return state;
-}function applyCollectionMedia(state){for(const c of state.collections){const pinataImage=c.pinata&&c.pinata.image?c.pinata.image.ipfsUri:'';if(c.source==='creator-pinata'||c.status==='registered'){const shopImage=c.shopImage||c.image||pinataImage||'';c.image=shopImage;c.banner=c.shopBanner||c.banner||shopImage;c.shopImage=shopImage;c.shopBanner=c.banner;continue;}if(isUsableMediaUrl(c.image||c.banner))continue;const found=state.nfts.filter(n=>n.collectionId===c.id).find(n=>resolveMediaUrl(n));if(found){c.image=(found.metadata&&found.metadata.image)||found.image||'';c.banner=c.image;}}}
+}
+function applyCollectionMedia(state){for(const c of state.collections){const pinataImage=c.pinata&&c.pinata.image?c.pinata.image.ipfsUri:'';if(c.source==='creator-pinata'||c.status==='registered'){const shopImage=c.shopImage||c.image||pinataImage||'';c.image=shopImage;c.banner=c.shopBanner||c.banner||shopImage;c.shopImage=shopImage;c.shopBanner=c.banner;continue;}if(isUsableMediaUrl(c.image||c.banner))continue;const found=state.nfts.filter(n=>n.collectionId===c.id).find(n=>resolveMediaUrl(n));if(found){c.image=(found.metadata&&found.metadata.image)||found.image||'';c.banner=c.image;}}}
 async function loadBlockchainState(){
   const generation=++PNC_REFRESH_GENERATION;
   const walletSnapshot=PNC_STATE.wallet||null;
@@ -2686,11 +2686,7 @@ async function createMarketState(walletSnapshot,creatorSnapshot,chainSnapshot=''
   const canReadConfiguredChain=!!window.ethereum&&isConfiguredChain(chainSnapshot);
   const globalState=await loadRemoteKVState(PNC_GLOBAL_MARKET_KEY);
   if(globalState)applyKVCreatorState(state,globalState,{requireWalletMatch:false});
-  if(state.wallet){
-    const walletState=await loadRemoteKVState(state.wallet);
-    if(walletState)applyKVCreatorState(state,walletState,{requireWalletMatch:false});
-  }
-
+  
   applyCreatorRegisteredShops(state);
   applyCreatorMintedNFTs(state);
   if(canReadConfiguredChain){
