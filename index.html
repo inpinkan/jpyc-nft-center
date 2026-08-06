@@ -2672,6 +2672,33 @@ function normalizeShopForMarket(shop){
     storage
   };
 }
+
+function shopDraftToCollection(draft){
+  const ipfsImage=draft&&draft.pinata&&draft.pinata.image?draft.pinata.image.ipfsUri:'';
+  const paymentProfile=normalizeShopPaymentSelection(draft.paymentProfile||JNC_DEFAULT_SHOP_PAYMENT_PROFILE);
+  return{
+    id:draft.collectionId||draft.id,
+    name:draft.name,
+    creator:draft.creator,
+    chainKey:paymentProfile.chain.key,
+    paymentProfile,
+    verified:false,
+    description:draft.description,
+    icon:'🏪',
+    image:ipfsImage,
+    banner:ipfsImage,
+    shopImage:ipfsImage,
+    shopBanner:ipfsImage,
+    social:normalizeShopSocial(draft.social),
+    storage:{provider:draft.storageProvider||'pinata'},
+    source:'creator-pinata',
+    status:'registered',
+    pinata:draft.pinata||null,
+    registeredAt:draft.registeredAt||Date.now(),
+    createdAt:draft.createdAt||Date.now()
+  };
+}
+
 function nftReference(n){return nftKey(n);}
 function normalizeNFTIdentity(value){
   const id=String(value||'').trim();
@@ -3262,7 +3289,7 @@ function nftDraftMetadata(draft){if(!draft)return null;const displayUri=draft.me
 function nftDraftPayload(draft){if(!draft)return null;const metadata=nftDraftMetadata(draft);return{type:'nft',version:PNC_CONFIG.app.version,creator:draft.creator,owner:draft.owner,collectionId:draft.collectionId,collectionName:draft.collectionName,paymentProfile:getNFTPaymentProfile(draft),media:{mediaType:draft.mediaType||'image',image:{fileName:draft.imageName||draft.thumbnailName||'',ipfsUri:metadata.image},thumbnail:{fileName:draft.thumbnailName||draft.imageName||'',ipfsUri:metadata.pnc?.thumbnail||metadata.image},animation:{fileName:draft.videoName||'',ipfsUri:metadata.animation_url||''},mimeType:draft.mimeType||''},metadata,metadataUri:draft.pinata&&draft.pinata.metadata?draft.pinata.metadata.ipfsUri:'PENDING_METADATA_UPLOAD',pinata:draft.pinata||null,status:draft.status||'draft',registeredAt:draft.registeredAt||null,createdAt:draft.createdAt};}
 function validateShopDraft(d){const issues=[];if(!d.name)issues.push(t('validation.shopNameRequired'));if(!d.creator)issues.push(t('validation.creatorWalletRequired'));if(!d.imageName)issues.push(t('validation.shopImageRequired'));const social=normalizeShopSocial(d.social);const xValidation=socialUrlValidation(social.x,'x');const lineValidation=socialUrlValidation(social.lineOpenChat,'lineOpenChat');if(!xValidation.ok)issues.push(xValidation.message);if(!lineValidation.ok)issues.push(lineValidation.message);return issues;}
 function validateNFTDraft(d){const issues=[];if(!d.collectionId)issues.push(t('validation.shopRequired'));if(!d.name)issues.push(t('validation.nftNameRequired'));if(!d.creator||!d.owner)issues.push(t('validation.creatorOwnerRequired'));if(d.mediaType==='video'){if(!d.videoName)issues.push(t('validation.videoRequired'));if(!d.thumbnailName)issues.push(t('validation.thumbnailRequired'));if(d.videoFile&&d.videoFile.type&&d.videoFile.type!=='video/mp4')issues.push(t('validation.videoMustMp4'));}else if(!d.imageName)issues.push(t('validation.nftImageRequired'));return issues;}
-function createShopDraftFromForm(form){if(!requireWallet())return;const fd=new FormData(form),media=filePreviewFromInput(form.elements.shopImageFile),createPaymentProfileSnapshot(fd.get('paymentProfileId'));const draft={type:'shop',status:'draft',creator:PNC_STATE.wallet,id:'draft-shop-'+Date.now(),chainKey:paymentSelection.chain.key,paymentProfile:paymentSelection,name:String(fd.get('name')||'').trim(),description:String(fd.get('description')||'').trim(),social:normalizeShopSocial({x:fd.get('socialX'),lineOpenChat:fd.get('socialLineOpenChat')}),storageProvider:String(fd.get('storageProvider')||'pinata'),storageCredential:normalizeStorageCredential({provider:fd.get('storageProvider'),apiKey:fd.get('pinataApiKey'),apiSecret:fd.get('pinataApiSecret')}),imageName:media.name,imagePreview:media.preview,imageFile:media.file,imageRole:'shopImage',createdAt:Date.now()};draft.validation=validateShopDraft(draft);draft.payload=shopDraftPayload(draft);ensureCreatorState().shopDraft=draft;renderCreatorCenter(PNC_STATE);alert(t('creatorTx.draftSaved'));}
+function createShopDraftFromForm(form){if(!requireWallet())return;const fd=new FormData(form),media=filePreviewFromInput(form.elements.shopImageFile),paymentSelection=createPaymentProfileSnapshot(fd.get('paymentProfileId'));const draft={type:'shop',status:'draft',creator:PNC_STATE.wallet,id:'draft-shop-'+Date.now(),chainKey:paymentSelection.chain.key,paymentProfile:paymentSelection,name:String(fd.get('name')||'').trim(),description:String(fd.get('description')||'').trim(),social:normalizeShopSocial({x:fd.get('socialX'),lineOpenChat:fd.get('socialLineOpenChat')}),storageProvider:String(fd.get('storageProvider')||'pinata'),storageCredential:normalizeStorageCredential({provider:fd.get('storageProvider'),apiKey:fd.get('pinataApiKey'),apiSecret:fd.get('pinataApiSecret')}),imageName:media.name,imagePreview:media.preview,imageFile:media.file,imageRole:'shopImage',createdAt:Date.now()};draft.validation=validateShopDraft(draft);draft.payload=shopDraftPayload(draft);ensureCreatorState().shopDraft=draft;renderCreatorCenter(PNC_STATE);alert(t('creatorTx.draftSaved'));}
 function createNFTDraftFromForm(form){if(!requireWallet())return;const fd=new FormData(form),mediaType=String(fd.get('mediaType')||'image'),image=filePreviewFromInput(form.elements.imageFile),video=filePreviewFromInput(form.elements.videoFile),thumbnail=filePreviewFromInput(form.elements.thumbnailFile),collectionId=String(fd.get('collectionId')||''),paymentProfile=getCollectionPaymentProfile(collectionId);const draft={type:'nft',status:'draft',targetChainKey:paymentProfile.chain.key||String(fd.get('targetChainKey')||JNC_LAUNCH_CHAIN_KEY),runtimeChainKey:JNC_ACTIVE_ARCHITECTURE.chain.id,paymentProfile,creator:PNC_STATE.wallet,owner:PNC_STATE.wallet,collectionId,collectionName:collectionNameById(collectionId),name:String(fd.get('name')||'').trim(),description:String(fd.get('description')||'').trim(),utility:String(fd.get('utility')||'').trim(),mediaType,imageName:image.name,imagePreview:image.preview,imageFile:image.file,videoName:video.name,videoPreview:video.preview,videoFile:video.file,thumbnailName:thumbnail.name,thumbnailPreview:thumbnail.preview,thumbnailFile:thumbnail.file,mimeType:mediaType==='video'?(video.mimeType||'video/mp4'):(image.mimeType||''),createdAt:Date.now()};draft.validation=validateNFTDraft(draft);try{storageCredentialForShop(draft.collectionId);}catch(e){draft.validation.push(t('creator.storageRequired'));}draft.metadata=nftDraftMetadata(draft);draft.payload=nftDraftPayload(draft);ensureCreatorState().nftDraft=draft;renderCreatorCenter(PNC_STATE);alert(t('creatorTx.draftSaved'));}
 function normalizePinataResponse(json){const data=json&&(json.data||json.result||json);const cid=data&&(data.IpfsHash||data.ipfsHash||data.cid||data.hash||data.Hash||data.IpfsCid);if(!cid)throw new Error(t('mediaError.pinataCidMissing'));return{cid,ipfsUri:'ipfs://'+cid,gatewayUrl:PNC_CONFIG.pinata.gateway+cid,raw:json};}
 const JNC_STORAGE_CREDENTIAL_PREFIX='JNC_SHOP_STORAGE_V1';
