@@ -531,10 +531,6 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 }
 
 
-/* =========================================================
-   JNC v2.3.10 — AUCTION TRANSACTION VERIFICATION
-   One shared utility path for copy, PolygonScan and MetaMask import guidance.
-   ========================================================= */
 .utility-value{display:inline-flex;align-items:center;justify-content:flex-end;gap:5px;max-width:100%;cursor:pointer;border-radius:6px;padding:1px 2px;transition:color var(--pnc-transition),background var(--pnc-transition)}
 .utility-value:hover{color:var(--jpyc-secondary);background:rgba(97,183,232,.07)}
 .utility-value-text{min-width:0;overflow-wrap:anywhere}
@@ -590,7 +586,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
   <div class="menu" id="menu" aria-hidden="true"><div class="menu-inner"><div class="menu-title" data-i18n="nav.title"></div><button onclick="showPage('homePage')">🏠 <span data-i18n="nav.home"></span></button><button onclick="showPage('collectionsPage')">🏪 <span data-i18n="nav.collections"></span></button><button onclick="showPage('vaultPage')">🏦 <span data-i18n="nav.vault"></span></button><button onclick="showPage('creatorPage')">🎨 <span data-i18n="nav.creator"></span></button><div class="menu-title" data-i18n="appearance.title"></div><button onclick="setTheme('light')">☀️ <span data-i18n="appearance.light"></span></button><button onclick="setTheme('dark')">🌙 <span data-i18n="appearance.dark"></span></button><div class="menu-title" data-i18n="language.title"></div><div class="language-panel"><div class="language-current-summary"><span data-i18n="language.currentLanguage"></span><strong id="currentLanguageName">English</strong></div><div class="language-list" role="group"><button class="language-option" type="button" data-language="en" onclick="selectLanguage('en')"><span class="language-option-main"><span aria-hidden="true">🇺🇸</span><span class="language-option-label">English</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ja" onclick="selectLanguage('ja')"><span class="language-option-main"><span aria-hidden="true">🇯🇵</span><span class="language-option-label">日本語</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ko" onclick="selectLanguage('ko')"><span class="language-option-main"><span aria-hidden="true">🇰🇷</span><span class="language-option-label">한국어</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ru" onclick="selectLanguage('ru')"><span class="language-option-main"><span aria-hidden="true">🇷🇺</span><span class="language-option-label">Русский</span></span><span class="language-option-status"></span></button></div></div></div></div>
 </header>
 <main>
-  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.5.6</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
+  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.5.8</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
   <div class="page" id="collectionsPage"><div class="hero"><h1 data-i18n="nav.collections"></h1><p data-i18n="collections.hero"></p></div><section class="section"><div class="grid" id="allCollections"></div></section></div>
   <div class="page" id="collectionPage"><div id="collectionDetail"></div></div>
   <div class="page" id="vaultPage"><div class="hero vault-hero"><h1 data-i18n="nav.vault"></h1><p id="vaultStats"></p><div class="vault-tabs" role="tablist"><button class="vault-tab active" id="vaultTabOwned" type="button" onclick="setVaultTab('owned')"></button><button class="vault-tab" id="vaultTabSend" type="button" onclick="setVaultTab('send')"></button><button class="vault-tab" id="vaultTabReceive" type="button" onclick="setVaultTab('receive')"></button></div></div><section class="section"><div id="vaultContent"></div></section></div>
@@ -608,26 +604,16 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 'use strict';
 
 /* =========================================================
-   JNC v2.5.6 — MARKETPLACE PAYMENT ROUTING
-   - Marketplace actions now receive the NFT / Shop Payment Profile explicitly.
-   - Chain + ERC20 token identity is resolved from the Payment Profile before writes.
-   - Buy / Offer / Auction / List routes fail closed when the selected profile does not
-     match the payment token accepted by the deployed Marketplace contract.
-   - Existing Polygon / JPYC production trading remains on the verified deployment.
-   - This prevents a display-only collaboration token from being mistaken for the
-     actual settlement token.
-   - JPYCMarketplace v2.21.0 has an immutable paymentToken; therefore additional
-     collaboration-token settlement requires a Marketplace contract upgrade/deployment.
-   - Marketplace Fee remains 5% and is distributed on-chain by the Marketplace contract
-     to the existing feeWallet in the same ERC20 token used by that contract.
-   - Shop / NFT Payment Profile snapshots from v2.5.5 are preserved unchanged.
+   JNC v2.5.8 — PAYMENT PROFILE FINAL AUDIT
+   - Payment Profile is the Shop/NFT payment identity source.
+   - Marketplace writes resolve the NFT Payment Profile before settlement.
+   - Collaboration lifecycle gates NEW Shop/NFT/Mint only.
+   - Existing NFT Marketplace/Transfer paths remain independent of lifecycle end.
+   - Historical test/future-chain registries and redundant production audits removed.
+   - Current Polygon/JPYC runtime data remains only as a compatibility guard for
+     the already deployed single-token Marketplace contract.
    ========================================================= */
 
-/* =========================================================
-   JNC v2.3.11-2 — BUY / BID RECOVERY
-   BUY and BID both re-read authoritative Marketplace state before ERC20
-   approval/payment and verify the resulting on-chain state after receipt.
-   ========================================================= */
 
 /* =========================================================
    JNC v2.3.10 — AUCTION TRANSACTION VERIFICATION
@@ -639,22 +625,6 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
    - Approval + Auction are documented as two expected transactions when approval is needed.
    ========================================================= */
 
-/* =========================================================
-   JNC v2.3.6 — PRODUCTION AUDIT FIX
-   ---------------------------------------------------------
-   Marketplace creation and transaction actions are now defined through immutable registries.
-   New Listings, Offers and Auctions read their minimum from the shared rule
-   engine instead of duplicating direct minimumNativeWei checks.
-
-   Existing Listings, Offers and Auctions are not revalidated when a rule is
-   changed. This preserves valid market positions created under an earlier
-   minimum. The deployed Marketplace contract remains the final enforcement
-   authority; the interface never pretends that a lower client-side value can
-   bypass an on-chain minimum.
-
-   Chain, deployment, payment asset, Marketplace rules, action routing and payment execution
-   remain separate. No obsolete parallel validation path is retained.
-   ========================================================= */
 
 
 /* =========================================================
@@ -908,7 +878,7 @@ function sleep(ms){return new Promise(resolve=>window.setTimeout(resolve,Math.ma
    Polygon + JPYC is active only because the NFT, Marketplace, fee-wallet,
    JPYC token, decimals and production minimum-price units are configured.
    ========================================================= */
-const JNC_CONFIGURATION_VERSION='2.5.6';
+const JNC_CONFIGURATION_VERSION='2.5.8';
 /* =========================================================
    JNC v2.5.1 — ADMIN REGISTRY FOUNDATION
    ---------------------------------------------------------
@@ -924,12 +894,33 @@ let JNC_ADMIN_PAYMENT_TOKEN_REGISTRY=Object.freeze([]);
 let JNC_ADMIN_REGISTRY_STATUS=Object.freeze({
   loaded:false,
   count:0,
+  activeCount:0,
   updatedAt:'',
   error:''
 });
 
+function normalizeCollaborationLifecycle(record){
+  const now=Date.now();
+  const lifecycle=record&&typeof record.lifecycle==='object'&&record.lifecycle?record.lifecycle:{};
+  const raw=String(lifecycle.status||record?.status||record?.state||'').trim().toLowerCase();
+  const startsAt=String(lifecycle.startsAt||record?.startsAt||record?.startAt||record?.startDate||'').trim();
+  const endsAt=String(lifecycle.endsAt||record?.endsAt||record?.endAt||record?.endDate||'').trim();
+  const startMs=startsAt?Date.parse(startsAt):NaN;
+  const endMs=endsAt?Date.parse(endsAt):NaN;
+  let status='';
+  if(['active','started','live','running','enabled'].includes(raw))status='active';
+  else if(['upcoming','scheduled','pending','draft'].includes(raw))status='upcoming';
+  else if(['stopped','stop','paused','disabled','inactive'].includes(raw))status='stopped';
+  else if(['ended','end','finished','closed','expired'].includes(raw))status='ended';
+  if(Number.isFinite(endMs)&&now>=endMs)status='ended';
+  else if(Number.isFinite(startMs)&&now<startMs)status='upcoming';
+  else if(!status)status=record?.enabled===true?'active':'stopped';
+  const canCreate=status==='active'&&record?.enabled!==false;
+  return Object.freeze({status,canCreate,startsAt,endsAt});
+}
+
 function normalizeAdminRegistryRecord(record){
-  if(!record||record.enabled!==true)return null;
+  if(!record)return null;
   const chain=record.chain||{};
   const paymentToken=record.paymentToken||{};
   const chainKey=String(chain.key||'').trim().toLowerCase();
@@ -938,9 +929,11 @@ function normalizeAdminRegistryRecord(record){
   const tokenSymbol=String(paymentToken.symbol||'').trim().toUpperCase();
   if(!chainKey||!Number.isInteger(chainId)||chainId<=0)return null;
   if(!/^0x[a-fA-F0-9]{40}$/.test(tokenAddress)||!tokenSymbol)return null;
+  const lifecycle=normalizeCollaborationLifecycle(record);
   return Object.freeze({
     projectId:String(record.projectId||`${chainKey}-${tokenSymbol.toLowerCase()}`).trim(),
-    enabled:true,
+    enabled:record.enabled!==false,
+    lifecycle,
     chain:Object.freeze({
       key:chainKey,
       name:String(chain.name||chainKey).trim(),
@@ -972,6 +965,7 @@ async function loadAdminPaymentTokenRegistry(){
     JNC_ADMIN_REGISTRY_STATUS=Object.freeze({
       loaded:true,
       count:records.length,
+      activeCount:records.filter(item=>item.lifecycle.canCreate).length,
       updatedAt:new Date().toISOString(),
       error:''
     });
@@ -981,16 +975,41 @@ async function loadAdminPaymentTokenRegistry(){
     JNC_ADMIN_REGISTRY_STATUS=Object.freeze({
       loaded:false,
       count:JNC_ADMIN_PAYMENT_TOKEN_REGISTRY.length,
+      activeCount:0,
       updatedAt:new Date().toISOString(),
       error:error?.message||String(error)
     });
-    console.warn('[JNC Admin Registry] Existing Polygon / JPYC operation preserved:',error);
+    console.warn('[JNC Admin Registry] New creation paused; existing asset operation preserved:',error);
     return JNC_ADMIN_PAYMENT_TOKEN_REGISTRY;
   }
 }
 
 function getAdminPaymentTokenRegistry(){
   return JNC_ADMIN_PAYMENT_TOKEN_REGISTRY;
+}
+
+function getAdminPaymentProfileByProjectId(projectId){
+  return getAdminPaymentTokenRegistry().find(profile=>String(profile.projectId)===String(projectId))||null;
+}
+
+function isAdminPaymentProfileActive(profileOrProjectId){
+  if(!JNC_ADMIN_REGISTRY_STATUS.loaded)return false;
+  const profile=typeof profileOrProjectId==='object'&&profileOrProjectId
+    ?getAdminPaymentProfileByProjectId(profileOrProjectId.projectId)
+    :getAdminPaymentProfileByProjectId(profileOrProjectId);
+  return !!profile?.lifecycle?.canCreate;
+}
+
+function assertAdminPaymentProfileActive(projectId,label='Payment Profile'){
+  if(!JNC_ADMIN_REGISTRY_STATUS.loaded){
+    throw new Error('Admin Center registry is unavailable. New creation is temporarily paused; existing NFTs remain usable.');
+  }
+  const profile=getAdminPaymentProfileByProjectId(projectId);
+  if(!profile)throw new Error(`${label} is no longer registered in Admin Center.`);
+  if(!profile.lifecycle.canCreate){
+    throw new Error(`${label} is ${profile.lifecycle.status}. New Shop / NFT creation is not available for this collaboration.`);
+  }
+  return profile;
 }
 
 const JNC_DEFAULT_SHOP_PAYMENT_PROFILE=Object.freeze({
@@ -1004,8 +1023,9 @@ const JNC_DEFAULT_SHOP_PAYMENT_PROFILE=Object.freeze({
   })
 });
 function getShopPaymentProfiles(){
+  if(!JNC_ADMIN_REGISTRY_STATUS.loaded)return[];
   const unique=new Map();
-  getAdminPaymentTokenRegistry().forEach(profile=>{
+  getAdminPaymentTokenRegistry().filter(profile=>profile?.lifecycle?.canCreate).forEach(profile=>{
     const key=`${String(profile?.chain?.key||'').toLowerCase()}:${String(profile?.paymentToken?.address||'').toLowerCase()}`;
     if(key!==':'&&!unique.has(key))unique.set(key,profile);
   });
@@ -1047,11 +1067,13 @@ function updateCreateShopPaymentTokens(form){
 function createPaymentProfileSnapshot(projectId){
   const profile=getShopPaymentProfile(projectId);
   if(!profile)throw new Error('The selected Payment Profile is not active in Admin Center.');
+  assertAdminPaymentProfileActive(profile.projectId,'The selected Payment Profile');
   return{
     schemaVersion:1,
     projectId:profile.projectId,
     source:profile.source||'admin-registry',
     snapshotAt:new Date().toISOString(),
+    lifecycleAtSnapshot:{...profile.lifecycle},
     chain:{...profile.chain},
     paymentToken:{...profile.paymentToken}
   };
@@ -1063,6 +1085,7 @@ function normalizeShopPaymentSelection(value){
             projectId:value.projectId||null,
             source:value.source||'snapshot',
             snapshotAt:value.snapshotAt||null,
+            lifecycleAtSnapshot:value.lifecycleAtSnapshot?{...value.lifecycleAtSnapshot}:null,
             chain:{...value.chain},
             paymentToken:{...value.paymentToken}
         };
@@ -1081,6 +1104,23 @@ function normalizeShopPaymentSelection(value){
 function getCollectionPaymentProfile(collectionOrId){
   const collection=typeof collectionOrId==='object'&&collectionOrId?collectionOrId:PNC_STATE.collections.find(item=>String(item.id)===String(collectionOrId));
   return normalizeShopPaymentSelection(collection?.paymentProfile||JNC_DEFAULT_SHOP_PAYMENT_PROFILE);
+}
+function isCollectionOpenForNewNFT(collectionOrId){
+  const collection=typeof collectionOrId==='object'&&collectionOrId?collectionOrId:PNC_STATE.collections.find(item=>String(item.id)===String(collectionOrId));
+  if(!collection)return false;
+  const profile=getCollectionPaymentProfile(collection);
+  return !!profile?.projectId&&isAdminPaymentProfileActive(profile.projectId);
+}
+function assertCollectionOpenForNewNFT(collectionOrId){
+  const collection=typeof collectionOrId==='object'&&collectionOrId?collectionOrId:PNC_STATE.collections.find(item=>String(item.id)===String(collectionOrId));
+  if(!collection)throw new Error('Shop not found.');
+  const profile=getCollectionPaymentProfile(collection);
+  if(!profile?.projectId)throw new Error('This Shop does not have an Admin Center Payment Profile.');
+  assertAdminPaymentProfileActive(profile.projectId,`Shop Payment Profile (${paymentProfileLabel(profile)})`);
+  return collection;
+}
+function creatorMintEligibleCollections(state){
+  return creatorOwnedCollections(state).filter(isCollectionOpenForNewNFT);
 }
 function getNFTPaymentProfile(nft){
   if(nft?.paymentProfile)return normalizeShopPaymentSelection(nft.paymentProfile);
@@ -1137,20 +1177,25 @@ function collectionPaymentTokenBadgeHtml(collection){
 }
 function syncCreateNFTShopProfile(form){
   if(!form)return;
-  const profile=getCollectionPaymentProfile(form.elements.collectionId?.value);
+  const collectionId=form.elements.collectionId?.value;
+  const profile=getCollectionPaymentProfile(collectionId);
   const preview=form.querySelector('[data-nft-payment-preview]');
   if(preview)preview.textContent=paymentProfileLabel(profile);
+  const chainSelect=form.elements.targetChainKey;
+  if(chainSelect){
+    chainSelect.innerHTML=`<option value="${esc(profile.chain.key)}" selected>${esc(profile.chain.name)} (${esc(profile.chain.nativeSymbol||profile.chain.chainId)})</option>`;
+  }
 }
 
+/* =========================================================
+   JNC v2.5.8 — PAYMENT PROFILE FINAL RUNTIME
+   ---------------------------------------------------------
+   Admin Center Payment Profiles own Shop/NFT payment identity.
+   This block contains only the currently deployed Marketplace runtime
+   required to verify that a selected Payment Profile can settle on-chain.
+   Historical Sepolia and disabled future-chain registries were removed.
+   ========================================================= */
 const JNC_ENVIRONMENT_REGISTRY=Object.freeze({
-  development:Object.freeze({
-    id:'development',label:'Development',production:false,enabled:true,
-    allowMarketplaceWrites:false,requireVerifiedContracts:false
-  }),
-  test:Object.freeze({
-    id:'test',label:'Test',production:false,enabled:true,
-    allowMarketplaceWrites:true,requireVerifiedContracts:true
-  }),
   production:Object.freeze({
     id:'production',label:'Production',production:true,enabled:true,
     allowMarketplaceWrites:true,requireVerifiedContracts:true
@@ -1158,91 +1203,41 @@ const JNC_ENVIRONMENT_REGISTRY=Object.freeze({
 });
 const JNC_CONFIGURATION=Object.freeze({
   version:JNC_CONFIGURATION_VERSION,
-  edition:'identity-minimum-unification',
+  edition:'payment-profile-final',
   activeEnvironmentKey:'production',
   activeDeploymentKey:'polygonJpyc',
   productionDeploymentKey:'polygonJpyc',
-  launchTarget:Object.freeze({
-    chainKey:'polygon',
-    paymentAssetKey:'polygonJpyc',
-    deploymentKey:'polygonJpyc'
-  }),
-  supportedChainKeys:Object.freeze(['sepolia','polygon','ethereum','avalanche','bnb']),
-  futureProductionChainKeys:Object.freeze(['ethereum','avalanche','bnb']),
-  activationPolicy:Object.freeze({
-    requireVerifiedContracts:true,
-    requireVerifiedPaymentAsset:true,
-    requireConfiguredMinimumUnits:true,
-    keepTestActiveUntilProductionReady:false
-  })
+  launchTarget:Object.freeze({chainKey:'polygon',paymentAssetKey:'polygonJpyc',deploymentKey:'polygonJpyc'})
 });
-function getEnvironmentConfig(environmentKey){
-  return requireRegistryEntry(JNC_ENVIRONMENT_REGISTRY,environmentKey,'Environment');
+function requireRegistryEntry(registry,key,label){
+  const entry=registry[key];
+  if(!entry)throw new Error(`${label} registry entry is missing: ${key}`);
+  return entry;
 }
-function getActiveEnvironmentConfig(){
-  return getEnvironmentConfig(JNC_CONFIGURATION.activeEnvironmentKey);
-}
+function getEnvironmentConfig(environmentKey){return requireRegistryEntry(JNC_ENVIRONMENT_REGISTRY,environmentKey,'Environment');}
+function getActiveEnvironmentConfig(){return getEnvironmentConfig(JNC_CONFIGURATION.activeEnvironmentKey);}
 
+/* Runtime chain data is compatibility data for the currently deployed contracts,
+   not a source for new Shop/NFT Payment Profiles. */
 const JNC_CHAIN_REGISTRY=Object.freeze({
-  sepolia:Object.freeze({
-    id:'sepolia',chainId:'0xaa36a7',name:'Sepolia Testnet',family:'evm',
-    nativeSymbol:'SepoliaETH',environment:'test',enabled:true,iconKey:'',launchTarget:false,
-    walletAddable:false,rpcUrls:Object.freeze([]),blockExplorerUrls:Object.freeze(['https://sepolia.etherscan.io/'])
-  }),
   polygon:Object.freeze({
-    id:'polygon',chainId:'0x89',name:'Polygon',family:'evm',
-    nativeSymbol:'POL',environment:'production',enabled:true,iconKey:'polygon',launchTarget:true,
-    walletAddable:true,rpcUrls:Object.freeze(['https://polygon.drpc.org']),blockExplorerUrls:Object.freeze(['https://polygonscan.com/'])
-  }),
-  ethereum:Object.freeze({
-    id:'ethereum',chainId:'0x1',name:'Ethereum',family:'evm',
-    nativeSymbol:'ETH',environment:'production',enabled:false,iconKey:'',launchTarget:false,
-    walletAddable:false,rpcUrls:Object.freeze([]),blockExplorerUrls:Object.freeze([])
-  }),
-  avalanche:Object.freeze({
-    id:'avalanche',chainId:'0xa86a',name:'Avalanche C-Chain',family:'evm',
-    nativeSymbol:'AVAX',environment:'production',enabled:false,iconKey:'',launchTarget:false,
-    walletAddable:false,rpcUrls:Object.freeze([]),blockExplorerUrls:Object.freeze([])
-  }),
-  bnb:Object.freeze({
-    id:'bnb',chainId:'0x38',name:'BNB Smart Chain',family:'evm',
-    nativeSymbol:'BNB',environment:'production',enabled:false,iconKey:'',launchTarget:false,
-    walletAddable:false,rpcUrls:Object.freeze([]),blockExplorerUrls:Object.freeze([])
+    id:'polygon',chainId:'0x89',name:'Polygon',family:'evm',nativeSymbol:'POL',environment:'production',
+    enabled:true,iconKey:'polygon',walletAddable:true,
+    rpcUrls:Object.freeze(['https://polygon.drpc.org']),blockExplorerUrls:Object.freeze(['https://polygonscan.com/'])
   })
 });
-
-const JNC_MARKETPLACE_MINIMUM=Object.freeze({
-  symbol:'JPYC',
-  displayAmount:'1',
-  baseUnits:'1000000000000000000'
-});
-
+const JNC_MARKETPLACE_MINIMUM=Object.freeze({displayAmount:'1',baseUnits:'1000000000000000000'});
 const JNC_PAYMENT_ASSET_REGISTRY=Object.freeze({
-  sepoliaNative:Object.freeze({
-    id:'sepoliaNative',chainKey:'sepolia',type:'native',symbol:'SepoliaETH',
-    name:'Sepolia Ether',decimals:18,contractAddress:'',enabled:true,
-    minimumBaseUnits:null,
-    purpose:'Current Phase 1 compatibility payment'
-  }),
   polygonJpyc:Object.freeze({
-    id:'polygonJpyc',chainKey:'polygon',type:'erc20',symbol:'JPYC',
-    name:'JPYC',decimals:18,contractAddress:'0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29',enabled:true,verified:true,
-    status:'active-production',minimumBaseUnits:JNC_MARKETPLACE_MINIMUM.baseUnits,
-    purpose:'Polygon production payment using verified JPYC ERC20; minimum Marketplace amount is 1 JPYC'
+    id:'polygonJpyc',chainKey:'polygon',type:'erc20',symbol:'JPYC',name:'JPYC',decimals:18,
+    contractAddress:'0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29',enabled:true,verified:true,
+    minimumBaseUnits:JNC_MARKETPLACE_MINIMUM.baseUnits
   })
 });
-
 const JNC_DEPLOYMENT_REGISTRY=Object.freeze({
-  sepoliaTest:Object.freeze({
-    id:'sepoliaTest',chainKey:'sepolia',paymentAssetKey:'sepoliaNative',environmentKey:'test',enabled:true,verified:true,status:'active-test',
-    contracts:Object.freeze({
-      nft:'0x621AEECB9374E2A57F767564E1dc999478d440c7',
-      marketplace:'0xAdAcd3ceef3629f4031E9d4F189Fbd198691f044',
-      feeWallet:'0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5'
-    })
-  }),
   polygonJpyc:Object.freeze({
-    id:'polygonJpyc',chainKey:'polygon',paymentAssetKey:'polygonJpyc',environmentKey:'production',enabled:true,verified:true,status:'active-production',
+    id:'polygonJpyc',chainKey:'polygon',paymentAssetKey:'polygonJpyc',environmentKey:'production',
+    enabled:true,verified:true,
     contracts:Object.freeze({
       nft:'0xeFf5f71E382E8668Db8a0894ED12D6e4c741b370',
       marketplace:'0xab83444A0f35D5388Fa2B6161aC177aA4Aabb1Eb',
@@ -1250,57 +1245,7 @@ const JNC_DEPLOYMENT_REGISTRY=Object.freeze({
     })
   })
 });
-
-function getProductionDeployment(){
-  return requireRegistryEntry(JNC_DEPLOYMENT_REGISTRY,JNC_CONFIGURATION.productionDeploymentKey,'Production deployment');
-}
-function getLaunchTargetConfiguration(){
-  const target=JNC_CONFIGURATION.launchTarget;
-  const chain=requireRegistryEntry(JNC_CHAIN_REGISTRY,target.chainKey,'Launch chain');
-  const asset=requireRegistryEntry(JNC_PAYMENT_ASSET_REGISTRY,target.paymentAssetKey,'Launch payment asset');
-  const deployment=requireRegistryEntry(JNC_DEPLOYMENT_REGISTRY,target.deploymentKey,'Launch deployment');
-  if(chain.id!==deployment.chainKey)throw new Error('Launch deployment chain does not match launch chain.');
-  if(asset.id!==deployment.paymentAssetKey)throw new Error('Launch deployment payment asset does not match launch payment asset.');
-  if(asset.chainKey!==chain.id)throw new Error('Launch payment asset chain does not match launch chain.');
-  return Object.freeze({chain,asset,deployment});
-}
-function runProductionReadinessAudit(){
-  const checks=[];
-  let target=null;
-  try{
-    target=getLaunchTargetConfiguration();
-    checks.push(paymentAuditCheck('launchTargetConfiguration',true,target.deployment.id));
-  }catch(error){
-    checks.push(paymentAuditCheck('launchTargetConfiguration',false,error.message||error));
-    return Object.freeze({version:JNC_CONFIGURATION_VERSION,ready:false,checks:Object.freeze(checks),target:null});
-  }
-  const {chain,asset,deployment}=target;
-  const environment=getEnvironmentConfig(deployment.environmentKey||chain.environment);
-  checks.push(paymentAuditCheck('productionEnvironment',environment.production===true,environment.id));
-  checks.push(paymentAuditCheck('polygonLaunchChain',chain.id===JNC_CONFIGURATION.launchTarget.chainKey,chain.id));
-  checks.push(paymentAuditCheck('polygonChainId',normalizeChainId(chain.chainId)==='0x89',chain.chainId));
-  checks.push(paymentAuditCheck('polygonRpcConfigured',Array.isArray(chain.rpcUrls)&&chain.rpcUrls.length>0,chain.rpcUrls?.[0]||''));
-  checks.push(paymentAuditCheck('polygonExplorerConfigured',Array.isArray(chain.blockExplorerUrls)&&chain.blockExplorerUrls.length>0,chain.blockExplorerUrls?.[0]||''));
-  checks.push(paymentAuditCheck('productionNftContract',isValidEvmAddress(deployment.contracts.nft),deployment.contracts.nft));
-  checks.push(paymentAuditCheck('productionMarketplaceContract',isValidEvmAddress(deployment.contracts.marketplace),deployment.contracts.marketplace));
-  checks.push(paymentAuditCheck('productionFeeWallet',isValidEvmAddress(deployment.contracts.feeWallet),deployment.contracts.feeWallet));
-  checks.push(paymentAuditCheck('productionDeploymentVerified',deployment.verified===true,String(deployment.verified)));
-  checks.push(paymentAuditCheck('jpycTokenAddress',isValidEvmAddress(asset.contractAddress),asset.contractAddress));
-  checks.push(paymentAuditCheck('jpycDecimals',Number.isInteger(asset.decimals)&&asset.decimals>=0&&asset.decimals<=255,String(asset.decimals)));
-  checks.push(paymentAuditCheck('jpycMinimumUnits',getConfiguredAssetMinimumBaseUnits(asset)!==null,String(asset.minimumBaseUnits??'')));
-  checks.push(paymentAuditCheck('jpycMinimumSourceUnified',String(asset.minimumBaseUnits)===JNC_MARKETPLACE_MINIMUM.baseUnits,JNC_MARKETPLACE_MINIMUM.displayAmount+' '+JNC_MARKETPLACE_MINIMUM.symbol));
-  checks.push(paymentAuditCheck('jpycAssetVerified',asset.verified===true,String(asset.verified)));
-  const ready=checks.every(check=>check.ok);
-  return Object.freeze({version:JNC_CONFIGURATION_VERSION,ready,checks:Object.freeze(checks),target});
-}
-const JNC_PRODUCTION_READINESS_REPORT=runProductionReadinessAudit();
-
 const JNC_ACTIVE_DEPLOYMENT_KEY=JNC_CONFIGURATION.activeDeploymentKey;
-function requireRegistryEntry(registry,key,label){
-  const entry=registry[key];
-  if(!entry)throw new Error(`${label} registry entry is missing: ${key}`);
-  return entry;
-}
 function getActiveDeployment(){
   const deployment=requireRegistryEntry(JNC_DEPLOYMENT_REGISTRY,JNC_ACTIVE_DEPLOYMENT_KEY,'Deployment');
   if(!deployment.enabled)throw new Error(`Active deployment is disabled: ${JNC_ACTIVE_DEPLOYMENT_KEY}`);
@@ -1315,59 +1260,48 @@ function getActiveChainConfig(){
 function getActivePaymentAsset(){
   const deployment=getActiveDeployment();
   const asset=requireRegistryEntry(JNC_PAYMENT_ASSET_REGISTRY,deployment.paymentAssetKey,'Payment asset');
-  if(!asset.enabled)throw new Error(`Active payment asset is disabled: ${deployment.paymentAssetKey}`);
-  if(asset.chainKey!==deployment.chainKey)throw new Error('Payment asset chain does not match deployment chain.');
+  if(!asset.enabled||asset.chainKey!==deployment.chainKey)throw new Error('Active payment asset is unavailable or mismatched.');
   return asset;
 }
+function getProductionDeployment(){return getActiveDeployment();}
+function getLaunchTargetConfiguration(){
+  return Object.freeze({chain:getActiveChainConfig(),asset:getActivePaymentAsset(),deployment:getActiveDeployment()});
+}
 function validateActiveArchitecture(){
-  const deployment=getActiveDeployment(),chain=getActiveChainConfig(),asset=getActivePaymentAsset();
-  const environment=getEnvironmentConfig(deployment.environmentKey||chain.environment);
-  if(!environment.enabled)throw new Error(`Active environment is disabled: ${environment.id}`);
-  if(environment.id!==JNC_CONFIGURATION.activeEnvironmentKey)throw new Error(`Active deployment environment mismatch: ${environment.id}`);
-  if(chain.environment!==environment.id)throw new Error(`Active chain environment mismatch: ${chain.environment}`);
-  if(!JNC_CONFIGURATION.supportedChainKeys.includes(chain.id))throw new Error(`Active chain is not registered in configuration: ${chain.id}`);
-  const requiredContracts=['nft','marketplace','feeWallet'];
-  for(const key of requiredContracts){
-    if(!/^0x[a-fA-F0-9]{40}$/.test(String(deployment.contracts[key]||''))){
-      throw new Error(`Active deployment contract is invalid: ${key}`);
-    }
-  }
-  if(asset.type==='erc20'&&!/^0x[a-fA-F0-9]{40}$/.test(String(asset.contractAddress||''))){
-    throw new Error('Active ERC20 payment contract is invalid.');
-  }
+  const deployment=getActiveDeployment(),chain=getActiveChainConfig(),asset=getActivePaymentAsset(),environment=getActiveEnvironmentConfig();
+  if(!environment.enabled||!environment.allowMarketplaceWrites)throw new Error('Production Marketplace writes are disabled.');
+  for(const key of ['nft','marketplace','feeWallet'])if(!isValidEvmAddress(deployment.contracts[key]))throw new Error(`Active deployment contract is invalid: ${key}`);
+  if(asset.type!=='erc20'||!isValidEvmAddress(asset.contractAddress))throw new Error('Active ERC20 payment contract is invalid.');
   return Object.freeze({deployment,chain,asset,environment,configuration:JNC_CONFIGURATION});
 }
 const JNC_ACTIVE_ARCHITECTURE=validateActiveArchitecture();
-const JNC_LAUNCH_CHAIN_KEY=JNC_CONFIGURATION.launchTarget.chainKey;
-function getChainConfig(chainKey){return requireRegistryEntry(JNC_CHAIN_REGISTRY,chainKey,'Chain');}
+const JNC_LAUNCH_CHAIN_KEY=JNC_ACTIVE_ARCHITECTURE.chain.id;
 function getDeploymentByNftContract(contractAddress){
-  const contract=lc(contractAddress);
-  if(!contract)return null;
-  return Object.values(JNC_DEPLOYMENT_REGISTRY).find(deployment=>lc(deployment?.contracts?.nft)===contract)||null;
+  return lc(contractAddress)===lc(JNC_ACTIVE_ARCHITECTURE.deployment.contracts.nft)?JNC_ACTIVE_ARCHITECTURE.deployment:null;
 }
 function getNFTChainKey(nft){
-  const contractDeployment=getDeploymentByNftContract(nft&&nft.contractAddress);
-  if(contractDeployment)return contractDeployment.chainKey;
-  const explicit=String(nft&&nft.chainKey||'').trim();
-  if(explicit&&JNC_CHAIN_REGISTRY[explicit])return explicit;
-  return 'legacy';
+  if(getDeploymentByNftContract(nft?.contractAddress))return JNC_ACTIVE_ARCHITECTURE.chain.id;
+  const profile=getNFTPaymentProfile(nft);
+  return String(profile?.chain?.key||nft?.chainKey||'legacy').trim()||'legacy';
 }
 function getNFTPaymentAsset(nft){
-  const deployment=getDeploymentByNftContract(nft&&nft.contractAddress);
-  return deployment?JNC_PAYMENT_ASSET_REGISTRY[deployment.paymentAssetKey]||null:null;
+  const profile=getNFTPaymentProfile(nft);
+  if(profile?.paymentToken)return profile.paymentToken;
+  return getDeploymentByNftContract(nft?.contractAddress)?JNC_ACTIVE_ARCHITECTURE.asset:null;
 }
-function getNFTCurrencyUnit(nft){
-  return getNFTPaymentProfile(nft)?.paymentToken?.symbol||getNFTPaymentAsset(nft)?.symbol||'';
-}
+function getNFTCurrencyUnit(nft){return String(getNFTPaymentProfile(nft)?.paymentToken?.symbol||'');}
 function getChainVisual(chainKey){
-  const chain=JNC_CHAIN_REGISTRY[chainKey];
-  if(!chain)return{name:'Legacy',nativeSymbol:'',logo:''};
-  return{name:chain.name,nativeSymbol:chain.nativeSymbol,logo:chain.iconKey&&JPYC_UI_ICONS[chain.iconKey]?JPYC_UI_ICONS[chain.iconKey]:''};
+  const runtime=JNC_CHAIN_REGISTRY[chainKey];
+  if(runtime)return{name:runtime.name,nativeSymbol:runtime.nativeSymbol,logo:runtime.iconKey&&JPYC_UI_ICONS[runtime.iconKey]?JPYC_UI_ICONS[runtime.iconKey]:''};
+  const profile=getAdminPaymentTokenRegistry().find(item=>item?.chain?.key===chainKey);
+  return profile?{name:profile.chain.name,nativeSymbol:profile.chain.nativeSymbol,logo:''}:{name:chainKey||'Legacy',nativeSymbol:'',logo:''};
 }
 function chainBadgeHtml(nft){
-  const visual=getChainVisual(getNFTChainKey(nft));
-  return `<span class="chain-badge">${visual.logo?`<img class="chain-logo" src="${visual.logo}" alt="">`:''}<span>${esc(visual.name)}</span></span>`;
+  const profile=getNFTPaymentProfile(nft),chain=profile?.chain||{};
+  const visual=getChainVisual(chain.key||getNFTChainKey(nft));
+  return `<span class="chain-badge">${visual.logo?`<img class="chain-logo" src="${visual.logo}" alt="">`:''}<span>${esc(chain.name||visual.name)}</span></span>`;
 }
+
 function encodeERC20BalanceOfCall(account){return '0x70a08231'+addrWord(account);}
 function encodeERC20AllowanceCall(owner,spender){return '0xdd62ed3e'+addrWord(owner)+addrWord(spender);}
 function encodeERC20ApproveCall(spender,amount){return '0x095ea7b3'+addrWord(spender)+toHex(amount).slice(2);}
@@ -1409,10 +1343,7 @@ async function ensureERC20Allowance({tokenAddress,owner,spender,requiredAmount})
   return{approved:true,allowance,txHash,resetTxHash};
 }
 
-const JNC_PAYMENT_ENGINES=Object.freeze({
-  native:Object.freeze({id:'native'}),
-  erc20:Object.freeze({id:'erc20'})
-});
+const JNC_PAYMENT_ENGINES=Object.freeze({erc20:Object.freeze({id:'erc20'})});
 
 function getMarketplacePaymentEngine(nftOrProfile){
   const route=resolveMarketplacePaymentRoute(nftOrProfile);
@@ -1460,10 +1391,10 @@ async function executeMarketplacePayment(request,nftOrProfile){
 const JNC_MARKETPLACE_RULES=Object.freeze({
   version:'2026-07-28',
   minimums:Object.freeze({
-    list:Object.freeze({source:'JNC_MARKETPLACE_MINIMUM',applyOnCreate:true,preserveExisting:true}),
-    createOffer:Object.freeze({source:'JNC_MARKETPLACE_MINIMUM',applyOnCreate:true,preserveExisting:true}),
-    createAuction:Object.freeze({source:'JNC_MARKETPLACE_MINIMUM',applyOnCreate:true,preserveExisting:true}),
-    auctionBuyNow:Object.freeze({source:'JNC_MARKETPLACE_MINIMUM',applyOnCreate:true,preserveExisting:true}),
+    list:Object.freeze({source:'runtimeMarketplaceMinimum',applyOnCreate:true,preserveExisting:true}),
+    createOffer:Object.freeze({source:'runtimeMarketplaceMinimum',applyOnCreate:true,preserveExisting:true}),
+    createAuction:Object.freeze({source:'runtimeMarketplaceMinimum',applyOnCreate:true,preserveExisting:true}),
+    auctionBuyNow:Object.freeze({source:'runtimeMarketplaceMinimum',applyOnCreate:true,preserveExisting:true}),
     bidIncrement:Object.freeze({source:'marketplaceContract'})
   }),
   fees:Object.freeze({
@@ -1519,53 +1450,33 @@ function assertMarketplaceIntegration(){
 
 
 /* =========================================================
-   JNC v2.5.4 — RUNTIME STARTUP REPAIR
-   - Keeps the production architecture audit version aligned with
-     JNC_CONFIGURATION_VERSION so the fail-closed startup audit does not
-     reject this completed v2.5.4 configuration.
-   - No Marketplace, wallet, storage, Admin Registry or transaction route
-     is changed by this repair.
+   JNC v2.5.8 — FINAL ARCHITECTURE AUDIT
+   One compact audit verifies the live runtime compatibility layer.
+   Payment identity itself remains owned by Payment Profile snapshots.
    ========================================================= */
-
-/* =========================================================
-   JNC v2.3.6 — PRODUCTION ARCHITECTURE AUDIT
-   ---------------------------------------------------------
-   architectureComplete verifies the configuration and fail-closed safeguards.
-   productionReady becomes true only after verified Polygon contracts and JPYC
-   token units are supplied. Polygon production is now deliberately active.
-   ========================================================= */
-const JNC_PRODUCTION_AUDIT_VERSION='2.5.6';
+const JNC_PRODUCTION_AUDIT_VERSION='2.5.8';
 function runProductionArchitectureAudit(){
-  const checks=[];
-  const activeDeployment=getActiveDeployment();
-  const activeEnvironment=getActiveEnvironmentConfig();
-  const target=getLaunchTargetConfiguration();
-  const productionReady=JNC_PRODUCTION_READINESS_REPORT.ready===true;
-  checks.push(paymentAuditCheck('configurationVersionFinal',JNC_CONFIGURATION.version===JNC_PRODUCTION_AUDIT_VERSION,JNC_CONFIGURATION.version));
-  checks.push(paymentAuditCheck('configurationEditionFinal',JNC_CONFIGURATION.edition==='identity-minimum-unification',JNC_CONFIGURATION.edition));
-  checks.push(paymentAuditCheck('activeProductionDeployment',activeDeployment.id==='polygonJpyc'&&activeDeployment.enabled===true,activeDeployment.id));
-  checks.push(paymentAuditCheck('activeProductionEnvironment',activeEnvironment.id==='production'&&activeEnvironment.production===true,activeEnvironment.id));
-  checks.push(paymentAuditCheck('polygonIsLaunchTarget',target.chain.id==='polygon'&&normalizeChainId(target.chain.chainId)==='0x89',`${target.chain.id}/${target.chain.chainId}`));
-  checks.push(paymentAuditCheck('productionDeploymentKeyUnified',JNC_CONFIGURATION.productionDeploymentKey===target.deployment.id,target.deployment.id));
-  checks.push(paymentAuditCheck('productionPaymentAssetKeyUnified',JNC_CONFIGURATION.launchTarget.paymentAssetKey===target.asset.id,target.asset.id));
-  checks.push(paymentAuditCheck('futureChainsDisabled',JNC_CONFIGURATION.futureProductionChainKeys.every(key=>JNC_CHAIN_REGISTRY[key]?.enabled===false),JNC_CONFIGURATION.futureProductionChainKeys.join(',')));
-  checks.push(paymentAuditCheck('marketplaceIntegrationComplete',JNC_MARKETPLACE_INTEGRATION_REPORT.ok===true,String(JNC_MARKETPLACE_INTEGRATION_REPORT.ok)));
-  checks.push(paymentAuditCheck('marketplaceActionCount',Object.keys(JNC_MARKETPLACE_ACTION_REGISTRY).length===14,String(Object.keys(JNC_MARKETPLACE_ACTION_REGISTRY).length)));
-  checks.push(paymentAuditCheck('paymentEngineCoverage',!!JNC_PAYMENT_ENGINES.native&&!!JNC_PAYMENT_ENGINES.erc20,Object.keys(JNC_PAYMENT_ENGINES).join(',')));
-  checks.push(paymentAuditCheck('productionDeploymentReady',productionReady&&target.deployment.enabled===true&&target.asset.enabled===true,`${productionReady}/${target.deployment.enabled}/${target.asset.enabled}`));
-  checks.push(paymentAuditCheck('productionActivationConsistency',!target.deployment.enabled||productionReady,String(productionReady)));
-  checks.push(paymentAuditCheck('productionAssetActivationConsistency',!target.asset.enabled||productionReady,String(productionReady)));
-  checks.push(paymentAuditCheck('productionActivationPolicy',JNC_CONFIGURATION.activationPolicy.keepTestActiveUntilProductionReady===false,String(JNC_CONFIGURATION.activationPolicy.keepTestActiveUntilProductionReady))); 
+  const architecture=validateActiveArchitecture();
+  const {deployment,chain,asset,environment}=architecture;
+  const checks=[
+    paymentAuditCheck('configurationVersion',JNC_CONFIGURATION.version===JNC_PRODUCTION_AUDIT_VERSION,JNC_CONFIGURATION.version),
+    paymentAuditCheck('paymentProfileEdition',JNC_CONFIGURATION.edition==='payment-profile-final',JNC_CONFIGURATION.edition),
+    paymentAuditCheck('productionEnvironment',environment.production===true&&environment.allowMarketplaceWrites===true,environment.id),
+    paymentAuditCheck('runtimeChain',chain.enabled===true,`${chain.id}/${chain.chainId}`),
+    paymentAuditCheck('runtimeNft',isValidEvmAddress(deployment.contracts.nft),deployment.contracts.nft),
+    paymentAuditCheck('runtimeMarketplace',isValidEvmAddress(deployment.contracts.marketplace),deployment.contracts.marketplace),
+    paymentAuditCheck('runtimeFeeWallet',isValidEvmAddress(deployment.contracts.feeWallet),deployment.contracts.feeWallet),
+    paymentAuditCheck('runtimePaymentToken',asset.type==='erc20'&&isValidEvmAddress(asset.contractAddress),asset.contractAddress),
+    paymentAuditCheck('marketplaceIntegration',JNC_MARKETPLACE_INTEGRATION_REPORT.ok===true,String(JNC_MARKETPLACE_INTEGRATION_REPORT.ok))
+  ];
   const architectureComplete=checks.every(check=>check.ok);
-  return Object.freeze({version:JNC_PRODUCTION_AUDIT_VERSION,architectureComplete,productionReady,activeDeployment:activeDeployment.id,productionDeployment:target.deployment.id,checks:Object.freeze(checks),readiness:JNC_PRODUCTION_READINESS_REPORT});
+  return Object.freeze({version:JNC_PRODUCTION_AUDIT_VERSION,architectureComplete,productionReady:architectureComplete,activeDeployment:deployment.id,productionDeployment:deployment.id,checks:Object.freeze(checks)});
 }
 const JNC_PRODUCTION_AUDIT_REPORT=runProductionArchitectureAudit();
 function assertProductionArchitectureAudit(){
-  const report=JNC_PRODUCTION_AUDIT_REPORT;
-  if(report.architectureComplete)return report;
-  const failed=report.checks.filter(check=>!check.ok).map(check=>`${check.id}${check.detail?`: ${check.detail}`:''}`);
-  const error=new Error(`Production Architecture Audit failed: ${failed.join(', ')}`);
-  error.code='PRODUCTION_ARCHITECTURE_AUDIT_FAILED';error.report=report;throw error;
+  if(JNC_PRODUCTION_AUDIT_REPORT.architectureComplete)return JNC_PRODUCTION_AUDIT_REPORT;
+  const failed=JNC_PRODUCTION_AUDIT_REPORT.checks.filter(check=>!check.ok).map(check=>check.id);
+  throw new Error(`Production Architecture Audit failed: ${failed.join(', ')}`);
 }
 const JNC_PRODUCTION_ARCHITECTURE=assertProductionArchitectureAudit();
 function getMarketplaceRule(action){
@@ -1582,9 +1493,6 @@ function getMarketplaceMinimumBaseUnits(action,state=PNC_STATE){
   const rule=getMarketplaceRule(action);
   if(!rule||rule.applyOnCreate!==true)return 0n;
   const asset=getActivePaymentAsset();
-  if(asset.type==='native'){
-    return BigInt(state?.market?.minimumNativeWei||'0');
-  }
   if(asset.type==='erc20'){
     const configured=getConfiguredAssetMinimumBaseUnits(asset);
     if(configured===null){
@@ -1610,7 +1518,6 @@ function validateMarketplaceMinimum(action,amountBaseUnits,state=PNC_STATE){
 function getMarketplaceMinimumDisplay(action,state=PNC_STATE){
   const minimum=getMarketplaceMinimumBaseUnits(action,state);
   const asset=getActivePaymentAsset();
-  if(asset.type==='native')return weiToEth(minimum.toString());
   if(Number.isInteger(asset.decimals)&&asset.decimals>=0){
     const scale=10n**BigInt(asset.decimals);
     const whole=minimum/scale,remainder=(minimum%scale).toString().padStart(asset.decimals,'0').replace(/0+$/,'');
@@ -1665,7 +1572,7 @@ async function executeMarketplaceTransaction(request={}){
    units before Marketplace writes are allowed. Disabled future deployments
    may retain placeholders, but the active deployment may not.
    ========================================================= */
-const JNC_PAYMENT_AUDIT_VERSION='2.5.6-marketplace-payment-routing';
+const JNC_PAYMENT_AUDIT_VERSION='2.5.8-payment-profile-final-audit';
 function paymentAuditCheck(id,ok,detail=''){
   return Object.freeze({id,ok:!!ok,detail:String(detail||'')});
 }
@@ -1680,9 +1587,6 @@ function runPaymentAudit(){
     return Object.freeze({version:JNC_PAYMENT_AUDIT_VERSION,ok:false,checks,architecture:null});
   }
   const {deployment,chain,asset,environment,configuration}=architecture;
-  checks.push(paymentAuditCheck('configurationVersion',configuration.version===JNC_CONFIGURATION_VERSION,configuration.version));
-  checks.push(paymentAuditCheck('activeDeploymentKey',configuration.activeDeploymentKey===deployment.id,deployment.id));
-  checks.push(paymentAuditCheck('activeEnvironmentKey',configuration.activeEnvironmentKey===environment.id,environment.id));
   checks.push(paymentAuditCheck('environmentEnabled',environment.enabled===true,environment.id));
   checks.push(paymentAuditCheck('marketplaceWritesAllowed',environment.allowMarketplaceWrites===true,String(environment.allowMarketplaceWrites)));
   checks.push(paymentAuditCheck('chainEnabled',chain.enabled===true,chain.id));
@@ -1693,7 +1597,6 @@ function runPaymentAudit(){
   checks.push(paymentAuditCheck('feeWallet',isValidEvmAddress(deployment.contracts.feeWallet),deployment.contracts.feeWallet));
   checks.push(paymentAuditCheck('paymentEngine',!!JNC_PAYMENT_ENGINES[asset.type],asset.type));
   checks.push(paymentAuditCheck('marketplaceIntegration',JNC_MARKETPLACE_INTEGRATION_REPORT.ok,String(JNC_MARKETPLACE_INTEGRATION_REPORT.ok)));
-  checks.push(paymentAuditCheck('productionArchitectureAudit',JNC_PRODUCTION_AUDIT_REPORT.architectureComplete,String(JNC_PRODUCTION_AUDIT_REPORT.architectureComplete)));
   checks.push(paymentAuditCheck('marketplaceActionRegistry',Object.keys(JNC_MARKETPLACE_ACTION_REGISTRY).length===14,String(Object.keys(JNC_MARKETPLACE_ACTION_REGISTRY).length)));
   checks.push(paymentAuditCheck('assetDecimals',Number.isInteger(asset.decimals)&&asset.decimals>=0&&asset.decimals<=255,String(asset.decimals)));
   if(asset.type==='native'){
@@ -1740,7 +1643,7 @@ function canAuctionNFT(nft,state=PNC_STATE){const c=marketplacePermissionContext
    applies creation-time minimum rules from JNC_MARKETPLACE_RULES, and keeps
    payment settlement delegated to executeMarketplacePayment(). */
 const PNC_CONFIG={
-  app:{version:'v2.5.6-marketplace-payment-routing',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
+  app:{version:'v2.5.8-payment-profile-final-audit',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
   production:{
     deploymentKey:JNC_CONFIGURATION.productionDeploymentKey,
     chainKey:JNC_CONFIGURATION.launchTarget.chainKey,
@@ -3266,8 +3169,8 @@ function editShopFormHtml(state){
   return`<div class="card"><h2>${esc(t('creator.editShop'))}</h2><div class="note owner-note">${esc(t('creator.onlyOwnedShops'))}<br>${esc(t('creator.shopDataUnchanged'))}</div><form class="form" autocomplete="off" onsubmit="event.preventDefault();saveEditedShop(this);"><label class="edit-shop-selector">${esc(t('creator.shopToEdit'))}<select name="shopSelector" onchange="selectEditShop(this.value)">${options}</select><span class="edit-shop-summary">${esc(t('common.creator'))}: ${esc(short(shop.creator))} · ${esc(t('creator.publicNfts'))}: ${collectionItems(state,shop.id).length}</span></label><input type="hidden" name="shopId" value="${esc(shop.id)}"><div class="chain-select-preview"><div class="chain-select-copy"><strong>${esc(paymentProfileLabel(getCollectionPaymentProfile(shop)))}</strong><span>Payment Profile Snapshot is fixed when the Shop is created.</span></div></div><label>${esc(t('creator.shopName'))}<input name="name" value="${esc(shop.name||'')}" required></label><label>${esc(t('creator.description'))}<textarea name="description" placeholder="${esc(t('creator.shopDescriptionPlaceholder'))}">${esc(shop.description||'')}</textarea></label><label>${esc(t('creator.currentShopImage'))}<div class="shop-edit-preview ${img?'has-image':''}" ${img?`style="background-image:url('${esc(ipfs(img))}')"`:''}>🏪</div></label><label>${esc(t('creator.replaceShopImage'))}<span>${esc(t('creator.replaceShopImageHelp'))}</span><input name="shopImageFile" type="file" accept="image/*"></label><div class="storage-settings"><div class="storage-settings-title">${esc(t('creator.storageSettings'))}</div><div class="storage-status">${validStorageCredential(readShopStorageCredential(state.wallet,shop.id))?esc(t('creator.storageConnected')):esc(t('creator.storageRequired'))}</div><label>${esc(t('creator.pinataApiKey'))}<input name="pinataApiKey" type="password" autocomplete="off" data-lpignore="true" placeholder="••••••••"></label><label>${esc(t('creator.pinataApiSecret'))}<input name="pinataApiSecret" type="password" autocomplete="off" data-lpignore="true" placeholder="••••••••"></label><div class="storage-help-links"><a href="https://app.pinata.cloud/register" target="_blank" rel="noopener noreferrer">${esc(t('creator.pinataAccountHelp'))}</a><a href="https://docs.pinata.cloud/account-management/api-keys" target="_blank" rel="noopener noreferrer">${esc(t('creator.pinataKeyHelp'))}</a><button class="storage-help-link-button" type="button" onclick="openPinataPermissionGuide()">${esc(t('creator.pinataPermissionHelp'))}</button></div></div><div class="media-type-fields"><label>X<span>${esc(t('creatorSafe.xUrlRule'))}</span><input name="socialX" type="url" value="${esc(social.x)}" placeholder="https://x.com/username"></label><label>LINE OpenChat<span>${esc(t('creatorSafe.lineUrlRule'))}</span><input name="socialLineOpenChat" type="url" value="${esc(social.lineOpenChat)}" placeholder="https://line.me/ti/g2/..."></label></div><div class="toolbar"><button class="primary-btn" type="submit">${esc(t('creator.saveChanges'))}</button><button class="small-btn ghost-btn" type="button" onclick="cancelEditShop()">${esc(t('common.cancel'))}</button></div></form></div>`;
 }
 async function saveEditedShop(form){if(!requireWallet())return;const fd=new FormData(form),shop=editableShopById(fd.get('shopId'));if(!shop){alert(t('creatorSafe.shopNotFound'));return;}if(lc(shop.creator)!==lc(PNC_STATE.wallet)){alert(t('creatorSafe.onlyCreatorEdit'));return;}const name=String(fd.get('name')||'').trim(),description=String(fd.get('description')||'').trim(),social=normalizeShopSocial({x:fd.get('socialX'),lineOpenChat:fd.get('socialLineOpenChat')});if(!name){alert(t('creatorSafe.shopNameRequired'));return;}for(const [type,url] of [['x',social.x],['lineOpenChat',social.lineOpenChat]]){const validation=socialUrlValidation(url,type);if(!validation.ok){alert(validation.message);return;}if(url)social[type]=validation.url;}const file=form.elements.shopImageFile&&form.elements.shopImageFile.files?form.elements.shopImageFile.files[0]:null,newApiKey=String(fd.get('pinataApiKey')||'').trim(),newApiSecret=String(fd.get('pinataApiSecret')||'').trim();if((newApiKey&&!newApiSecret)||(!newApiKey&&newApiSecret)){alert(t('creator.storageRequired'));return;}if(newApiKey&&newApiSecret)saveShopStorageCredential(PNC_STATE.wallet,shop.id,{provider:'pinata',apiKey:newApiKey,apiSecret:newApiSecret});try{const updated=normalizeShopForMarket({...shop,name,description,social,paymentProfile:getCollectionPaymentProfile(shop),updatedAt:Date.now()});if(file){const optimized=await optimizeImageFile(file,{maxSide:1600,quality:.86,label:'shop'});const credential=storageCredentialForShop(shop.id);const image=await uploadFileToPinata(optimized.file,optimized.file.name,credential);updated.pinata={...(shop.pinata||{}),image};updated.image=image.ipfsUri;updated.banner=image.ipfsUri;updated.shopImage=image.ipfsUri;updated.shopBanner=image.ipfsUri;}PNC_STATE.collections=PNC_STATE.collections.map(c=>c.id===updated.id?updated:c);const creator=ensureCreatorState();creator.registeredShops=(creator.registeredShops||[]).filter(c=>c.id!==updated.id).concat(updated);applyCreatorRegisteredShops(PNC_STATE);await saveKVState();PNC_EDIT_SHOP_ID='';PNC_CREATOR_TAB='dashboard';renderAll(PNC_STATE);openCollection(updated.id);showToast(t('creatorSafe.shopSaved'),'success');}catch(e){console.warn(e);alert(t('creatorSafe.shopUpdateFailed')+'\n'+(e.message||e));}}
-function creatorShopFormHtml(state){if(!state.wallet)return lockedCreatorPanel();const profiles=getShopPaymentProfiles(),initialProfile=profiles[0]||null,initialChainKey=initialProfile?.chain?.key||'';return`<div class="card"><h2>${esc(t('creator.createShop'))}</h2><div class="note owner-note">${esc(t('creator.shopOwnerNote'))} <strong>${esc(short(state.wallet))}</strong><br>${esc(t('creatorSafe.walletDataRule'))}</div><form class="form" autocomplete="off" onsubmit="event.preventDefault();createShopDraftFromForm(this);"><label>${esc(t('common.chain'))}<select name="chainKey" required onchange="updateCreateShopPaymentTokens(this.form)" ${profiles.length?'':'disabled'}>${shopChainOptionsHtml()}</select></label><label>Payment Token<select name="paymentProfileId" required onchange="updateCreateShopPaymentTokens(this.form)" ${profiles.length?'':'disabled'}>${shopPaymentTokenOptionsHtml(initialChainKey)}</select></label><div class="chain-select-preview"><div class="chain-select-copy"><strong data-shop-payment-preview>${esc(initialProfile?paymentProfileLabel(initialProfile):'No active Payment Profile')}</strong><span>Chain and Payment Token are loaded only from active Admin Center records.</span></div></div><label>${esc(t('creator.shopName'))}<input name="name" placeholder="${esc(t('creator.shopNamePlaceholder'))}" autocomplete="off" required></label><label>${esc(t('creator.description'))}<textarea name="description" placeholder="${esc(t('creator.shopDescriptionPlaceholder'))}"></textarea></label><label>${esc(t('creator.shopImage'))}<span>${esc(t('creatorSafe.shopImageShared'))}</span><input name="shopImageFile" type="file" accept="image/*"></label><div class="storage-settings"><div class="storage-settings-title">${esc(t('creator.storageSettings'))}</div><div class="storage-provider-options"><label class="storage-provider-option"><input type="radio" name="storageProvider" value="pinata" checked> Pinata (IPFS)</label><label class="storage-provider-option is-disabled"><input type="radio" disabled> NFT.Storage (${esc(t('wallet.comingSoon'))})</label><label class="storage-provider-option is-disabled"><input type="radio" disabled> Arweave (${esc(t('wallet.comingSoon'))})</label></div><label>${esc(t('creator.pinataApiKey'))}<input name="pinataApiKey" type="password" autocomplete="off" data-lpignore="true" required></label><label>${esc(t('creator.pinataApiSecret'))}<input name="pinataApiSecret" type="password" autocomplete="off" data-lpignore="true" required></label><div class="storage-help-links"><a href="https://app.pinata.cloud/register" target="_blank" rel="noopener noreferrer">${esc(t('creator.pinataAccountHelp'))}</a><a href="https://docs.pinata.cloud/account-management/api-keys" target="_blank" rel="noopener noreferrer">${esc(t('creator.pinataKeyHelp'))}</a><button class="storage-help-link-button" type="button" onclick="openPinataPermissionGuide()">${esc(t('creator.pinataPermissionHelp'))}</button></div></div><div class="media-type-fields"><label>X<span>${esc(t('creatorSafe.xUrlRule'))}</span><input name="socialX" type="url" placeholder="https://x.com/username" autocomplete="url"></label><label>LINE OpenChat<span>${esc(t('creatorSafe.lineUrlRule'))}</span><input name="socialLineOpenChat" type="url" placeholder="https://line.me/ti/g2/..." autocomplete="url"></label></div><div class="toolbar"><button class="primary-btn" type="submit">${esc(t('creator.createDraft'))}</button></div></form>${creatorShopDraftPreviewHtml(state)}</div>`;}
-function creatorNFTFormHtml(state){if(!state.wallet)return lockedCreatorPanel();const shops=creatorOwnedCollections(state),shopNotice=shops.length?'':`<div class="validation warn">${esc(t('creator.selectShopRequired'))}</div>`,initialProfile=getCollectionPaymentProfile(shops[0]);return`<div class="card"><h2>${esc(t('creator.createNft'))}</h2><div class="note owner-note">${esc(t('creator.nftOwnerNote'))} <strong>${esc(short(state.wallet))}</strong><br>${esc(t('creatorSafe.mintOwnerRule'))}</div><form class="form" autocomplete="off" onsubmit="event.preventDefault();createNFTDraftFromForm(this);"><label>${esc(t('common.chain'))}<select name="targetChainKey" required><option value="polygon" selected>Polygon (POL)</option></select></label><div class="chain-select-preview"><img class="chain-select-logo" src="${JPYC_UI_ICONS.polygon}" alt=""><div class="chain-select-copy"><strong>Polygon (POL)</strong><span>JNC production chain. NFT Mint and Marketplace operations use the active Polygon deployment.</span></div></div><label>${esc(t('common.shop'))}<select name="collectionId" required onchange="syncCreateNFTShopProfile(this.form)">${shops.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')||`<option value="" disabled selected>${esc(t('creator.noEditableShopOption'))}</option>`}</select></label><div class="chain-select-preview"><div class="chain-select-copy"><strong>Inherited Chain / Payment Token</strong><span data-nft-payment-preview>${esc(paymentProfileLabel(initialProfile))}</span></div></div><div class="storage-status">${esc(t('creator.storageInherited'))}</div><label>${esc(t('creator.nftName'))}<input name="name" placeholder="${esc(t('creator.nftNamePlaceholder'))}" autocomplete="off" required></label><label>${esc(t('creator.description'))}<textarea name="description" placeholder="${esc(t('creator.nftDescriptionPlaceholder'))}"></textarea></label><label>${esc(t('creator.utility'))}<textarea name="utility" placeholder="${esc(t('creator.utilityPlaceholder'))}"></textarea></label><div><span class="meta" style="display:block;margin-bottom:7px">${esc(t('creator.mediaType'))}</span><div class="media-choice"><label><input type="radio" name="mediaType" value="image" checked onchange="toggleNFTMediaFields(this.form)"> ${esc(t('creator.imageNft'))}</label><label><input type="radio" name="mediaType" value="video" onchange="toggleNFTMediaFields(this.form)"> ${esc(t('creator.videoNft'))}</label></div></div><div class="media-type-fields" data-media-fields="image"><label>${esc(t('creator.nftImage'))}<span>${esc(t('creator.imageHelp'))}</span><input name="imageFile" type="file" accept="image/*"></label></div><div class="media-type-fields" data-media-fields="video" hidden><label>${esc(t('creator.videoFile'))}<span>${esc(t('creator.videoHelp'))}</span><input name="videoFile" type="file" accept="video/mp4,.mp4"></label><label>${esc(t('creator.thumbnailImage'))}<span>${esc(t('creator.thumbnailHelp'))}</span><input name="thumbnailFile" type="file" accept="image/jpeg,image/png,image/webp"></label></div><div class="toolbar"><button class="primary-btn" type="submit" ${shops.length?'':'disabled'}>${esc(t('creator.createDraft'))}</button></div></form>${shopNotice}${creatorNftDraftPreviewHtml(state)}</div>`;}
+function creatorShopFormHtml(state){if(!state.wallet)return lockedCreatorPanel();const profiles=getShopPaymentProfiles(),initialProfile=profiles[0]||null,initialChainKey=initialProfile?.chain?.key||'';return`<div class="card"><h2>${esc(t('creator.createShop'))}</h2><div class="note owner-note">${esc(t('creator.shopOwnerNote'))} <strong>${esc(short(state.wallet))}</strong><br>${esc(t('creatorSafe.walletDataRule'))}</div><form class="form" autocomplete="off" onsubmit="event.preventDefault();createShopDraftFromForm(this);"><label>${esc(t('common.chain'))}<select name="chainKey" required onchange="updateCreateShopPaymentTokens(this.form)" ${profiles.length?'':'disabled'}>${shopChainOptionsHtml()}</select></label><label>Payment Token<select name="paymentProfileId" required onchange="updateCreateShopPaymentTokens(this.form)" ${profiles.length?'':'disabled'}>${shopPaymentTokenOptionsHtml(initialChainKey)}</select></label><div class="chain-select-preview"><div class="chain-select-copy"><strong data-shop-payment-preview>${esc(initialProfile?paymentProfileLabel(initialProfile):'No active Payment Profile')}</strong><span>Only Active Admin Center collaborations can create a new Shop. Stopped / Ended records are hidden.</span></div></div><label>${esc(t('creator.shopName'))}<input name="name" placeholder="${esc(t('creator.shopNamePlaceholder'))}" autocomplete="off" required></label><label>${esc(t('creator.description'))}<textarea name="description" placeholder="${esc(t('creator.shopDescriptionPlaceholder'))}"></textarea></label><label>${esc(t('creator.shopImage'))}<span>${esc(t('creatorSafe.shopImageShared'))}</span><input name="shopImageFile" type="file" accept="image/*"></label><div class="storage-settings"><div class="storage-settings-title">${esc(t('creator.storageSettings'))}</div><div class="storage-provider-options"><label class="storage-provider-option"><input type="radio" name="storageProvider" value="pinata" checked> Pinata (IPFS)</label><label class="storage-provider-option is-disabled"><input type="radio" disabled> NFT.Storage (${esc(t('wallet.comingSoon'))})</label><label class="storage-provider-option is-disabled"><input type="radio" disabled> Arweave (${esc(t('wallet.comingSoon'))})</label></div><label>${esc(t('creator.pinataApiKey'))}<input name="pinataApiKey" type="password" autocomplete="off" data-lpignore="true" required></label><label>${esc(t('creator.pinataApiSecret'))}<input name="pinataApiSecret" type="password" autocomplete="off" data-lpignore="true" required></label><div class="storage-help-links"><a href="https://app.pinata.cloud/register" target="_blank" rel="noopener noreferrer">${esc(t('creator.pinataAccountHelp'))}</a><a href="https://docs.pinata.cloud/account-management/api-keys" target="_blank" rel="noopener noreferrer">${esc(t('creator.pinataKeyHelp'))}</a><button class="storage-help-link-button" type="button" onclick="openPinataPermissionGuide()">${esc(t('creator.pinataPermissionHelp'))}</button></div></div><div class="media-type-fields"><label>X<span>${esc(t('creatorSafe.xUrlRule'))}</span><input name="socialX" type="url" placeholder="https://x.com/username" autocomplete="url"></label><label>LINE OpenChat<span>${esc(t('creatorSafe.lineUrlRule'))}</span><input name="socialLineOpenChat" type="url" placeholder="https://line.me/ti/g2/..." autocomplete="url"></label></div><div class="toolbar"><button class="primary-btn" type="submit">${esc(t('creator.createDraft'))}</button></div></form>${creatorShopDraftPreviewHtml(state)}</div>`;}
+function creatorNFTFormHtml(state){if(!state.wallet)return lockedCreatorPanel();const allShops=creatorOwnedCollections(state),shops=creatorMintEligibleCollections(state),closedCount=Math.max(0,allShops.length-shops.length),shopNotice=shops.length?(closedCount?`<div class="validation warn">${closedCount} Shop(s) use a Stopped / Ended collaboration and cannot create new NFTs.</div>`:''):`<div class="validation warn">No Active Admin Center collaboration is available for this wallet's Shops.</div>`,initialProfile=getCollectionPaymentProfile(shops[0]);return`<div class="card"><h2>${esc(t('creator.createNft'))}</h2><div class="note owner-note">${esc(t('creator.nftOwnerNote'))} <strong>${esc(short(state.wallet))}</strong><br>${esc(t('creatorSafe.mintOwnerRule'))}</div><form class="form" autocomplete="off" onsubmit="event.preventDefault();createNFTDraftFromForm(this);"><label>${esc(t('common.chain'))}<select name="targetChainKey" required disabled><option value="${esc(initialProfile?.chain?.key||'')}" selected>${esc(initialProfile?`${initialProfile.chain.name} (${initialProfile.chain.nativeSymbol||initialProfile.chain.chainId})`:'No Active Shop')}</option></select></label><div class="chain-select-preview"><div class="chain-select-copy"><strong>${esc(initialProfile?initialProfile.chain.name:'No Active Collaboration')}</strong><span>The Chain / Payment Token is inherited from the selected Shop Payment Profile and cannot be changed here.</span></div></div><label>${esc(t('common.shop'))}<select name="collectionId" required onchange="syncCreateNFTShopProfile(this.form)">${shops.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')||`<option value="" disabled selected>${esc(t('creator.noEditableShopOption'))}</option>`}</select></label><div class="chain-select-preview"><div class="chain-select-copy"><strong>Inherited Chain / Payment Token</strong><span data-nft-payment-preview>${esc(paymentProfileLabel(initialProfile))}</span></div></div><div class="storage-status">${esc(t('creator.storageInherited'))}</div><label>${esc(t('creator.nftName'))}<input name="name" placeholder="${esc(t('creator.nftNamePlaceholder'))}" autocomplete="off" required></label><label>${esc(t('creator.description'))}<textarea name="description" placeholder="${esc(t('creator.nftDescriptionPlaceholder'))}"></textarea></label><label>${esc(t('creator.utility'))}<textarea name="utility" placeholder="${esc(t('creator.utilityPlaceholder'))}"></textarea></label><div><span class="meta" style="display:block;margin-bottom:7px">${esc(t('creator.mediaType'))}</span><div class="media-choice"><label><input type="radio" name="mediaType" value="image" checked onchange="toggleNFTMediaFields(this.form)"> ${esc(t('creator.imageNft'))}</label><label><input type="radio" name="mediaType" value="video" onchange="toggleNFTMediaFields(this.form)"> ${esc(t('creator.videoNft'))}</label></div></div><div class="media-type-fields" data-media-fields="image"><label>${esc(t('creator.nftImage'))}<span>${esc(t('creator.imageHelp'))}</span><input name="imageFile" type="file" accept="image/*"></label></div><div class="media-type-fields" data-media-fields="video" hidden><label>${esc(t('creator.videoFile'))}<span>${esc(t('creator.videoHelp'))}</span><input name="videoFile" type="file" accept="video/mp4,.mp4"></label><label>${esc(t('creator.thumbnailImage'))}<span>${esc(t('creator.thumbnailHelp'))}</span><input name="thumbnailFile" type="file" accept="image/jpeg,image/png,image/webp"></label></div><div class="toolbar"><button class="primary-btn" type="submit" ${shops.length?'':'disabled'}>${esc(t('creator.createDraft'))}</button></div></form>${shopNotice}${creatorNftDraftPreviewHtml(state)}</div>`;}
 function toggleNFTMediaFields(form){const type=String(new FormData(form).get('mediaType')||'image');form.querySelectorAll('[data-media-fields]').forEach(box=>box.hidden=box.getAttribute('data-media-fields')!==type);}
 function creatorMarketplaceHtml(state){if(!state.wallet)return lockedCreatorPanel();const mine=walletManagedNFTs(state);return`<div class="card"><h2>${esc(t('creator.marketplaceActions'))}</h2><p class="meta">${esc(t('creator.listHelp'))}</p><div class="creator-list">${mine.map(n=>`<div class="creator-list-item"><div class="creator-list-title">${esc(n.name)}</div><div class="meta">${esc(t('common.owner'))}: ${esc(short(n.owner))}<br>${esc(t('common.chain'))}: ${esc(chainLabel(n))}<br>${esc(t('common.status'))}: ${esc(statusLabel(n))}</div><div class="toolbar"><button class="small-btn sell-btn" ${canListNFT(n,state)?'':'disabled'} onclick="handleList('${esc(nftReference(n))}')">${esc(t('marketUi.list'))}</button><button class="small-btn delete-btn" ${canUnlistNFT(n,state)?'':'disabled'} onclick="handleUnlist('${esc(nftReference(n))}')">${esc(t('marketUi.unlist'))}</button><button class="small-btn sell-btn" ${canListNFT(n,state)&&(!n.offers||n.offers.length===0)?'':'disabled'} onclick="handleCreateAuction('${esc(nftReference(n))}')">${esc(t('marketUi.startAuction'))}</button></div></div>`).join('')||`<div class="meta">${esc(t('creator.noEditableNft'))}</div>`}</div></div>`;}
 
@@ -3353,7 +3256,7 @@ function nftDraftPayload(draft){if(!draft)return null;const metadata=nftDraftMet
 function validateShopDraft(d){const issues=[];if(!d.name)issues.push(t('validation.shopNameRequired'));if(!d.creator)issues.push(t('validation.creatorWalletRequired'));if(!d.imageName)issues.push(t('validation.shopImageRequired'));const social=normalizeShopSocial(d.social);const xValidation=socialUrlValidation(social.x,'x');const lineValidation=socialUrlValidation(social.lineOpenChat,'lineOpenChat');if(!xValidation.ok)issues.push(xValidation.message);if(!lineValidation.ok)issues.push(lineValidation.message);return issues;}
 function validateNFTDraft(d){const issues=[];if(!d.collectionId)issues.push(t('validation.shopRequired'));if(!d.name)issues.push(t('validation.nftNameRequired'));if(!d.creator||!d.owner)issues.push(t('validation.creatorOwnerRequired'));if(d.mediaType==='video'){if(!d.videoName)issues.push(t('validation.videoRequired'));if(!d.thumbnailName)issues.push(t('validation.thumbnailRequired'));if(d.videoFile&&d.videoFile.type&&d.videoFile.type!=='video/mp4')issues.push(t('validation.videoMustMp4'));}else if(!d.imageName)issues.push(t('validation.nftImageRequired'));return issues;}
 function createShopDraftFromForm(form){if(!requireWallet())return;const fd=new FormData(form),media=filePreviewFromInput(form.elements.shopImageFile);let paymentSelection;try{paymentSelection=createPaymentProfileSnapshot(fd.get('paymentProfileId'));}catch(error){alert(error.message||error);return;}const draft={type:'shop',status:'draft',creator:PNC_STATE.wallet,id:'draft-shop-'+Date.now(),chainKey:paymentSelection.chain.key,paymentProfile:paymentSelection,name:String(fd.get('name')||'').trim(),description:String(fd.get('description')||'').trim(),social:normalizeShopSocial({x:fd.get('socialX'),lineOpenChat:fd.get('socialLineOpenChat')}),storageProvider:String(fd.get('storageProvider')||'pinata'),storageCredential:normalizeStorageCredential({provider:fd.get('storageProvider'),apiKey:fd.get('pinataApiKey'),apiSecret:fd.get('pinataApiSecret')}),imageName:media.name,imagePreview:media.preview,imageFile:media.file,imageRole:'shopImage',createdAt:Date.now()};draft.validation=validateShopDraft(draft);draft.payload=shopDraftPayload(draft);ensureCreatorState().shopDraft=draft;renderCreatorCenter(PNC_STATE);alert(t('creatorTx.draftSaved'));}
-function createNFTDraftFromForm(form){if(!requireWallet())return;const fd=new FormData(form),mediaType=String(fd.get('mediaType')||'image'),image=filePreviewFromInput(form.elements.imageFile),video=filePreviewFromInput(form.elements.videoFile),thumbnail=filePreviewFromInput(form.elements.thumbnailFile),collectionId=String(fd.get('collectionId')||''),paymentProfile=getCollectionPaymentProfile(collectionId);const draft={type:'nft',status:'draft',targetChainKey:paymentProfile.chain.key||String(fd.get('targetChainKey')||JNC_LAUNCH_CHAIN_KEY),runtimeChainKey:JNC_ACTIVE_ARCHITECTURE.chain.id,paymentProfile,creator:PNC_STATE.wallet,owner:PNC_STATE.wallet,collectionId,collectionName:collectionNameById(collectionId),name:String(fd.get('name')||'').trim(),description:String(fd.get('description')||'').trim(),utility:String(fd.get('utility')||'').trim(),mediaType,imageName:image.name,imagePreview:image.preview,imageFile:image.file,videoName:video.name,videoPreview:video.preview,videoFile:video.file,thumbnailName:thumbnail.name,thumbnailPreview:thumbnail.preview,thumbnailFile:thumbnail.file,mimeType:mediaType==='video'?(video.mimeType||'video/mp4'):(image.mimeType||''),createdAt:Date.now()};draft.validation=validateNFTDraft(draft);try{storageCredentialForShop(draft.collectionId);}catch(e){draft.validation.push(t('creator.storageRequired'));}draft.metadata=nftDraftMetadata(draft);draft.payload=nftDraftPayload(draft);ensureCreatorState().nftDraft=draft;renderCreatorCenter(PNC_STATE);alert(t('creatorTx.draftSaved'));}
+function createNFTDraftFromForm(form){if(!requireWallet())return;const fd=new FormData(form),mediaType=String(fd.get('mediaType')||'image'),image=filePreviewFromInput(form.elements.imageFile),video=filePreviewFromInput(form.elements.videoFile),thumbnail=filePreviewFromInput(form.elements.thumbnailFile),collectionId=String(fd.get('collectionId')||'');try{assertCollectionOpenForNewNFT(collectionId);}catch(error){alert(error.message||error);return;}const paymentProfile=getCollectionPaymentProfile(collectionId);const draft={type:'nft',status:'draft',targetChainKey:paymentProfile.chain.key||String(fd.get('targetChainKey')||JNC_LAUNCH_CHAIN_KEY),runtimeChainKey:JNC_ACTIVE_ARCHITECTURE.chain.id,paymentProfile,creator:PNC_STATE.wallet,owner:PNC_STATE.wallet,collectionId,collectionName:collectionNameById(collectionId),name:String(fd.get('name')||'').trim(),description:String(fd.get('description')||'').trim(),utility:String(fd.get('utility')||'').trim(),mediaType,imageName:image.name,imagePreview:image.preview,imageFile:image.file,videoName:video.name,videoPreview:video.preview,videoFile:video.file,thumbnailName:thumbnail.name,thumbnailPreview:thumbnail.preview,thumbnailFile:thumbnail.file,mimeType:mediaType==='video'?(video.mimeType||'video/mp4'):(image.mimeType||''),createdAt:Date.now()};draft.validation=validateNFTDraft(draft);try{storageCredentialForShop(draft.collectionId);}catch(e){draft.validation.push(t('creator.storageRequired'));}draft.metadata=nftDraftMetadata(draft);draft.payload=nftDraftPayload(draft);ensureCreatorState().nftDraft=draft;renderCreatorCenter(PNC_STATE);alert(t('creatorTx.draftSaved'));}
 function normalizePinataResponse(json){const data=json&&(json.data||json.result||json);const cid=data&&(data.IpfsHash||data.ipfsHash||data.cid||data.hash||data.Hash||data.IpfsCid);if(!cid)throw new Error(t('mediaError.pinataCidMissing'));return{cid,ipfsUri:'ipfs://'+cid,gatewayUrl:PNC_CONFIG.pinata.gateway+cid,raw:json};}
 const JNC_STORAGE_CREDENTIAL_PREFIX='JNC_SHOP_STORAGE_V1';
 function storageCredentialKey(wallet,shopId){return `${JNC_STORAGE_CREDENTIAL_PREFIX}:${lc(wallet)}:${String(shopId||'')}`;}
@@ -3367,10 +3270,11 @@ function selectedDraftStorageCredential(draft){if(draft?.type==='shop'&&validSto
 async function uploadFileToPinata(file,filename,credential){if(!file)throw new Error(t('mediaError.fileMissing'));const auth=normalizeStorageCredential(credential);if(!validStorageCredential(auth))throw new Error(t('creator.storageRequired'));const form=new FormData();form.append('file',file,filename||file.name||'jnc-upload');form.append('pinataMetadata',JSON.stringify({name:filename||file.name||'jnc-upload'}));const res=await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS',{method:'POST',headers:{pinata_api_key:auth.apiKey,pinata_secret_api_key:auth.apiSecret},body:form});let json=null;try{json=await res.json();}catch(e){json={error:'Invalid JSON response'};}if(!res.ok)throw new Error((json&&(json.error?.details||json.error||json.message))||t('mediaError.pinataUploadFailed',{status:res.status}));return normalizePinataResponse(json);}
 async function uploadJSONToPinata(data,filename,credential){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const file=new File([blob],filename||'metadata.json',{type:'application/json'});return await uploadFileToPinata(file,filename||'metadata.json',credential);}
 async function uploadShopDraftToPinata(){if(!requireWallet())return;const creator=ensureCreatorState(),draft=creator.shopDraft;if(!draft){alert(t('creatorTx.shopDraftMissing'));return;}draft.validation=validateShopDraft(draft);if(draft.validation.length){renderCreatorCenter(PNC_STATE);alert(t('creatorTx.shopDraftInvalid'));return;}if(!draft.imageFile){alert(t('creatorTx.mediaRequired'));return;}try{draft.status='pinata-uploading';renderCreatorCenter(PNC_STATE);alert(t('creatorTx.uploadStarted'));const credential=selectedDraftStorageCredential(draft);const image=await uploadFileToPinata(draft.imageFile,draft.imageName||'shop-image',credential);draft.pinata={...(draft.pinata||{}),image};draft.status='pinata-ready';draft.payload=shopDraftPayload(draft);renderCreatorCenter(PNC_STATE);alert(t('creatorTx.uploadComplete'));}catch(e){draft.status='draft';draft.uploadError=e.message||String(e);renderCreatorCenter(PNC_STATE);console.warn(e);alert(t('creatorTx.uploadFailed')+'\n'+(e.message||e));}}async function uploadNFTDraftToPinata(){if(!requireWallet())return;const creator=ensureCreatorState(),draft=creator.nftDraft;if(!draft){alert(t('creatorTx.nftDraftMissing'));return;}draft.validation=validateNFTDraft(draft);if(draft.validation.length){renderCreatorCenter(PNC_STATE);alert(t('creatorTx.nftDraftInvalid'));return;}try{draft.status='pinata-uploading';renderCreatorCenter(PNC_STATE);alert(t('creatorTx.uploadStarted'));if(draft.mediaType==='video'){const pipeline=await buildVideoThumbnailPipeline(draft.thumbnailFile);draft.optimization=pipeline;const credential=selectedDraftStorageCredential(draft);const video=await uploadFileToPinata(draft.videoFile,draft.videoName||'jnc-video.mp4',credential);const thumbnail=await uploadFileToPinata(pipeline.thumbnail.file,pipeline.thumbnail.file.name,credential);draft.pinata={...(draft.pinata||{}),video,thumbnail};}else{const pipeline=await buildStaticImagePipeline(draft.imageFile);draft.optimization=pipeline;const credential=selectedDraftStorageCredential(draft);const [display,thumbnail]=await Promise.all([uploadFileToPinata(pipeline.display.file,pipeline.display.file.name,credential),uploadFileToPinata(pipeline.thumbnail.file,pipeline.thumbnail.file.name,credential)]);draft.pinata={...(draft.pinata||{}),display,thumbnail,image:display};}draft.metadata=nftDraftMetadata(draft);const credential=selectedDraftStorageCredential(draft);const metadata=await uploadJSONToPinata(draft.metadata,(draft.name||'jnc-nft').replace(/[^a-z0-9_-]+/gi,'_')+'_metadata.json',credential);draft.pinata={...(draft.pinata||{}),metadata};draft.status='pinata-ready';draft.payload=nftDraftPayload(draft);renderCreatorCenter(PNC_STATE);alert(t('creatorTx.uploadComplete'));}catch(e){draft.status='draft';draft.uploadError=e.message||String(e);renderCreatorCenter(PNC_STATE);console.warn(e);alert(t('creatorTx.uploadFailed')+'\n'+(e.message||e));}}
-function clearCreatorDraft(type){const creator=ensureCreatorState();if(type==='shop')creator.shopDraft=null;if(type==='nft')creator.nftDraft=null;renderCreatorCenter(PNC_STATE);alert(t('creatorTx.draftCleared'));}async function registerShopDraftFromPreview(){const creator=ensureCreatorState(),draft=creator.shopDraft;if(!draft){alert(t('creatorTx.shopDraftMissing'));return;}draft.validation=validateShopDraft(draft);if(draft.validation.length){renderCreatorCenter(PNC_STATE);alert(t('creatorTx.shopDraftInvalid'));return;}if(draft.status!=='pinata-ready'||!draft.pinata?.image?.ipfsUri){alert(t('creatorTx.shopUploadRequired'));return;}if(draft.status==='registered'||creator.registeredShops.some(s=>s.id===(draft.collectionId||draft.id))){alert(t('creatorTx.shopAlreadyRegistered'));return;}draft.collectionId=draft.collectionId||draft.id;moveShopStorageCredential(PNC_STATE.wallet,draft.id,draft.collectionId,draft.storageCredential);delete draft.storageCredential;draft.registeredAt=Date.now();draft.status='registered';draft.payload=shopDraftPayload(draft);clearCreatorWork(PNC_STATE.wallet);const shop=shopDraftToCollection(draft);creator.registeredShops=creator.registeredShops.filter(s=>s.id!==shop.id).concat(shop);PNC_STATE.collections=PNC_STATE.collections.filter(c=>c.id!==shop.id).concat(shop);PNC_CREATOR_TAB='nft';renderAll(PNC_STATE);await saveKVState();alert(t('creatorTx.shopRegistered'));}async function mintNFTDraftToBlockchain(){
+function clearCreatorDraft(type){const creator=ensureCreatorState();if(type==='shop')creator.shopDraft=null;if(type==='nft')creator.nftDraft=null;renderCreatorCenter(PNC_STATE);alert(t('creatorTx.draftCleared'));}async function registerShopDraftFromPreview(){const creator=ensureCreatorState(),draft=creator.shopDraft;if(!draft){alert(t('creatorTx.shopDraftMissing'));return;}try{assertAdminPaymentProfileActive(draft.paymentProfile?.projectId,'Shop Payment Profile');}catch(error){alert(error.message||error);return;}draft.validation=validateShopDraft(draft);if(draft.validation.length){renderCreatorCenter(PNC_STATE);alert(t('creatorTx.shopDraftInvalid'));return;}if(draft.status!=='pinata-ready'||!draft.pinata?.image?.ipfsUri){alert(t('creatorTx.shopUploadRequired'));return;}if(draft.status==='registered'||creator.registeredShops.some(s=>s.id===(draft.collectionId||draft.id))){alert(t('creatorTx.shopAlreadyRegistered'));return;}draft.collectionId=draft.collectionId||draft.id;moveShopStorageCredential(PNC_STATE.wallet,draft.id,draft.collectionId,draft.storageCredential);delete draft.storageCredential;draft.registeredAt=Date.now();draft.status='registered';draft.payload=shopDraftPayload(draft);clearCreatorWork(PNC_STATE.wallet);const shop=shopDraftToCollection(draft);creator.registeredShops=creator.registeredShops.filter(s=>s.id!==shop.id).concat(shop);PNC_STATE.collections=PNC_STATE.collections.filter(c=>c.id!==shop.id).concat(shop);PNC_CREATOR_TAB='nft';renderAll(PNC_STATE);await saveKVState();alert(t('creatorTx.shopRegistered'));}async function mintNFTDraftToBlockchain(){
   if(!requireWallet())return;
   const creator=ensureCreatorState(),draft=creator.nftDraft;
   if(!draft){alert(t('creatorTx.nftDraftMissing'));return;}
+  try{assertCollectionOpenForNewNFT(draft.collectionId);}catch(error){alert(error.message||error);return;}
   const metadataUri=draft.pinata?.metadata?.ipfsUri||'';
   if(draft.status!=='pinata-ready'&&!draft.txHash){alert(t('creatorTx.nftUploadRequired'));return;}
   if(draft.txHash&&draft.status!=='minted'){
