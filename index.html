@@ -1452,11 +1452,12 @@ function assertMarketplaceIntegration(){
 
 
 /* =========================================================
-   JNC v2.5.8 — FINAL ARCHITECTURE AUDIT
+   JNC v2.5.9 — FINAL ARCHITECTURE AUDIT
    One compact audit verifies the live runtime compatibility layer.
    Payment identity itself remains owned by Payment Profile snapshots.
+   Audit version follows the single JNC configuration version source.
    ========================================================= */
-const JNC_PRODUCTION_AUDIT_VERSION='2.5.8';
+const JNC_PRODUCTION_AUDIT_VERSION=JNC_CONFIGURATION_VERSION;
 function runProductionArchitectureAudit(){
   const architecture=validateActiveArchitecture();
   const {deployment,chain,asset,environment}=architecture;
