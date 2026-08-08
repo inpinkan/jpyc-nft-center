@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1</title>
+<title>JNC Admin Center v1.1.1</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -23,14 +23,14 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.1</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
 <div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplace操作は運営Fee WalletのMetaMask承認が必要です。</div>
-<div class="flow"><strong>v1.1の登録経路：</strong> 入力 → MetaMask → ERC20 decimals取得 → 対象チェーンのMarketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。</div>
+<div class="flow"><strong>v1.1.1の登録経路：</strong> 入力 → MetaMask → ERC20 decimals取得 → 対象チェーンのMarketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -178,12 +178,19 @@ function word(data,index){return String(data||"").replace(/^0x/,"").slice(index*
 function uintAt(data,index){return BigInt("0x"+word(data,index))}
 function boolAt(data,index){return uintAt(data,index)!==0n}
 
-async function connectWallet(){
+async function getCurrentWalletAddress(requestAccess=false){
   if(!window.ethereum)throw new Error("MetaMaskが見つかりません。");
-  const accounts=await ethereum.request({method:"eth_requestAccounts"});
+  const method=requestAccess?"eth_requestAccounts":"eth_accounts";
+  let accounts=await ethereum.request({method});
+  if((!accounts||!accounts.length)&&!requestAccess)accounts=await ethereum.request({method:"eth_requestAccounts"});
   walletAddress=accounts?.[0]||"";
-  if(!walletAddress)throw new Error("ウォレットアカウントが選択されませんでした。");
-  preview();return walletAddress;
+  preview();
+  return walletAddress;
+}
+async function connectWallet(){
+  const current=await getCurrentWalletAddress(true);
+  if(!current)throw new Error("ウォレットアカウントが選択されませんでした。");
+  return current;
 }
 async function ensureChain(){
   const c=chainData();if(!c.chainHex)throw new Error("チェーン設定がありません。");
@@ -220,10 +227,14 @@ async function verifyOnChain(show=true){
   }catch(error){setOnchain("確認失敗","bad");if(show)message(error.message,false);throw error}
 }
 async function sendTx(data,label){
-  const d=deployment();if(!walletAddress)await connectWallet();await ensureChain();
-  if(lc(walletAddress)!==lc(d.feeWallet))throw new Error(`この操作はMarketplace Fee Wallet ${d.feeWallet} で承認してください。`);
+  const d=deployment();
+  await ensureChain();
+  // Always re-read the account MetaMask currently exposes before a privileged write.
+  const currentWallet=await getCurrentWalletAddress(false);
+  if(!currentWallet)throw new Error("MetaMaskを接続してください。");
+  if(lc(currentWallet)!==lc(d.feeWallet))throw new Error(`現在のMetaMask ${currentWallet} では承認できません。Marketplace Fee Wallet ${d.feeWallet} をMetaMaskで選択してから、もう一度実行してください。`);
   setOnchain(`${label} 承認待ち`,"wait");
-  const hash=await ethereum.request({method:"eth_sendTransaction",params:[{from:walletAddress,to:d.marketplace,data,value:"0x0"}]});
+  const hash=await ethereum.request({method:"eth_sendTransaction",params:[{from:currentWallet,to:d.marketplace,data,value:"0x0"}]});
   message(`${label}を送信しました。確定待ち…\n${hash}`);
   await waitReceipt(hash);return hash;
 }
@@ -320,7 +331,8 @@ $("form").onsubmit=async event=>{
   event.preventDefault();const error=validate();if(error)return message(error,false);
   try{
     ["saveBtn","connectBtn","verifyBtn"].forEach(id=>$(id).disabled=true);
-    if(!walletAddress)await connectWallet();await ensureChain();
+    await ensureChain();
+    await getCurrentWalletAddress(false);
     const sync=await syncMarketplace();
     message("Marketplace設定を確認しました。ロゴとJNC設定を保存しています…");
     const logo=await uploadLogo(f.logoFile.files[0]);const symbol=f.tokenSymbol.value.trim().toUpperCase(),d=deployment();
