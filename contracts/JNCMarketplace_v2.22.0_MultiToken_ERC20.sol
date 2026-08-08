@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 /*
-    JNCMarketplace_v2.22.0_MultiToken_ERC20_REBUILT
+    JNCMarketplace_v2.22.0_MultiToken_ERC20
 
     JPYC NFT Center multi-token ERC20 marketplace.
 
@@ -14,7 +14,8 @@ pragma solidity ^0.8.24;
     - Disabling a payment token blocks new market positions only.
     - Existing listings, offers, auctions, bids, settlements and refunds continue
       with the payment token stored in each market position.
-    - Minimum payment amount is configured per ERC20 payment token.
+    - Each ERC20 payment token has an immutable absolute floor and an operator minimum.
+    - The operator minimum can be raised or lowered, but never below the absolute floor.
     - Auction bid increment is snapshotted when the auction is created.
     - Primary sale: seller 95%, marketplace 5% by default.
     - Resale: seller 85%, creator 10%, marketplace 5% by default.
@@ -38,6 +39,7 @@ contract JNCMarketplace {
     struct PaymentTokenConfig {
         bool configured;
         bool enabled;
+        uint256 floorPaymentAmount;
         uint256 minimumPaymentAmount;
     }
 
@@ -98,6 +100,7 @@ contract JNCMarketplace {
     error TransferFailed();
     error UnsupportedPaymentToken();
     error PaymentTokenNotConfigured();
+    error PaymentTokenAlreadyConfigured();
     error PaymentTokenDisabled();
     error Reentrant();
 
@@ -142,6 +145,7 @@ contract JNCMarketplace {
 
     event PaymentTokenConfigured(
         address indexed paymentToken,
+        uint256 floorPaymentAmount,
         uint256 minimumPaymentAmount,
         bool enabled
     );
@@ -269,20 +273,23 @@ contract JNCMarketplace {
         2. initialFeeWallet
         3. initialFeeBps
         4. initialRoyaltyBps
-        5. initialMinimumPaymentAmount
+        5. initialFloorPaymentAmount
+
+        At deployment, the operator minimum starts equal to the immutable floor.
+        The operator minimum can later be raised with updatePaymentTokenMinimum().
     */
     constructor(
         address initialPaymentToken,
         address initialFeeWallet,
         uint16 initialFeeBps,
         uint16 initialRoyaltyBps,
-        uint256 initialMinimumPaymentAmount
+        uint256 initialFloorPaymentAmount
     ) {
         if (
             initialPaymentToken == address(0) ||
             initialPaymentToken.code.length == 0 ||
             initialFeeWallet == address(0) ||
-            initialMinimumPaymentAmount == 0
+            initialFloorPaymentAmount == 0
         ) revert InvalidInput();
 
         _checkRates(initialFeeBps, initialRoyaltyBps);
@@ -294,12 +301,14 @@ contract JNCMarketplace {
         paymentTokenConfigs[initialPaymentToken] = PaymentTokenConfig({
             configured: true,
             enabled: true,
-            minimumPaymentAmount: initialMinimumPaymentAmount
+            floorPaymentAmount: initialFloorPaymentAmount,
+            minimumPaymentAmount: initialFloorPaymentAmount
         });
 
         emit PaymentTokenConfigured(
             initialPaymentToken,
-            initialMinimumPaymentAmount,
+            initialFloorPaymentAmount,
+            initialFloorPaymentAmount,
             true
         );
     }
@@ -1164,24 +1173,32 @@ contract JNCMarketplace {
 
     function configurePaymentToken(
         address paymentToken,
+        uint256 floorPaymentAmount,
         uint256 minimumPaymentAmount,
         bool enabled
     ) external onlyFeeWallet {
         if (
             paymentToken == address(0) ||
             paymentToken.code.length == 0 ||
-            minimumPaymentAmount == 0
+            floorPaymentAmount == 0 ||
+            minimumPaymentAmount < floorPaymentAmount
         ) revert InvalidInput();
+
+        if (paymentTokenConfigs[paymentToken].configured) {
+            revert PaymentTokenAlreadyConfigured();
+        }
 
         paymentTokenConfigs[paymentToken] =
             PaymentTokenConfig({
                 configured: true,
                 enabled: enabled,
+                floorPaymentAmount: floorPaymentAmount,
                 minimumPaymentAmount: minimumPaymentAmount
             });
 
         emit PaymentTokenConfigured(
             paymentToken,
+            floorPaymentAmount,
             minimumPaymentAmount,
             enabled
         );
@@ -1202,6 +1219,7 @@ contract JNCMarketplace {
 
         emit PaymentTokenConfigured(
             paymentToken,
+            config.floorPaymentAmount,
             config.minimumPaymentAmount,
             enabled
         );
@@ -1218,8 +1236,8 @@ contract JNCMarketplace {
             revert PaymentTokenNotConfigured();
         }
 
-        if (minimumPaymentAmount == 0) {
-            revert InvalidInput();
+        if (minimumPaymentAmount < config.floorPaymentAmount) {
+            revert BelowMinimum();
         }
 
         config.minimumPaymentAmount =
@@ -1227,7 +1245,29 @@ contract JNCMarketplace {
 
         emit PaymentTokenConfigured(
             paymentToken,
+            config.floorPaymentAmount,
             minimumPaymentAmount,
+            config.enabled
+        );
+    }
+
+    function getPaymentTokenLimits(
+        address paymentToken
+    ) external view returns (
+        uint256 floorPaymentAmount,
+        uint256 minimumPaymentAmount,
+        bool enabled
+    ) {
+        PaymentTokenConfig storage config =
+            paymentTokenConfigs[paymentToken];
+
+        if (!config.configured) {
+            revert PaymentTokenNotConfigured();
+        }
+
+        return (
+            config.floorPaymentAmount,
+            config.minimumPaymentAmount,
             config.enabled
         );
     }
