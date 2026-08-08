@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1.3</title>
+<title>JNC Admin Center v1.1.4</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -17,20 +17,20 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 .badge{display:inline-block;margin:16px 5px 6px 0;padding:6px 9px;border-radius:999px;background:#eaf4ff;color:#075fbf;font-size:12px;font-weight:850}.preview h3{font-size:23px;margin:7px 0 4px}.symbol{font-weight:900;color:var(--blue);font-size:18px}.address{font:12px ui-monospace,Consolas,monospace;background:#f5f7fa;padding:11px;border-radius:10px;overflow-wrap:anywhere;margin-top:14px}.status{margin-top:14px;font-size:13px;font-weight:850}.on{color:var(--green)}.off{color:var(--red)}.message{font-size:13px;min-height:20px;margin-top:13px;white-space:pre-wrap}
 .list-panel{margin-top:20px}.cards{display:grid;gap:12px}.card{border:1px solid var(--line);border-radius:14px;padding:15px;display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center}.card-logo{width:48px;height:48px;border-radius:50%;object-fit:cover;background:#edf2f7}.card h3{font-size:15px;margin:0 0 4px}.card.stopped{opacity:.72;background:#fafbfc}.lifecycle{display:inline-block;margin-top:4px;padding:3px 7px;border-radius:999px;font-size:11px;font-weight:850}.lifecycle.active{background:#e7f6ee;color:var(--green)}.lifecycle.stopped{background:#fff0ef;color:var(--red)}.meta{font-size:12px;color:var(--muted);overflow-wrap:anywhere;line-height:1.55}.card-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.small{padding:8px 10px;font-size:12px}.empty{color:var(--muted);font-size:13px}.security{background:#fff8e7;border:1px solid #f1d792;border-radius:12px;padding:12px;font-size:12px;line-height:1.6;margin-bottom:17px}
 .flow{background:#f5f9ff;border:1px solid #cfe0f5;border-radius:12px;padding:12px;font-size:12px;line-height:1.65;margin-bottom:17px}.flow strong{color:var(--blue2)}
-.runtime{display:grid;gap:8px;margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:#f8fbff}.runtime-row{display:flex;justify-content:space-between;gap:12px;font-size:12px}.runtime-row span{color:var(--muted)}.runtime-row strong{text-align:right;overflow-wrap:anywhere}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf3fa;color:#52627a;font-size:11px}.pill.ok{background:#e7f6ee;color:var(--green)}.pill.wait{background:#fff8e7;color:var(--amber)}.pill.bad{background:#fff0ef;color:var(--red)}
+.runtime{display:grid;gap:8px;margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:#f8fbff}.runtime-row{display:flex;justify-content:space-between;gap:12px;font-size:12px}.runtime-row span{color:var(--muted)}.runtime-row strong{text-align:right;overflow-wrap:anywhere}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf3fa;color:#52627a;font-size:11px}.pill.ok{background:#e7f6ee;color:var(--green)}.pill.wait{background:#fff8e7;color:var(--amber)}.pill.bad{background:#fff0ef;color:var(--red)}.runtime-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:-4px}
 @media(max-width:820px){.grid{grid-template-columns:1fr}.preview{position:static}}@media(max-width:560px){.row{grid-template-columns:1fr}.card{grid-template-columns:44px 1fr}.card-actions{grid-column:1/-1;justify-content:flex-start}.hero h1{font-size:23px}}
 </style>
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.3</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.4</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
-<div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplace操作は運営Fee WalletのMetaMask承認が必要です。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
-<div class="flow"><strong>v1.1.3の登録経路：</strong> 入力 → MetaMask → ERC20 decimals取得 → 対象チェーンのMarketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。終了／再開もMarketplaceとKVを同じ状態へ同期します。</div>
+<div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplaceへの書き込み操作は運営Fee WalletのMetaMask承認が必要です。読み取り確認ではWallet接続を要求しません。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
+<div class="flow"><strong>v1.1.4の登録経路：</strong> 入力 → ERC20 decimals取得 → 対象チェーンのMarketplace確認 → 書き込み時だけFee Wallet確認 → Marketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。終了／再開もMarketplaceとKVを同じ状態へ同期します。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -62,11 +62,11 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 <div class="runtime-row"><span>Wallet Provider</span><strong id="providerRuntime">未検出</strong></div>
 <div class="runtime-row"><span>MetaMask</span><strong id="walletRuntime">未接続</strong></div>
 <div class="runtime-row"><span>On-chain</span><strong id="onchainRuntime"><span class="pill">未確認</span></strong></div>
+<div class="runtime-note">Wallet表示は参考情報です。Marketplaceへの書き込み時に、その瞬間の接続アカウントを再確認します。</div>
 </div>
 
 <div class="actions">
 <button class="primary" type="submit" id="saveBtn">Marketplace登録 + JNC保存</button>
-<button class="secondary" type="button" id="connectBtn">MetaMask接続確認</button>
 <button class="secondary" type="button" id="verifyBtn">オンチェーン確認</button>
 <button class="secondary" type="button" id="newBtn">新規入力</button>
 <button class="secondary" type="button" id="reloadBtn">登録一覧を再読込</button>
@@ -244,19 +244,13 @@ function word(data,index){return String(data||"").replace(/^0x/,"").slice(index*
 function uintAt(data,index){return BigInt("0x"+word(data,index))}
 function boolAt(data,index){return uintAt(data,index)!==0n}
 
-async function getCurrentWalletAddress(requestAccess=false){
+async function refreshWalletAddress(requestAccess=false){
   const provider=getProvider();
-  const method=requestAccess?"eth_requestAccounts":"eth_accounts";
-  const accounts=await provider.request({method});
+  let accounts=await provider.request({method:"eth_accounts"});
+  if(requestAccess && (!accounts||!accounts.length)){
+    accounts=await provider.request({method:"eth_requestAccounts"});
+  }
   walletAddress=accounts?.[0]||"";
-  preview();
-  return walletAddress;
-}
-async function connectWallet(){
-  const provider=getProvider();
-  const accounts=await provider.request({method:"eth_requestAccounts"});
-  walletAddress=accounts?.[0]||"";
-  if(!walletAddress)throw new Error("MetaMaskで接続するアカウントを選択してください。");
   preview();
   return walletAddress;
 }
@@ -272,7 +266,7 @@ async function ethCall(to,data){
   return getProvider().request({method:"eth_call",params:[{to,data},"latest"]});
 }
 async function readDecimals(){
-  if(!walletAddress)await connectWallet();await ensureChain();
+  await ensureChain();
   if(!isAddress(f.tokenAddress.value))throw new Error("トークンアドレスを確認してください。");
   const raw=await ethCall(normalizeAddress(f.tokenAddress.value),SELECTOR.decimals);
   if(!raw||raw==="0x")throw new Error("ERC20 decimals()を取得できませんでした。");
@@ -281,7 +275,7 @@ async function readDecimals(){
 }
 async function readPaymentTokenConfig(){
   const d=deployment();if(!d?.enabled||!isAddress(d.marketplace))throw new Error("Marketplace未Deployです。");
-  if(!walletAddress)await connectWallet();await ensureChain();
+  await ensureChain();
   const raw=await ethCall(d.marketplace,SELECTOR.paymentTokenConfigs+addrWord(f.tokenAddress.value));
   if(String(raw||"").replace(/^0x/,"").length<256)throw new Error("Payment Token設定を読み取れませんでした。");
   return{configured:boolAt(raw,0),enabled:boolAt(raw,1),floorPaymentAmount:uintAt(raw,2),minimumPaymentAmount:uintAt(raw,3)};
@@ -300,14 +294,20 @@ async function verifyOnChain(show=true){
 async function sendTx(data,label){
   const d=deployment();
   await ensureChain();
-  // Always re-read the account MetaMask currently exposes before a privileged write.
-  const currentWallet=await getCurrentWalletAddress(false);
-  if(!currentWallet)throw new Error("MetaMaskを接続してください。");
-  if(lc(currentWallet)!==lc(d.feeWallet))throw new Error(`現在のMetaMask ${currentWallet} では承認できません。Marketplace Fee Wallet ${d.feeWallet} をMetaMaskで選択してから、もう一度実行してください。`);
+
+  // Single privileged-wallet path:
+  // resolve the account immediately before every Marketplace write.
+  const currentWallet=await refreshWalletAddress(true);
+  if(!currentWallet)throw new Error("MetaMaskでMarketplace Fee Walletを接続してください。");
+  if(lc(currentWallet)!==lc(d.feeWallet)){
+    throw new Error(`現在このサイトに接続されているMetaMask ${currentWallet} では承認できません。Marketplace Fee Wallet ${d.feeWallet} を接続してから、もう一度実行してください。`);
+  }
+
   setOnchain(`${label} 承認待ち`,"wait");
   const hash=await getProvider().request({method:"eth_sendTransaction",params:[{from:currentWallet,to:d.marketplace,data,value:"0x0"}]});
   message(`${label}を送信しました。確定待ち…\n${hash}`);
-  await waitReceipt(hash);return hash;
+  await waitReceipt(hash);
+  return hash;
 }
 async function waitReceipt(hash,timeout=180000){
   const start=Date.now();
@@ -395,7 +395,6 @@ async function prepareItemContext(item){
   const d=deployment();
   if(!d?.enabled||!isAddress(d.marketplace))throw new Error(`${item.chain?.name||item.chain.key}のMarketplaceは未Deployです。`);
   await ensureChain();
-  await getCurrentWalletAddress(false);
   return{p,d};
 }
 
@@ -513,7 +512,6 @@ function resetForm(){
 
 f.logoFile.addEventListener("change",()=>{const file=f.logoFile.files[0];if(!file){$("logoPreview").innerHTML=existingLogoUrl?`<img src="${gateway(existingLogoUrl)}" alt="">`:"LOGO";return}const reader=new FileReader();reader.onload=e=>$("logoPreview").innerHTML=`<img src="${e.target.result}" alt="">`;reader.readAsDataURL(file)});
 Object.values(f).forEach(field=>{field.addEventListener("input",()=>{if(field===f.tokenAddress){f.decimals.value="";setOnchain("未確認","")}preview()});field.addEventListener("change",preview)});
-$("connectBtn").onclick=()=>connectWallet().then(()=>message(`MetaMask接続確認：${walletAddress}\nProvider：${providerLabel()}`)).catch(error=>message(error.message,false));
 $("verifyBtn").onclick=()=>verifyOnChain(true).catch(()=>{});
 $("newBtn").onclick=resetForm;
 $("reloadBtn").onclick=()=>loadRegistry().catch(error=>message(error.message,false));
@@ -521,9 +519,8 @@ $("reloadBtn").onclick=()=>loadRegistry().catch(error=>message(error.message,fal
 $("form").onsubmit=async event=>{
   event.preventDefault();const error=validate();if(error)return message(error,false);
   try{
-    ["saveBtn","connectBtn","verifyBtn"].forEach(id=>$(id).disabled=true);
+    ["saveBtn","verifyBtn"].forEach(id=>$(id).disabled=true);
     await ensureChain();
-    await getCurrentWalletAddress(false);
     const sync=await syncMarketplace();
     message("Marketplace設定を確認しました。ロゴとJNC設定を保存しています…");
     const logo=await uploadLogo(f.logoFile.files[0]);const symbol=f.tokenSymbol.value.trim().toUpperCase(),d=deployment();
@@ -543,7 +540,7 @@ $("form").onsubmit=async event=>{
     message(`${data.collaboration.paymentToken.displaySymbol}をMarketplaceとJNCへ反映しました。`);
     await loadRegistry();startEdit(data.collaboration);
   }catch(error){message(error.message,false);setOnchain("要確認","bad")}
-  finally{["saveBtn","connectBtn","verifyBtn"].forEach(id=>$(id).disabled=false)}
+  finally{["saveBtn","verifyBtn"].forEach(id=>$(id).disabled=false)}
 };
 
 initProviderDiscovery();
@@ -569,7 +566,7 @@ setTimeout(async()=>{
   selectMetaMaskProvider();
   bindSelectedProviderEvents();
   if(walletProvider){
-    try{await getCurrentWalletAddress(false)}catch(_error){walletAddress="";}
+    try{await refreshWalletAddress(false)}catch(_error){walletAddress="";}
   }
   preview();
 },150);
