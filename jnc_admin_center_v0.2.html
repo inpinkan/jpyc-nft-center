@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1.2</title>
+<title>JNC Admin Center v1.1.3</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -23,14 +23,14 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.2</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.3</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
-<div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplace操作は運営Fee WalletのMetaMask承認が必要です。</div>
-<div class="flow"><strong>v1.1.2の登録経路：</strong> 入力 → MetaMask → ERC20 decimals取得 → 対象チェーンのMarketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。終了／再開もMarketplaceとKVを同じ状態へ同期します。</div>
+<div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplace操作は運営Fee WalletのMetaMask承認が必要です。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
+<div class="flow"><strong>v1.1.3の登録経路：</strong> 入力 → MetaMask → ERC20 decimals取得 → 対象チェーンのMarketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。終了／再開もMarketplaceとKVを同じ状態へ同期します。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -59,13 +59,14 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 <div class="runtime">
 <div class="runtime-row"><span>Marketplace</span><strong id="marketplaceRuntime">—</strong></div>
 <div class="runtime-row"><span>Fee Wallet</span><strong id="feeWalletRuntime">—</strong></div>
+<div class="runtime-row"><span>Wallet Provider</span><strong id="providerRuntime">未検出</strong></div>
 <div class="runtime-row"><span>MetaMask</span><strong id="walletRuntime">未接続</strong></div>
 <div class="runtime-row"><span>On-chain</span><strong id="onchainRuntime"><span class="pill">未確認</span></strong></div>
 </div>
 
 <div class="actions">
 <button class="primary" type="submit" id="saveBtn">Marketplace登録 + JNC保存</button>
-<button class="secondary" type="button" id="connectBtn">MetaMask接続</button>
+<button class="secondary" type="button" id="connectBtn">MetaMask接続確認</button>
 <button class="secondary" type="button" id="verifyBtn">オンチェーン確認</button>
 <button class="secondary" type="button" id="newBtn">新規入力</button>
 <button class="secondary" type="button" id="reloadBtn">登録一覧を再読込</button>
@@ -115,6 +116,70 @@ const MARKETPLACE_DEPLOYMENTS=Object.freeze({
 const $=id=>document.getElementById(id);
 const f={adminKey:$("adminKey"),chain:$("chain"),tokenName:$("tokenName"),tokenSymbol:$("tokenSymbol"),tokenAddress:$("tokenAddress"),decimals:$("decimals"),floorAmount:$("floorAmount"),minimumAmount:$("minimumAmount"),logoFile:$("logoFile"),enabled:$("enabled")};
 let registry=[],editingId="",existingLogoUrl="",existingLogoCid="",walletAddress="",editingOriginal=null;
+let walletProvider=null,walletProviderInfo=null;
+const discoveredProviders=[];
+
+
+function isLikelyMetaMaskProvider(provider){
+  if(!provider || provider.isMetaMask!==true)return false;
+  if(provider.isOkxWallet||provider.isRabby||provider.isBraveWallet||provider.isCoinbaseWallet||provider.isPhantom)return false;
+  return true;
+}
+function providerLabel(){
+  if(walletProviderInfo?.name)return walletProviderInfo.name;
+  if(walletProviderInfo?.rdns)return walletProviderInfo.rdns;
+  return walletProvider?"MetaMask":"未検出";
+}
+function setWalletProvider(provider,info=null){
+  if(!provider)return false;
+  walletProvider=provider;
+  walletProviderInfo=info||null;
+  const el=document.getElementById("providerRuntime");
+  if(el)el.textContent=providerLabel();
+  return true;
+}
+function selectMetaMaskProvider(){
+  const exact=discoveredProviders.find(x=>{
+    const rdns=String(x.info?.rdns||"").toLowerCase();
+    const name=String(x.info?.name||"").toLowerCase();
+    return rdns==="io.metamask"||name==="metamask";
+  });
+  if(exact)return setWalletProvider(exact.provider,exact.info);
+
+  const injected=window.ethereum?.providers;
+  if(Array.isArray(injected)){
+    const mm=injected.find(isLikelyMetaMaskProvider);
+    if(mm)return setWalletProvider(mm,{name:"MetaMask"});
+  }
+
+  if(isLikelyMetaMaskProvider(window.ethereum)){
+    return setWalletProvider(window.ethereum,{name:"MetaMask"});
+  }
+
+  walletProvider=null;
+  walletProviderInfo=null;
+  const el=document.getElementById("providerRuntime");
+  if(el)el.textContent="MetaMask未検出";
+  return false;
+}
+function initProviderDiscovery(){
+  window.addEventListener("eip6963:announceProvider",event=>{
+    const detail=event?.detail;
+    if(!detail?.provider)return;
+    const key=detail.info?.uuid||detail.info?.rdns||detail.info?.name||String(discoveredProviders.length);
+    if(!discoveredProviders.some(x=>(x.info?.uuid||x.info?.rdns||x.info?.name)===key)){
+      discoveredProviders.push(detail);
+    }
+    selectMetaMaskProvider();
+  });
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
+  selectMetaMaskProvider();
+}
+function getProvider(){
+  if(!walletProvider)selectMetaMaskProvider();
+  if(!walletProvider)throw new Error("MetaMask Providerを検出できません。MetaMask拡張機能を確認してください。");
+  return walletProvider;
+}
 
 function chainData(){const o=f.chain.options[f.chain.selectedIndex];return{key:f.chain.value,name:o?.dataset.name||"",chainId:o?.dataset.id?Number(o.dataset.id):null,chainHex:o?.dataset.hex||"",nativeSymbol:o?.dataset.native||""}}
 function deployment(){return MARKETPLACE_DEPLOYMENTS[f.chain.value]||null}
@@ -140,6 +205,7 @@ function preview(){
   $("decimalsPreview").textContent=f.decimals.value||"—";
   $("marketplaceRuntime").textContent=d?.enabled&&isAddress(d.marketplace)?short(d.marketplace):"未Deploy";
   $("feeWalletRuntime").textContent=d?.enabled&&isAddress(d.feeWallet)?short(d.feeWallet):"—";
+  $("providerRuntime").textContent=providerLabel();
   $("walletRuntime").textContent=walletAddress?short(walletAddress):"未接続";
   if(!d?.enabled&&f.chain.value)setOnchain("Marketplace未Deploy","wait");
 }
@@ -179,27 +245,32 @@ function uintAt(data,index){return BigInt("0x"+word(data,index))}
 function boolAt(data,index){return uintAt(data,index)!==0n}
 
 async function getCurrentWalletAddress(requestAccess=false){
-  if(!window.ethereum)throw new Error("MetaMaskが見つかりません。");
+  const provider=getProvider();
   const method=requestAccess?"eth_requestAccounts":"eth_accounts";
-  let accounts=await ethereum.request({method});
-  if((!accounts||!accounts.length)&&!requestAccess)accounts=await ethereum.request({method:"eth_requestAccounts"});
+  const accounts=await provider.request({method});
   walletAddress=accounts?.[0]||"";
   preview();
   return walletAddress;
 }
 async function connectWallet(){
-  const current=await getCurrentWalletAddress(true);
-  if(!current)throw new Error("ウォレットアカウントが選択されませんでした。");
-  return current;
+  const provider=getProvider();
+  const accounts=await provider.request({method:"eth_requestAccounts"});
+  walletAddress=accounts?.[0]||"";
+  if(!walletAddress)throw new Error("MetaMaskで接続するアカウントを選択してください。");
+  preview();
+  return walletAddress;
 }
 async function ensureChain(){
+  const provider=getProvider();
   const c=chainData();if(!c.chainHex)throw new Error("チェーン設定がありません。");
-  const current=await ethereum.request({method:"eth_chainId"});
-  if(lc(current)!==lc(c.chainHex))await ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:c.chainHex}]});
-  const after=await ethereum.request({method:"eth_chainId"});
+  const current=await provider.request({method:"eth_chainId"});
+  if(lc(current)!==lc(c.chainHex))await provider.request({method:"wallet_switchEthereumChain",params:[{chainId:c.chainHex}]});
+  const after=await provider.request({method:"eth_chainId"});
   if(lc(after)!==lc(c.chainHex))throw new Error(`${c.name}への切替が完了しませんでした。`);
 }
-async function ethCall(to,data){return ethereum.request({method:"eth_call",params:[{to,data},"latest"]})}
+async function ethCall(to,data){
+  return getProvider().request({method:"eth_call",params:[{to,data},"latest"]});
+}
 async function readDecimals(){
   if(!walletAddress)await connectWallet();await ensureChain();
   if(!isAddress(f.tokenAddress.value))throw new Error("トークンアドレスを確認してください。");
@@ -234,14 +305,14 @@ async function sendTx(data,label){
   if(!currentWallet)throw new Error("MetaMaskを接続してください。");
   if(lc(currentWallet)!==lc(d.feeWallet))throw new Error(`現在のMetaMask ${currentWallet} では承認できません。Marketplace Fee Wallet ${d.feeWallet} をMetaMaskで選択してから、もう一度実行してください。`);
   setOnchain(`${label} 承認待ち`,"wait");
-  const hash=await ethereum.request({method:"eth_sendTransaction",params:[{from:currentWallet,to:d.marketplace,data,value:"0x0"}]});
+  const hash=await getProvider().request({method:"eth_sendTransaction",params:[{from:currentWallet,to:d.marketplace,data,value:"0x0"}]});
   message(`${label}を送信しました。確定待ち…\n${hash}`);
   await waitReceipt(hash);return hash;
 }
 async function waitReceipt(hash,timeout=180000){
   const start=Date.now();
   while(Date.now()-start<timeout){
-    const r=await ethereum.request({method:"eth_getTransactionReceipt",params:[hash]});
+    const r=await getProvider().request({method:"eth_getTransactionReceipt",params:[hash]});
     if(r){if(r.status&&BigInt(r.status)===0n)throw new Error("トランザクションがRevertしました。");return r}
     await new Promise(resolve=>setTimeout(resolve,1800));
   }
@@ -442,7 +513,7 @@ function resetForm(){
 
 f.logoFile.addEventListener("change",()=>{const file=f.logoFile.files[0];if(!file){$("logoPreview").innerHTML=existingLogoUrl?`<img src="${gateway(existingLogoUrl)}" alt="">`:"LOGO";return}const reader=new FileReader();reader.onload=e=>$("logoPreview").innerHTML=`<img src="${e.target.result}" alt="">`;reader.readAsDataURL(file)});
 Object.values(f).forEach(field=>{field.addEventListener("input",()=>{if(field===f.tokenAddress){f.decimals.value="";setOnchain("未確認","")}preview()});field.addEventListener("change",preview)});
-$("connectBtn").onclick=()=>connectWallet().then(()=>message(`MetaMask接続：${walletAddress}`)).catch(error=>message(error.message,false));
+$("connectBtn").onclick=()=>connectWallet().then(()=>message(`MetaMask接続確認：${walletAddress}\nProvider：${providerLabel()}`)).catch(error=>message(error.message,false));
 $("verifyBtn").onclick=()=>verifyOnChain(true).catch(()=>{});
 $("newBtn").onclick=resetForm;
 $("reloadBtn").onclick=()=>loadRegistry().catch(error=>message(error.message,false));
@@ -475,10 +546,34 @@ $("form").onsubmit=async event=>{
   finally{["saveBtn","connectBtn","verifyBtn"].forEach(id=>$(id).disabled=false)}
 };
 
-if(window.ethereum){
-  ethereum.on?.("accountsChanged",accounts=>{walletAddress=accounts?.[0]||"";preview()});
-  ethereum.on?.("chainChanged",()=>{setOnchain("未確認","");preview()});
+initProviderDiscovery();
+
+function handleAccountsChanged(accounts){
+  walletAddress=accounts?.[0]||"";
+  preview();
+  message(walletAddress?`MetaMaskアカウント変更：${walletAddress}`:"MetaMaskは未接続です。",Boolean(walletAddress));
 }
+function handleChainChanged(){
+  setOnchain("未確認","");
+  preview();
+}
+function bindSelectedProviderEvents(){
+  if(!walletProvider)return;
+  walletProvider.removeListener?.("accountsChanged",handleAccountsChanged);
+  walletProvider.removeListener?.("chainChanged",handleChainChanged);
+  walletProvider.on?.("accountsChanged",handleAccountsChanged);
+  walletProvider.on?.("chainChanged",handleChainChanged);
+}
+
+setTimeout(async()=>{
+  selectMetaMaskProvider();
+  bindSelectedProviderEvents();
+  if(walletProvider){
+    try{await getCurrentWalletAddress(false)}catch(_error){walletAddress="";}
+  }
+  preview();
+},150);
+
 preview();
 })();
 </script>
