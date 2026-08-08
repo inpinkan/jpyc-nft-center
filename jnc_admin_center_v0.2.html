@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1.4</title>
+<title>JNC Admin Center v1.1.5</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -23,14 +23,14 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.4</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.5</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
 <div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplaceへの書き込み操作は運営Fee WalletのMetaMask承認が必要です。読み取り確認ではWallet接続を要求しません。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
-<div class="flow"><strong>v1.1.4の登録経路：</strong> 入力 → ERC20 decimals取得 → 対象チェーンのMarketplace確認 → 書き込み時だけFee Wallet確認 → Marketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。終了／再開もMarketplaceとKVを同じ状態へ同期します。</div>
+<div class="flow"><strong>v1.1.5の登録経路：</strong> 入力 → ERC20 decimals取得 → 対象チェーンのMarketplace確認 → 書き込み時だけFee Wallet確認 → Marketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。終了／再開もMarketplaceとKVを同じ状態へ同期します。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -110,7 +110,7 @@ const MARKETPLACE_DEPLOYMENTS=Object.freeze({
   polygon:Object.freeze({chainId:137,chainHex:"0x89",name:"Polygon",marketplace:"0x7120910884379E0C6c5AADcc56c888436ef5eB81",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",enabled:true}),
   ethereum:Object.freeze({chainId:1,chainHex:"0x1",name:"Ethereum",marketplace:"",feeWallet:"",enabled:false}),
   avalanche:Object.freeze({chainId:43114,chainHex:"0xa86a",name:"Avalanche C-Chain",marketplace:"",feeWallet:"",enabled:false}),
-  bnb:Object.freeze({chainId:56,chainHex:"0x38",name:"BNB Smart Chain",marketplace:"",feeWallet:"",enabled:false})
+  bnb:Object.freeze({chainId:56,chainHex:"0x38",name:"BNB Smart Chain",marketplace:"0xAdAcd3ceef3629f4031E9d4F189Fbd198691f044",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",enabled:true})
 });
 
 const $=id=>document.getElementById(id);
