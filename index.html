@@ -614,6 +614,18 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
    ========================================================= */
 
 /* =========================================================
+   JNC v2.5.19 — PAYMENT ENGINE MIGRATION AUDIT
+   ---------------------------------------------------------
+   - Closes the Polygon/JPYC -> Payment Profile Multi-Chain/Multi-Token migration audit.
+   - ERC20 approval writes are explicitly bound to the resolved Payment Profile chain.
+   - Marketplace writes carry the resolved chain key through transaction preflight.
+   - Buy Now / Finalize re-read authoritative auction state immediately before submission.
+   - Offer accept/cancel re-read the authoritative offer and verify its Payment Profile token.
+   - Bid-refund withdrawal re-reads the authoritative token-scoped refund before submission.
+   - No new parallel payment path is added; all writes continue through executeMarketplaceTransaction.
+   ========================================================= */
+
+/* =========================================================
    JNC v2.5.14 — PAYMENT TOKEN DECIMALS RUNTIME FIX
    ---------------------------------------------------------
    - Marketplace deployments are owned by chains, not by individual tokens.
@@ -1455,8 +1467,9 @@ async function readERC20AllowanceWithRetry(tokenAddress,owner,spender,requiredAm
   }
   return allowance;
 }
-async function sendERC20Approval(tokenAddress,owner,spender,amount,label){
-  const txHash=await sendTx({from:owner,to:tokenAddress,data:encodeERC20ApproveCall(spender,amount)});
+async function sendERC20Approval(tokenAddress,owner,spender,amount,label,chainOrKey){
+  const chain=chainConfigFrom(chainOrKey);
+  const txHash=await sendTx({from:owner,to:tokenAddress,data:encodeERC20ApproveCall(spender,amount),chainKey:chain.id});
   const receipt=await waitForReceipt(txHash);
   assertSuccessfulReceipt(receipt,label);
   return txHash;
@@ -1468,12 +1481,12 @@ async function ensureERC20Allowance({tokenAddress,owner,spender,requiredAmount,c
 
   let resetTxHash=null;
   if(current>0n){
-    resetTxHash=await sendERC20Approval(tokenAddress,owner,spender,0n,'ERC20 allowance reset');
+    resetTxHash=await sendERC20Approval(tokenAddress,owner,spender,0n,'ERC20 allowance reset',chainOrKey);
     const resetAllowance=await readERC20AllowanceWithRetry(tokenAddress,owner,spender,0n,chainOrKey,6,500);
     if(resetAllowance!==0n)throw new Error('ERC20 allowance reset was not reflected.');
   }
 
-  const txHash=await sendERC20Approval(tokenAddress,owner,spender,required,'ERC20 approve');
+  const txHash=await sendERC20Approval(tokenAddress,owner,spender,required,'ERC20 approve',chainOrKey);
   const allowance=await readERC20AllowanceWithRetry(tokenAddress,owner,spender,required,chainOrKey,12,750);
   if(allowance<required){
     throw new Error(`ERC20 allowance verification timed out. required=${required} actual=${allowance}`);
@@ -1513,7 +1526,7 @@ async function payERC20(request,context){
   const balance=await readERC20Balance(tokenAddress,payment.from,chain);
   if(balance<payment.amount)throw new Error(`Insufficient ${symbol} balance.`);
   const approval=await ensureERC20Allowance({tokenAddress,owner:payment.from,spender:payment.to,requiredAmount:payment.amount,chainOrKey:chain});
-  const txHash=await sendTx({from:payment.from,to:payment.to,data:payment.data});
+  const txHash=await sendTx({from:payment.from,to:payment.to,data:payment.data,chainKey:chain.id});
   return Object.freeze({engine:'erc20',txHash,approval,paymentProfile:context.profile});
 }
 
@@ -1712,7 +1725,7 @@ async function executeMarketplaceTransaction(request={}){
   const accounts=await ethereum.request({method:'eth_accounts'});
   if(!accounts?.[0]||lc(accounts[0])!==lc(tx.from))throw new Error(t('systemTx.walletChanged'));
   if(tx.payment)return executeMarketplacePayment({from:tx.from,to:tx.to,data:tx.data,amount:tx.amount,label:tx.label},tx.profileSource);
-  const txHash=await sendTx({from:tx.from,to:tx.to,data:tx.data});
+  const txHash=await sendTx({from:tx.from,to:tx.to,data:tx.data,chainKey:(tx.route?.chain||tx.architecture.chain).id});
   return Object.freeze({engine:'transaction',txHash,approval:null,action:tx.action,contractRole:tx.definition.contractRole,paymentProfile:tx.route?.profile||null});
 }
 
@@ -1725,7 +1738,7 @@ async function executeMarketplaceTransaction(request={}){
    units before Marketplace writes are allowed. Disabled future deployments
    may retain placeholders, but the active deployment may not.
    ========================================================= */
-const JNC_PAYMENT_AUDIT_VERSION='2.5.8-payment-profile-final-audit';
+const JNC_PAYMENT_AUDIT_VERSION='2.5.19-payment-engine-migration-audit';
 function paymentAuditCheck(id,ok,detail=''){
   return Object.freeze({id,ok:!!ok,detail:String(detail||'')});
 }
@@ -1796,7 +1809,7 @@ function canAuctionNFT(nft,state=PNC_STATE){const c=marketplacePermissionContext
    applies creation-time minimum rules from JNC_MARKETPLACE_RULES, and keeps
    payment settlement delegated to executeMarketplacePayment(). */
 const PNC_CONFIG={
-  app:{version:'v2.5.15-token-visual-polish',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
+  app:{version:'v2.5.19-payment-engine-migration-audit',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
   production:{
     deploymentKey:JNC_CONFIGURATION.productionDeploymentKey,
     chainKey:JNC_CONFIGURATION.launchTarget.chainKey,
@@ -3782,20 +3795,29 @@ async function handleCreateOffer(id){
     reportTransactionOutcome(e,transactionConfirmed,'handleCreateOffer');
   }
 }
+async function readAuthoritativeOfferForAction(nft,offerId){
+  if(!nft||!nft.tokenId||!isValidEvmAddress(nft.contractAddress))throw new Error(t('dataError.offerMalformed'));
+  const route=resolveMarketplacePaymentRoute(nft);
+  await switchToConfiguredChain(route.chain);
+  const offer=await readMarketplaceOffer(offerId,nft.contractAddress);
+  if(!offer.active||lc(offer.nftContract)!==lc(nft.contractAddress)||String(offer.tokenId)!==String(nft.tokenId))throw new Error(t('dataError.offerMalformed'));
+  if(lc(offer.paymentToken)!==lc(route.tokenAddress))throw new Error('Offer payment token does not match this NFT Payment Profile.');
+  return offer;
+}
 async function handleCancelOffer(id,offerId){
   if(!requireWallet())return;
   const n=resolveNftReference(id);
   if(!n)return;
   try{assertMarketplacePaymentProfile(n);}catch(e){alert(e.message||e);return;}
-  const offer=n&&Array.isArray(n.offers)?n.offers.find(x=>String(x.offerId)===String(offerId)):null;
-  if(!offer||lc(offer.buyer)!==lc(PNC_STATE.wallet)){alert(t('marketTx.buyerOnlyCancelOffer'));return;}
   if(!confirm(t('marketTx.cancelOfferConfirm')))return;
   let transactionConfirmed=false;
   try{
-    const txHash=(await executeMarketplaceTransaction({action:'cancelOffer',from:PNC_STATE.wallet,nft:n,data:encodeCancelOfferCall(offerId),label:'Cancel offer'})).txHash;
+    const offer=await readAuthoritativeOfferForAction(n,offerId);
+    if(lc(offer.buyer)!==lc(PNC_STATE.wallet)){alert(t('marketTx.buyerOnlyCancelOffer'));return;}
+    const txHash=(await executeMarketplaceTransaction({action:'cancelOffer',from:PNC_STATE.wallet,nft:n,data:encodeCancelOfferCall(offer.offerId),label:'Cancel offer'})).txHash;
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Cancel offer transaction');transactionConfirmed=true;
     const refreshed=await refreshNFT(n);
-    if(refreshed&&refreshed.offers.some(o=>String(o.offerId)===String(offerId)))throw new Error(t('marketTx.offerCancelVerifyFailed'));
+    if(refreshed&&refreshed.offers.some(o=>String(o.offerId)===String(offer.offerId)))throw new Error(t('marketTx.offerCancelVerifyFailed'));
     alert(t('marketTx.offerCancelled'));
   }catch(e){
     console.warn(e);
@@ -3805,16 +3827,16 @@ async function handleCancelOffer(id,offerId){
 async function handleAcceptOffer(id,offerId){
   if(!requireWallet())return;
   const n=resolveNftReference(id);
-  const offer=n&&Array.isArray(n.offers)?n.offers.find(x=>String(x.offerId)===String(offerId)):null;
-  if(!n||!offer)return;
+  if(!n)return;
   try{assertMarketplacePaymentProfile(n);}catch(e){alert(e.message||e);return;}
   if(lc(n.owner)!==lc(PNC_STATE.wallet)){alert(t('marketTx.ownerOnlyAcceptOffer'));return;}
-  if(offer.expired){alert(t('marketTx.expiredOffer'));return;}
-  if(!confirm(t('marketTx.acceptOfferConfirm',{amount:offer.amountEth,currency:currencyUnit(n)})))return;
   let transactionConfirmed=false;
   try{
+    const offer=await readAuthoritativeOfferForAction(n,offerId);
+    if(offer.expired){alert(t('marketTx.expiredOffer'));return;}
+    if(!confirm(t('marketTx.acceptOfferConfirm',{amount:baseUnitsToTokenAmount(offer.amountWei,n,Math.max(6,paymentTokenDecimals(n))),currency:currencyUnit(n)})))return;
     await ensureMarketplaceApproval(n);
-    const txHash=(await executeMarketplaceTransaction({action:'acceptOffer',from:PNC_STATE.wallet,nft:n,data:encodeAcceptOfferCall(offerId),label:'Accept offer'})).txHash;
+    const txHash=(await executeMarketplaceTransaction({action:'acceptOffer',from:PNC_STATE.wallet,nft:n,data:encodeAcceptOfferCall(offer.offerId),label:'Accept offer'})).txHash;
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Accept offer transaction');transactionConfirmed=true;
     const refreshed=await refreshNFT(n);
     if(!refreshed||lc(refreshed.owner)!==lc(offer.buyer))throw new Error(t('marketTx.offerAcceptOwnerVerifyFailed'));
@@ -3972,24 +3994,21 @@ async function handleBidAuction(id){
 }
 async function handleBuyNowAuction(id){
   if(!requireWallet())return;
-  const n=resolveNftReference(id),a=n&&n.auction;
-  if(!n||!a||!a.active){alert(t('marketTx.notActiveAuction'));return;}
+  const n=resolveNftReference(id);
+  if(!n)return;
   try{assertMarketplacePaymentProfile(n);}catch(e){alert(e.message||e);return;}
-  if(auctionPhase(a)!=='live'){alert(t('marketTx.buyNowLiveOnly'));return;}
-  if(BigInt(a.buyNowPriceWei||'0')===0n){alert(t('marketTx.buyNowNotSet'));return;}
-  if(lc(a.seller)===lc(PNC_STATE.wallet)){alert(t('marketTx.sellerCannotBuyNow'));return;}
-  const refundNote=BigInt(a.highestBidWei||'0')>0n?t('marketTx.highestBidRefundNote'):'';
-  if(!confirm(t('marketTx.buyNowConfirm',{amount:a.buyNowPriceEth,currency:currencyUnit(n),refundNote})))return;
   let transactionConfirmed=false;
   try{
-    const {txHash}=await executeMarketplaceTransaction({
-      action:'auctionBuyNow',
-      from:PNC_STATE.wallet,
-      nft:n,
-      data:encodeBuyNowAuctionCall(a.auctionId),
-      amount:a.buyNowPriceWei,
-      label:'Auction Buy Now'
-    });
+    const a=await readAuthoritativeAuctionForAction(n);
+    if(auctionPhase(a)!=='live'){alert(t('marketTx.buyNowLiveOnly'));return;}
+    if(BigInt(a.buyNowPriceWei||'0')===0n){alert(t('marketTx.buyNowNotSet'));return;}
+    if(lc(a.seller)===lc(PNC_STATE.wallet)){alert(t('marketTx.sellerCannotBuyNow'));return;}
+    const route=resolveMarketplacePaymentRoute(n);
+    if(lc(a.paymentToken)!==lc(route.tokenAddress))throw new Error('Auction payment token does not match this NFT Payment Profile.');
+    const refundNote=BigInt(a.highestBidWei||'0')>0n?t('marketTx.highestBidRefundNote'):'';
+    const buyNowDisplay=baseUnitsToTokenAmount(a.buyNowPriceWei,n,Math.max(6,paymentTokenDecimals(n)));
+    if(!confirm(t('marketTx.buyNowConfirm',{amount:buyNowDisplay,currency:currencyUnit(n),refundNote})))return;
+    const {txHash}=await executeMarketplaceTransaction({action:'auctionBuyNow',from:PNC_STATE.wallet,nft:n,data:encodeBuyNowAuctionCall(a.auctionId),amount:a.buyNowPriceWei,label:'Auction Buy Now'});
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Auction Buy Now transaction');transactionConfirmed=true;
     const refreshed=await refreshNFT(n);
     if(!refreshed||lc(refreshed.owner)!==lc(PNC_STATE.wallet))throw new Error(t('marketTx.buyNowOwnerVerifyFailed'));
@@ -4054,13 +4073,16 @@ async function handleCancelAuction(id){
 }
 async function handleFinalizeAuction(id){
   if(!requireWallet())return;
-  const n=resolveNftReference(id),a=n&&n.auction;
-  if(!a||!a.active){alert(t('marketTx.notActiveAuction'));return;}
+  const n=resolveNftReference(id);
+  if(!n)return;
   try{assertMarketplacePaymentProfile(n);}catch(e){alert(e.message||e);return;}
-  if(!a.ended){alert(t('marketTx.auctionNotEnded'));return;}
-  if(!confirm(t('marketTx.finalizeConfirm')))return;
   let transactionConfirmed=false;
   try{
+    const a=await readAuthoritativeAuctionForAction(n);
+    if(!a.ended){alert(t('marketTx.auctionNotEnded'));return;}
+    const route=resolveMarketplacePaymentRoute(n);
+    if(lc(a.paymentToken)!==lc(route.tokenAddress))throw new Error('Auction payment token does not match this NFT Payment Profile.');
+    if(!confirm(t('marketTx.finalizeConfirm')))return;
     const winner=a.highestBidder;
     const txHash=(await executeMarketplaceTransaction({action:'finalizeAuction',from:PNC_STATE.wallet,nft:n,data:encodeFinalizeAuctionCall(a.auctionId),label:'Finalize auction'})).txHash;
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Finalize auction transaction');transactionConfirmed=true;
@@ -4103,20 +4125,18 @@ async function waitForListingVisible(key){
 async function handleWithdrawBidRefund(id){
   if(!requireWallet())return;
   const n=resolveNftReference(id);if(!n)return;
-  const wei=String(n.bidRefundWei||'0');
-  if(BigInt(wei)===0n){alert(t('marketTx.noBidRefund'));return;}
-  if(!confirm(t('marketTx.withdrawRefundConfirm',{amount:baseUnitsToTokenAmount(wei,n,Math.max(6,paymentTokenDecimals(n))),currency:currencyUnit(n)})))return;
+  try{assertMarketplacePaymentProfile(n);}catch(e){alert(e.message||e);return;}
   let transactionConfirmed=false;
   try{
     const route=resolveMarketplacePaymentRoute(n);
+    await switchToConfiguredChain(route.chain);
+    const wei=String(await readPendingBidRefund(PNC_STATE.wallet,n)||'0');
+    if(BigInt(wei)===0n){alert(t('marketTx.noBidRefund'));return;}
+    if(!confirm(t('marketTx.withdrawRefundConfirm',{amount:baseUnitsToTokenAmount(wei,n,Math.max(6,paymentTokenDecimals(n))),currency:currencyUnit(n)})))return;
     const txHash=(await executeMarketplaceTransaction({action:'withdrawBidRefund',from:PNC_STATE.wallet,nft:n,data:encodeWithdrawBidRefundCall(route.tokenAddress),label:'Withdraw bid refund'})).txHash;
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Withdraw bid refund transaction');transactionConfirmed=true;
     const cleared=await waitForBidRefundCleared(n);
-    if(!cleared){
-      console.warn('Bid refund succeeded on-chain; RPC synchronization is still pending.',txHash);
-      alert(t('marketTx.bidRefundWithdrawn'));
-      return;
-    }
+    if(!cleared)console.warn('Bid refund succeeded on-chain; RPC synchronization is still pending.',txHash);
     alert(t('marketTx.bidRefundWithdrawn'));
   }catch(e){
     console.warn(e);
