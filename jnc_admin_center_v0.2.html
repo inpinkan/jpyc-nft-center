@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1.5</title>
+<title>JNC Admin Center v1.1.6</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -23,14 +23,14 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.5</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.6</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
 <div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplaceへの書き込み操作は運営Fee WalletのMetaMask承認が必要です。読み取り確認ではWallet接続を要求しません。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
-<div class="flow"><strong>v1.1.5の登録経路：</strong> 入力 → ERC20 decimals取得 → 対象チェーンのMarketplace確認 → 書き込み時だけFee Wallet確認 → Marketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。終了／再開もMarketplaceとKVを同じ状態へ同期します。</div>
+<div class="flow"><strong>v1.1.6の登録経路：</strong> 入力 → ERC20 decimals取得 → 対象チェーンのMarketplace確認 → 書き込み時だけFee Wallet確認 → Marketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。終了／再開もMarketplaceとKVを同じ状態へ同期します。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -496,13 +496,32 @@ async function syncRegistryItemFromChain(item){
   }
 }
 
-function startEdit(item){
+async function startEdit(item){
   const p=item.paymentToken||{};editingId=item.projectId;editingOriginal=item;
   f.chain.value=item.chain?.key||"";f.tokenName.value=p.name||"";f.tokenSymbol.value=p.symbol||"";f.tokenAddress.value=p.address||"";
   f.decimals.value=p.decimals??"";f.floorAmount.value=p.floorAmount??"1";f.minimumAmount.value=p.minimumAmount??"1";f.enabled.checked=item.enabled!==false;
   existingLogoUrl=p.logoUrl||"";existingLogoCid=p.logoCid||"";f.chain.disabled=true;f.tokenAddress.readOnly=true;f.floorAmount.readOnly=true;
   $("logoPreview").innerHTML=existingLogoUrl?`<img src="${gateway(existingLogoUrl)}" alt="">`:"LOGO";$("saveBtn").textContent="Marketplace更新 + JNC保存";
-  preview();verifyOnChain(false).catch(()=>{});window.scrollTo({top:0,behavior:"smooth"});message(`${p.displaySymbol||p.symbol}を編集中です。絶対下限は変更できません。`);
+  preview();window.scrollTo({top:0,behavior:"smooth"});message(`${p.displaySymbol||p.symbol}を編集中です。オンチェーンの絶対下限を確認しています…`);
+  try{
+    const decimals=f.decimals.value?Number(f.decimals.value):await readDecimals();
+    const current=await readPaymentTokenConfig();
+    if(current.configured){
+      f.decimals.value=String(decimals);
+      f.floorAmount.value=formatUnits(current.floorPaymentAmount,decimals);
+      f.minimumAmount.value=formatUnits(current.minimumPaymentAmount,decimals);
+      f.enabled.checked=current.enabled;
+      setOnchain(current.enabled?"登録済み / 有効":"登録済み / 無効",current.enabled?"ok":"wait");
+      preview();
+      message(`${p.displaySymbol||p.symbol}を編集中です。絶対下限はオンチェーン値 ${f.floorAmount.value} に同期され、変更できません。運営設定の最低価格は変更できます。`);
+    }else{
+      setOnchain("未登録","bad");
+      message(`${p.displaySymbol||p.symbol}はMarketplace未登録です。`,false);
+    }
+  }catch(error){
+    setOnchain("確認失敗","bad");
+    message(`オンチェーン設定の読込に失敗しました：${error.message}`,false);
+  }
 }
 function resetForm(){
   const key=f.adminKey.value;$("form").reset();f.adminKey.value=key;f.enabled.checked=true;f.floorAmount.value="1";f.minimumAmount.value="1";f.decimals.value="";
