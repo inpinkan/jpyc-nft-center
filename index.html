@@ -1432,16 +1432,24 @@ function chainBadgeHtml(nft){
   return `<span class="chain-badge">${visual.logo?`<img class="chain-logo" src="${visual.logo}" alt="">`:''}<span>${esc(chain.name||visual.name)}</span></span>`;
 }
 
+/* =========================================================
+   JNC v2.5.18 — ERC20 CHAIN-BOUND ALLOWANCE VERIFICATION
+   ---------------------------------------------------------
+   ERC20 balance/allowance reads are bound to the Payment Profile chain.
+   Explicit chain context takes precedence over address inference so the
+   approval write and its verification read cannot diverge across EVM chains.
+   One allowance path is retained; no parallel legacy verifier is added.
+   ========================================================= */
 function encodeERC20BalanceOfCall(account){return '0x70a08231'+addrWord(account);}
 function encodeERC20AllowanceCall(owner,spender){return '0xdd62ed3e'+addrWord(owner)+addrWord(spender);}
 function encodeERC20ApproveCall(spender,amount){return '0x095ea7b3'+addrWord(spender)+toHex(amount).slice(2);}
-async function readERC20Balance(tokenAddress,account){return BigInt(await ethCall(tokenAddress,encodeERC20BalanceOfCall(account))||'0x0');}
-async function readERC20Allowance(tokenAddress,owner,spender){return BigInt(await ethCall(tokenAddress,encodeERC20AllowanceCall(owner,spender))||'0x0');}
-async function readERC20AllowanceWithRetry(tokenAddress,owner,spender,requiredAmount,attempts=10,delayMs=750){
+async function readERC20Balance(tokenAddress,account,chainOrKey=null){return BigInt(await ethCall(tokenAddress,encodeERC20BalanceOfCall(account),chainOrKey)||'0x0');}
+async function readERC20Allowance(tokenAddress,owner,spender,chainOrKey=null){return BigInt(await ethCall(tokenAddress,encodeERC20AllowanceCall(owner,spender),chainOrKey)||'0x0');}
+async function readERC20AllowanceWithRetry(tokenAddress,owner,spender,requiredAmount,chainOrKey=null,attempts=10,delayMs=750){
   const required=BigInt(requiredAmount||0);
   let allowance=0n;
   for(let attempt=0;attempt<attempts;attempt++){
-    allowance=await readERC20Allowance(tokenAddress,owner,spender);
+    allowance=await readERC20Allowance(tokenAddress,owner,spender,chainOrKey);
     if(allowance>=required)return allowance;
     if(attempt<attempts-1)await sleep(delayMs);
   }
@@ -1453,20 +1461,20 @@ async function sendERC20Approval(tokenAddress,owner,spender,amount,label){
   assertSuccessfulReceipt(receipt,label);
   return txHash;
 }
-async function ensureERC20Allowance({tokenAddress,owner,spender,requiredAmount}){
+async function ensureERC20Allowance({tokenAddress,owner,spender,requiredAmount,chainOrKey=null}){
   const required=BigInt(requiredAmount||0);
-  const current=await readERC20Allowance(tokenAddress,owner,spender);
+  const current=await readERC20Allowance(tokenAddress,owner,spender,chainOrKey);
   if(current>=required)return{approved:false,allowance:current,txHash:null};
 
   let resetTxHash=null;
   if(current>0n){
     resetTxHash=await sendERC20Approval(tokenAddress,owner,spender,0n,'ERC20 allowance reset');
-    const resetAllowance=await readERC20AllowanceWithRetry(tokenAddress,owner,spender,0n,6,500);
+    const resetAllowance=await readERC20AllowanceWithRetry(tokenAddress,owner,spender,0n,chainOrKey,6,500);
     if(resetAllowance!==0n)throw new Error('ERC20 allowance reset was not reflected.');
   }
 
   const txHash=await sendERC20Approval(tokenAddress,owner,spender,required,'ERC20 approve');
-  const allowance=await readERC20AllowanceWithRetry(tokenAddress,owner,spender,required,12,750);
+  const allowance=await readERC20AllowanceWithRetry(tokenAddress,owner,spender,required,chainOrKey,12,750);
   if(allowance<required){
     throw new Error(`ERC20 allowance verification timed out. required=${required} actual=${allowance}`);
   }
@@ -1497,14 +1505,14 @@ function normalizeMarketplacePaymentRequest(request={},context){
 
 async function payERC20(request,context){
   const payment=normalizeMarketplacePaymentRequest(request,context);
-  const {asset,deployment,tokenAddress,symbol}=context;
+  const {asset,deployment,tokenAddress,symbol,chain}=context;
   if(asset.type!=='erc20')throw new Error('The selected Marketplace payment asset is not ERC20.');
   if(!asset.enabled)throw new Error(`ERC20 payment asset is disabled: ${asset.id}`);
   if(!isValidEvmAddress(tokenAddress))throw new Error('ERC20 Payment Profile token is not configured.');
   if(lc(payment.to)!==lc(deployment.contracts.marketplace))throw new Error('ERC20 Marketplace payment target does not match the resolved deployment.');
-  const balance=await readERC20Balance(tokenAddress,payment.from);
+  const balance=await readERC20Balance(tokenAddress,payment.from,chain);
   if(balance<payment.amount)throw new Error(`Insufficient ${symbol} balance.`);
-  const approval=await ensureERC20Allowance({tokenAddress,owner:payment.from,spender:payment.to,requiredAmount:payment.amount});
+  const approval=await ensureERC20Allowance({tokenAddress,owner:payment.from,spender:payment.to,requiredAmount:payment.amount,chainOrKey:chain});
   const txHash=await sendTx({from:payment.from,to:payment.to,data:payment.data});
   return Object.freeze({engine:'erc20',txHash,approval,paymentProfile:context.profile});
 }
@@ -2559,7 +2567,7 @@ async function publicRpcRequest(chainOrKey,method,params=[]){
   throw lastError||new Error(`Public RPC request failed for ${chain?.name||'target chain'}.`);
 }
 async function ethCall(to,data,chainOrKey=null){
-  const targetChainKey=getTargetChainKey(to)||chainOrKey;
+  const targetChainKey=chainOrKey||getTargetChainKey(to);
   const targetChain=chainConfigFrom(targetChainKey);
   let result;
   const active=window.ethereum?await getActiveChainId():'';
