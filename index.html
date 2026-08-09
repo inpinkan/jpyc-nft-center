@@ -3871,7 +3871,16 @@ async function handleCreateAuction(id){
       label:'Create auction'
     })).txHash;
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Create auction transaction');transactionConfirmed=true;
-    const refreshed=await refreshNFT(n);
+
+    // JNC v2.5.17 — the receipt can be confirmed before the public RPC used by
+    // localized reads exposes the newly-created auction. Retry only this
+    // post-transaction synchronization check; never resubmit the transaction.
+    let refreshed=null;
+    for(let attempt=0;attempt<5;attempt++){
+      refreshed=await refreshNFT(n);
+      if(refreshed&&refreshed.auction&&refreshed.auction.active)break;
+      if(attempt<4)await sleep(1200);
+    }
     if(!refreshed||!refreshed.auction||!refreshed.auction.active)throw new Error(t('marketTx.auctionCreateVerifyFailed'));
     alert(t('marketTx.auctionCreated'));
   }catch(e){
