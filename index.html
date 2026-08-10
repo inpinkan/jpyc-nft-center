@@ -141,24 +141,6 @@ body.light .carousel-btn{background:rgba(255,255,255,.9)}
 
 
 
-/* =========================================================
-   JNC v1.9.5 — NETWORK & TRANSACTION SAFETY
-   ---------------------------------------------------------
-   Purpose:
-   - Keep Safe UI and Transaction UI strings on one t() lookup path.
-   - Preserve the approved UI, wallet, storage, media and marketplace feature paths.
-   - Migrate transaction prompts, confirmations, progress, success and failure messages through t().
-
-   Active boundaries:
-   - PNC_I18N / t() own safe and transaction interface labels.
-   - User NFT / Shop metadata is never translated or rewritten.
-   - Blockchain, Marketplace, Pinata, KV and transaction logic remains unchanged.
-   ========================================================= */
-
-/* =========================================================
-   JNC v1.8.5 — THEME FOUNDATION & MOBILE MENU SCROLL
-   Visual rules only. Marketplace / wallet logic is unchanged.
-   ========================================================= */
 :root{
   --pnc-space-1:4px;
   --pnc-space-2:8px;
@@ -274,10 +256,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 }
 
 
-/* =========================================================
-   JNC v1.8.5 — COMPONENT POLISH + FEEDBACK MOTION
-   NFT/Shop cards, modals, toast, loading and empty states.
-   ========================================================= */
 :root{
   --pnc-card-border:rgba(49,136,213,.34);
   --pnc-card-border-hover:rgba(97,183,232,.58);
@@ -410,10 +388,6 @@ body.light .language-option.is-current .language-option-status{color:#1d6b45}
 @media (prefers-reduced-motion:reduce){.menu,.menu.show,.pnc-toast,.pnc-loading{transition:none!important;animation:none!important}.pnc-loading::after{display:none}}
 
 
-/* =========================================================
-   JNC v1.8.5 — LIGHT THEME FOUNDATION / MOBILE MENU SCROLL
-   One theme path, one menu path. Dark behavior is preserved.
-   ========================================================= */
 body.light{
   color-scheme:light;
   background-image:
@@ -587,7 +561,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
   <div class="menu" id="menu" aria-hidden="true"><div class="menu-inner"><div class="menu-title" data-i18n="nav.title"></div><button onclick="showPage('homePage')">🏠 <span data-i18n="nav.home"></span></button><button onclick="showPage('collectionsPage')">🏪 <span data-i18n="nav.collections"></span></button><button onclick="showPage('vaultPage')">🏦 <span data-i18n="nav.vault"></span></button><button onclick="showPage('creatorPage')">🎨 <span data-i18n="nav.creator"></span></button><div class="menu-title" data-i18n="appearance.title"></div><button onclick="setTheme('light')">☀️ <span data-i18n="appearance.light"></span></button><button onclick="setTheme('dark')">🌙 <span data-i18n="appearance.dark"></span></button><div class="menu-title" data-i18n="language.title"></div><div class="language-panel"><div class="language-current-summary"><span data-i18n="language.currentLanguage"></span><strong id="currentLanguageName">English</strong></div><div class="language-list" role="group"><button class="language-option" type="button" data-language="en" onclick="selectLanguage('en')"><span class="language-option-main"><span aria-hidden="true">🇺🇸</span><span class="language-option-label">English</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ja" onclick="selectLanguage('ja')"><span class="language-option-main"><span aria-hidden="true">🇯🇵</span><span class="language-option-label">日本語</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ko" onclick="selectLanguage('ko')"><span class="language-option-main"><span aria-hidden="true">🇰🇷</span><span class="language-option-label">한국어</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ru" onclick="selectLanguage('ru')"><span class="language-option-main"><span aria-hidden="true">🇷🇺</span><span class="language-option-label">Русский</span></span><span class="language-option-status"></span></button></div></div></div></div>
 </header>
 <main>
-  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.5.25</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
+  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.6.0</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
   <div class="page" id="collectionsPage"><div class="hero"><h1 data-i18n="nav.collections"></h1><p data-i18n="collections.hero"></p></div><section class="section"><div class="grid" id="allCollections"></div></section></div>
   <div class="page" id="collectionPage"><div id="collectionDetail"></div></div>
   <div class="page" id="vaultPage"><div class="hero vault-hero"><h1 data-i18n="nav.vault"></h1><p id="vaultStats"></p><div class="vault-tabs" role="tablist"><button class="vault-tab active" id="vaultTabOwned" type="button" onclick="setVaultTab('owned')"></button><button class="vault-tab" id="vaultTabSend" type="button" onclick="setVaultTab('send')"></button><button class="vault-tab" id="vaultTabReceive" type="button" onclick="setVaultTab('receive')"></button></div></div><section class="section"><div id="vaultContent"></div></section></div>
@@ -604,130 +578,9 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 <script>
 'use strict';
 
-/* =========================================================
-   JNC v2.5.15 — TOKEN VISUAL POLISH
-   ---------------------------------------------------------
-   - Price token logos are enlarged by CSS size only.
-   - NFT / Collection card payment badges use the plain ERC20 symbol
-     (JPYC / PICH) without changing token identity or logo loading.
-   - Payment routing, decimals, Marketplace and image sources are unchanged.
-   ========================================================= */
-
-/* =========================================================
-   JNC v2.5.25 — LIVE AUCTIONS END-TIME ORDER
-   ---------------------------------------------------------
-   - Home "Live Auctions" keeps every active, not-yet-ended Auction visible.
-   - Auctions are ordered by endsAt ascending: the nearest ending Auction is first.
-   - No 30-item display cap is applied to Live Auctions.
-   - Ended Auctions leave the Home Live Auctions carousel on the next render/refresh.
-   - Sorting is display-only and never mutates or deletes Auction/NFT data.
-   - Mint / List / Buy / Offer / Auction transaction routing is unchanged.
-   ========================================================= */
-
-/* =========================================================
-   JNC v2.5.24 — NEW COLLECTIONS RECENCY WINDOW
-   ---------------------------------------------------------
-   - Home "New Collections" is newest-first: newest Shop is always at the left edge.
-   - Only the newest 30 Shops are rendered in the Home new-collection carousel.
-   - Shops beyond the 30-item Home window remain in MarketState / KV and all collection views.
-   - Sorting is display-only and never mutates or deletes collection data.
-   - A single newestCollections() path owns this Home ordering rule.
-   ========================================================= */
-
-/* =========================================================
-   JNC v2.5.23 — EDIT SHOP RECOVERY ISOLATION
-   ---------------------------------------------------------
-   - Manual Edit Shop selection now becomes authoritative immediately.
-   - Stale Mobile Work Recovery values from the previously selected Shop
-     are cleared before the newly selected Shop is rendered.
-   - Mobile/background work recovery remains enabled for the active Shop.
-   - Mint / List / Buy / Offer / Auction and Marketplace routing are unchanged.
-   ========================================================= */
-
-/* =========================================================
-   JNC v2.5.22 — WALLET UI CLEANUP
-   ---------------------------------------------------------
-   - Removed the speculative unavailable-wallet option from the connection UI.
-   - Removed its dead coming-soon handler and translations.
-   - The existing MetaMask connection / logout flow is unchanged.
-   ========================================================= */
-
-/* =========================================================
-   JNC v2.5.21 — NFT EXPLORER CLEANUP
-   ---------------------------------------------------------
-   - Web3 Tools now exposes one chain-aware block explorer button per NFT.
-   - The explorer target is the specific NFT item page:
-     /nft/{contractAddress}/{tokenId}.
-   - The old duplicated NFT / Contract explorer buttons are removed.
-   - Polygon / BNB explorer labels are resolved from the NFT Payment Profile chain.
-   - MetaMask import contract / Token ID copy utilities are unchanged.
-   ========================================================= */
-
-/* =========================================================
-   JNC v2.5.20 — TRANSACTION OUTCOME CONSISTENCY
-   ---------------------------------------------------------
-   - A mined success receipt can never be downgraded to a transaction failure
-     only because a later Marketplace/public-read synchronization is delayed.
-   - Receipt polling is chain-bound to the chain used by sendTx and can fall
-     back to that chain's configured public RPC if the wallet provider lags.
-   - Create Auction has three explicit outcomes: reverted/failed, confirmed +
-     synchronized, or confirmed + synchronization pending.
-   - No parallel auction/payment path is added; the existing shared transaction
-     and Marketplace routes are replaced in place.
-   ========================================================= */
-
-/* =========================================================
-   JNC v2.5.19 — PAYMENT ENGINE MIGRATION AUDIT
-   ---------------------------------------------------------
-   - Closes the Polygon/JPYC -> Payment Profile Multi-Chain/Multi-Token migration audit.
-   - ERC20 approval writes are explicitly bound to the resolved Payment Profile chain.
-   - Marketplace writes carry the resolved chain key through transaction preflight.
-   - Buy Now / Finalize re-read authoritative auction state immediately before submission.
-   - Offer accept/cancel re-read the authoritative offer and verify its Payment Profile token.
-   - Bid-refund withdrawal re-reads the authoritative token-scoped refund before submission.
-   - No new parallel payment path is added; all writes continue through executeMarketplaceTransaction.
-   ========================================================= */
-
-/* =========================================================
-   JNC v2.5.14 — PAYMENT TOKEN DECIMALS RUNTIME FIX
-   ---------------------------------------------------------
-   - Marketplace deployments are owned by chains, not by individual tokens.
-   - Polygon and BNB Smart Chain each use one JNCMarketplace v2.22.0 MultiToken ERC20 deployment.
-   - Admin Center Payment Profiles provide the ERC20 token identity.
-   - New collaboration tokens do not require a JNC HTML code registration.
-   - A token must still be configured + enabled on the chain Marketplace.
-   - Listing / Offer / Auction carry the Payment Profile token address.
-   - Runtime minimum is read from paymentTokenConfigs(paymentToken).
-   - Unsupported chains and unconfigured/disabled tokens fail closed.
-   - Default JPYC metadata remains only as the launch/fallback asset, not
-     as a whitelist that blocks other Admin Center ERC20 tokens.
-   ========================================================= */
-
-
-/* =========================================================
-   JNC v2.5.9 — MOBILE WORK RECOVERY & PUBLIC ADDRESS UX
-   - Keeps the v2.5.8 Payment Profile / Lifecycle architecture unchanged.
-   - Public Owner / Creator wallet addresses stay shortened but are no longer copy actions.
-   - Contract / Token ID / NFT ID Web3 utility copy actions remain available.
-   - Creator Center work is captured before mobile background / page suspension.
-   - Sensitive Pinata Key / Secret work-in-progress values use session storage only.
-   - Non-sensitive Creator Center work keeps the existing wallet-scoped persistent recovery.
-   - Recovery is ordered: capture → wallet recovery → render → stable restore.
-   - Manual wallet Logout still clears recovery state.
-   ========================================================= */
-
-
-/* =========================================================
-   JNC v2.3.10 — AUCTION TRANSACTION VERIFICATION
-   ---------------------------------------------------------
-   - Cancel Auction now re-reads the authoritative auction ID and struct.
-   - NFT escrow ownership is verified before cancellation.
-   - Cancellation success is verified by auctionIdByNFT == 0 and ownerOf == seller.
-   - Cached UI auction IDs are no longer trusted for cancellation.
-   - Approval + Auction are documented as two expected transactions when approval is needed.
-   ========================================================= */
-
-
+/* JNC v2.6.0 — CODEBASE CLEANUP
+   Current runtime only: historical release-note blocks and verified unreferenced helpers were removed.
+   Payment Profile, Multi-Chain, Pinata, wallet recovery, Mint/List/Buy/Offer/Auction routing and current display rules are preserved. */
 
 /* =========================================================
    JNC LANGUAGE ENGINE — v1.9.2.1
@@ -957,40 +810,12 @@ function openPinataPermissionGuide(){
 }
 function closePinataPermissionGuide(event){const modal=$('pinataPermissionModal');if(!modal)return;if(event&&event.target!==modal)return;modal.classList.remove('show');}
 
-function loadingStateHtml(label=t('common.loading')){return`<div class="pnc-loading"><span class="pnc-spinner" aria-hidden="true"></span><span>${esc(label)}</span></div>`;}
 function emptyStateHtml(icon,title,body){return`<div class="empty-state"><span class="empty-state-icon" aria-hidden="true">${esc(icon||'○')}</span><span class="empty-state-copy"><strong>${esc(title||t('common.nothingHere'))}</strong><span>${esc(body||'')}</span></span></div>`;}
 function sleep(ms){return new Promise(resolve=>window.setTimeout(resolve,Math.max(0,Number(ms)||0)));}
 
 
 
-/* =========================================================
-   JNC v2.3.6 — PRODUCTION AUDIT FIX
-   ---------------------------------------------------------
-   Registry rules:
-   1. A chain describes the EVM network itself.
-   2. A deployment binds JNC contracts to one chain.
-   3. A payment asset describes the settlement currency for a deployment.
-   4. Only an enabled deployment + enabled payment asset may be selected.
-   5. Empty addresses are intentional placeholders and must never be used.
-
-   Polygon production owns the deployed NFT, Multi-Token Marketplace and
-   fee-wallet addresses. Payment tokens are no longer part of deployment
-   identity: Admin Center Payment Profiles select ERC20 tokens dynamically.
-
-   JPYC remains the default launch asset. Each ERC20 token must be configured
-   and enabled on the active chain Marketplace before any write is allowed.
-   ========================================================= */
-const JNC_CONFIGURATION_VERSION='2.5.25';
-/* =========================================================
-   JNC v2.5.1 — ADMIN REGISTRY FOUNDATION
-   ---------------------------------------------------------
-   - Reads enabled Chain × Payment Token records from
-     /api/load-collaboration.
-   - Keeps the remote registry separate from the verified Polygon/JPYC
-     production registries in this release.
-   - A remote read failure never disables the existing JNC marketplace.
-   - No Marketplace, Mint, List, Buy, Offer or Auction route is changed here.
-   ========================================================= */
+const JNC_CONFIGURATION_VERSION='2.6.0';
 const JNC_ADMIN_REGISTRY_ENDPOINT='/api/load-collaboration';
 let JNC_ADMIN_PAYMENT_TOKEN_REGISTRY=Object.freeze([]);
 let JNC_ADMIN_REGISTRY_STATUS=Object.freeze({
@@ -1331,14 +1156,6 @@ function syncCreateNFTShopProfile(form){
   }
 }
 
-/* =========================================================
-   JNC v2.5.8 — PAYMENT PROFILE FINAL RUNTIME
-   ---------------------------------------------------------
-   Admin Center Payment Profiles own Shop/NFT payment identity.
-   This block contains only the currently deployed Marketplace runtime
-   required to verify that a selected Payment Profile can settle on-chain.
-   Historical Sepolia and disabled future-chain registries were removed.
-   ========================================================= */
 const JNC_ENVIRONMENT_REGISTRY=Object.freeze({
   production:Object.freeze({
     id:'production',label:'Production',production:true,enabled:true,
@@ -1420,10 +1237,6 @@ function getActivePaymentAsset(){
   if(!asset.enabled||asset.chainKey!==deployment.chainKey)throw new Error('Default payment asset is unavailable or mismatched.');
   return asset;
 }
-function getProductionDeployment(){return getActiveDeployment();}
-function getLaunchTargetConfiguration(){
-  return Object.freeze({chain:getActiveChainConfig(),asset:getActivePaymentAsset(),deployment:getActiveDeployment()});
-}
 function validateActiveArchitecture(){
   const deployment=getActiveDeployment(),chain=getActiveChainConfig(),asset=getActivePaymentAsset(),environment=getActiveEnvironmentConfig();
   if(!environment.enabled||!environment.allowMarketplaceWrites)throw new Error('Production Marketplace writes are disabled.');
@@ -1467,32 +1280,16 @@ function runAdminDrivenTokenRoutingAudit(){
 const JNC_ADMIN_DRIVEN_TOKEN_ROUTING_AUDIT=runAdminDrivenTokenRoutingAudit();
 
 const JNC_LAUNCH_CHAIN_KEY=JNC_ACTIVE_ARCHITECTURE.chain.id;
-function getDeploymentForChainKey(chainKey){
-  const key=String(chainKey||'').trim().toLowerCase();
-  const deployment=JNC_DEPLOYMENT_REGISTRY[key];
-  return deployment&&deployment.enabled?deployment:null;
-}
 function getDeploymentByNftContract(contractAddress){
   const address=lc(contractAddress);
   if(!address)return null;
   return Object.values(JNC_DEPLOYMENT_REGISTRY).find(item=>item.enabled&&lc(item.contracts?.nft)===address)||null;
-}
-function getDeploymentByMarketplaceContract(contractAddress){
-  const address=lc(contractAddress);
-  if(!address)return null;
-  return Object.values(JNC_DEPLOYMENT_REGISTRY).find(item=>item.enabled&&lc(item.contracts?.marketplace)===address)||null;
 }
 function getNFTChainKey(nft){
   const deployment=getDeploymentByNftContract(nft?.contractAddress);
   if(deployment)return deployment.chainKey;
   const profile=getNFTPaymentProfile(nft);
   return String(profile?.chain?.key||nft?.chainKey||'legacy').trim()||'legacy';
-}
-function getNFTPaymentAsset(nft){
-  const profile=getNFTPaymentProfile(nft);
-  if(profile?.paymentToken)return profile.paymentToken;
-  const deployment=getDeploymentByNftContract(nft?.contractAddress);
-  return deployment?.chainKey==='polygon'?JNC_ACTIVE_ARCHITECTURE.asset:null;
 }
 function getNFTCurrencyUnit(nft){return String(getNFTPaymentProfile(nft)?.paymentToken?.symbol||'');}
 function getChainVisual(chainKey){
@@ -1507,14 +1304,6 @@ function chainBadgeHtml(nft){
   return `<span class="chain-badge">${visual.logo?`<img class="chain-logo" src="${visual.logo}" alt="">`:''}<span>${esc(chain.name||visual.name)}</span></span>`;
 }
 
-/* =========================================================
-   JNC v2.5.18 — ERC20 CHAIN-BOUND ALLOWANCE VERIFICATION
-   ---------------------------------------------------------
-   ERC20 balance/allowance reads are bound to the Payment Profile chain.
-   Explicit chain context takes precedence over address inference so the
-   approval write and its verification read cannot diverge across EVM chains.
-   One allowance path is retained; no parallel legacy verifier is added.
-   ========================================================= */
 function encodeERC20BalanceOfCall(account){return '0x70a08231'+addrWord(account);}
 function encodeERC20AllowanceCall(owner,spender){return '0xdd62ed3e'+addrWord(owner)+addrWord(spender);}
 function encodeERC20ApproveCall(spender,amount){return '0x095ea7b3'+addrWord(spender)+toHex(amount).slice(2);}
@@ -1663,12 +1452,6 @@ function assertMarketplaceIntegration(){
 }
 
 
-/* =========================================================
-   JNC v2.5.9 — FINAL ARCHITECTURE AUDIT
-   One compact audit verifies the live runtime compatibility layer.
-   Payment identity itself remains owned by Payment Profile snapshots.
-   Audit version follows the single JNC configuration version source.
-   ========================================================= */
 const JNC_PRODUCTION_AUDIT_VERSION=JNC_CONFIGURATION_VERSION;
 function runProductionArchitectureAudit(){
   const architecture=validateActiveArchitecture();
@@ -1736,16 +1519,6 @@ function validateMarketplaceMinimum(action,amountBaseUnits,state=PNC_STATE){
   }
   return Object.freeze({action,amount,minimum,rule:getMarketplaceRule(action)});
 }
-function getMarketplaceMinimumDisplay(action,state=PNC_STATE){
-  const minimum=getMarketplaceMinimumBaseUnits(action,state);
-  const asset=getActivePaymentAsset();
-  if(Number.isInteger(asset.decimals)&&asset.decimals>=0){
-    const scale=10n**BigInt(asset.decimals);
-    const whole=minimum/scale,remainder=(minimum%scale).toString().padStart(asset.decimals,'0').replace(/0+$/,'');
-    return remainder?`${whole}.${remainder}`:whole.toString();
-  }
-  return minimum.toString();
-}
 
 function isValidEvmAddress(value){return /^0x[a-fA-F0-9]{40}$/.test(String(value||''));}
 function isValidCalldata(value){return /^0x(?:[a-fA-F0-9]{2})*$/.test(String(value||''));}
@@ -1793,14 +1566,6 @@ async function executeMarketplaceTransaction(request={}){
 }
 
 
-/* =========================================================
-   JNC v2.3.6 — PRODUCTION AUDIT ENGINE
-   ---------------------------------------------------------
-   One fail-closed audit path verifies the active chain, deployment,
-   payment asset, payment engine, contract addresses, decimals and minimum
-   units before Marketplace writes are allowed. Disabled future deployments
-   may retain placeholders, but the active deployment may not.
-   ========================================================= */
 const JNC_PAYMENT_AUDIT_VERSION='2.5.20-transaction-outcome-consistency';
 function paymentAuditCheck(id,ok,detail=''){
   return Object.freeze({id,ok:!!ok,detail:String(detail||'')});
@@ -1872,7 +1637,7 @@ function canAuctionNFT(nft,state=PNC_STATE){const c=marketplacePermissionContext
    applies creation-time minimum rules from JNC_MARKETPLACE_RULES, and keeps
    payment settlement delegated to executeMarketplacePayment(). */
 const PNC_CONFIG={
-  app:{version:'v2.5.25-live-auctions-end-time-order',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
+  app:{version:'v2.6.0-codebase-cleanup',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
   production:{
     deploymentKey:JNC_CONFIGURATION.productionDeploymentKey,
     chainKey:JNC_CONFIGURATION.launchTarget.chainKey,
@@ -2367,7 +2132,6 @@ let JNC_PENDING_RECOVERY_PAGE='';
 const PNC_METADATA_CACHE_KEY='PNC_METADATA_CACHE_V1';const PNC_GLOBAL_MARKET_KEY='PNC_GLOBAL_MARKET';
 const $=id=>document.getElementById(id);const lc=v=>String(v||'').toLowerCase();const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const short=a=>/^0x[a-fA-F0-9]{40}$/.test(String(a||''))?a.slice(0,4)+'...'+a.slice(-4):(a||'-');const displayAddress=a=>/^0x[a-fA-F0-9]{40}$/.test(String(a||''))?short(a):(a||'-');
 function emptyCreatorState(){return{shopDraft:null,nftDraft:null,registeredShops:[],mintedNfts:[]};}
-function emptyShopSocial(){return{x:'',lineOpenChat:''};}
 function normalizeShopSocial(value){const source=value&&typeof value==='object'?value:{};return{x:String(source.x||'').trim(),lineOpenChat:String(source.lineOpenChat||source.line||'').trim()};}
 const PNC_SOCIAL_DOMAINS={x:['x.com','twitter.com'],lineOpenChat:['line.me','openchat.line.me']};
 function socialUrlValidation(value,type){const url=String(value||'').trim();if(!url)return{ok:true,url:''};try{const parsed=new URL(url);if(parsed.protocol!=='https:')return{ok:false,message:t('urlValidation.httpsRequired')};const host=parsed.hostname.toLowerCase().replace(/\.$/,'');const allowed=PNC_SOCIAL_DOMAINS[type]||[];const matched=allowed.some(domain=>host===domain||host.endsWith('.'+domain));if(!matched)return{ok:false,message:type==='x'?t('urlValidation.xDomainRequired'):t('urlValidation.lineDomainRequired')};return{ok:true,url:parsed.href};}catch(e){return{ok:false,message:t('urlValidation.invalidUrl')};}}
@@ -2438,10 +2202,6 @@ function readCreatorWork(wallet){
   let session=null;
   try{session=readStoredCreatorWork(sessionStorage,creatorSessionWorkKey(wallet));}catch(e){}
   return mergeCreatorWork(persistent,session);
-}
-function isSensitiveCreatorField(el){
-  const name=String(el?.name||'').toLowerCase();
-  return el?.type==='password'||name==='pinataapikey'||name==='pinataapisecret';
 }
 function sanitizeCreatorWorkForPersistentStorage(value){
   const clone=JSON.parse(JSON.stringify(value||{}));
@@ -2720,15 +2480,6 @@ async function waitForReceipt(txHash,attempts=45,delayMs=4000,chainOrKey=null){
 function assertSuccessfulReceipt(receipt,label='Transaction'){if(receipt&&receipt.status&&receipt.status!=='0x1')throw new Error(t('systemTx.transactionReverted',{label}));return receipt;}
 function transactionOutcomeMessage(error,transactionConfirmed){return (transactionConfirmed?t('marketTx.transactionConfirmedSyncPending'):t('marketTx.transactionFailed'))+'\n'+(error&&error.message||error);}
 function reportTransactionOutcome(error,transactionConfirmed,label='Transaction'){console.warn(transactionConfirmed?`${label} succeeded on-chain; state synchronization is pending.`:`${label} failed.`,error);alert(transactionOutcomeMessage(error,transactionConfirmed));}
-/* =========================================================
-   JNC v2.5.14 — ERC20 DECIMALS LIST REPAIR
-   ---------------------------------------------------------
-   Payment Profile decimals are useful metadata, but settlement units must
-   follow the ERC20 contract on the active chain. Runtime reads therefore
-   cache decimals() by Chain × Token and all amount conversions prefer that
-   on-chain value. This prevents stale/missing Admin snapshots from turning
-   e.g. 10,000 PICH (9 decimals) into a trillion-unit display/value.
-   ========================================================= */
 const JNC_PAYMENT_TOKEN_DECIMALS_CACHE=new Map();
 function paymentTokenDecimalsCacheKey(nftOrProfile=null){
   const route=resolveMarketplacePaymentRoute(nftOrProfile);
@@ -2773,7 +2524,6 @@ function baseUnitsToTokenAmount(amount,nftOrProfile=null,maxFraction=6){
   const frac=raw.slice(0,Math.max(0,Math.min(decimals,Number(maxFraction)||decimals)));
   return frac?`${whole}.${frac}`:String(whole);
 }
-function ethToWei(value){return tokenAmountToBaseUnits(value,null);}function weiToEth(wei){return baseUnitsToTokenAmount(wei,null);}function weiToTxValue(wei){return'0x'+BigInt(String(wei||'0')).toString(16);}
 async function readOwnerOf(tokenId,nftContract=PNC_CONFIG.contracts.nft){return decodeAddress(await ethCall(nftContract,sig4('ownerOf(uint256)')+toHex(tokenId).slice(2)));}
 async function readOwnerOfWithRetry(tokenId,expectedOwner='',attempts=8,delayMs=1500,nftContract=PNC_CONFIG.contracts.nft){
   let lastError=null;
@@ -3329,14 +3079,6 @@ async function switchToConfiguredChain(chainOrKey=getActiveChainConfig()){
   if(confirmed!==target)throw new Error(t('systemTx.networkSwitchIncomplete'));
   return confirmed;
 }
-/* =========================================================
-   JNC v2.3.11-2 — WALLET CONNECTION RESTORATION
-   ---------------------------------------------------------
-   Preserve the confirmed v2.3.7 MetaMask account-selection flow:
-   revoke the site's existing eth_accounts permission, request account access,
-   read the selected account, then switch/add the configured chain.
-   One connection path is retained; the v2.3.8 standardization path is removed.
-   ========================================================= */
 async function resetMetaMaskAccountPermission(){if(!window.ethereum)throw new Error(t('systemTx.metamaskNotFound'));try{await ethereum.request({method:'wallet_revokePermissions',params:[{eth_accounts:{}}]});}catch(e){if(isMetaMaskPendingError(e))throw e;console.warn('wallet_revokePermissions skipped:',e);}}
 async function requestSelectedMetaMaskAccount(){if(!window.ethereum)throw new Error(t('systemTx.metamaskNotFound'));await resetMetaMaskAccountPermission();await ethereum.request({method:'wallet_requestPermissions',params:[{eth_accounts:{}}]});const accounts=await ethereum.request({method:'eth_accounts'});if(accounts&&accounts[0])return accounts[0];const requested=await ethereum.request({method:'eth_requestAccounts'});return requested&&requested[0]?requested[0]:null;}
 async function connectMetaMask(){
@@ -3503,12 +3245,6 @@ async function refreshPlatform(options={}){
   })();
   return PNC_REFRESH_PROMISE;
 }
-/* =========================================================
-   JNC v2.4.0 — STABILITY & UTILITY SYNCHRONIZATION
-   ---------------------------------------------------------
-   Ordinary NFT transactions refresh only the affected token. Full platform
-   reload remains reserved for wallet/chain changes and manual refresh.
-   ========================================================= */
 function renderNFTSurfaces(nft){
   renderHome(PNC_STATE);
   renderCollections(PNC_STATE);
@@ -4076,15 +3812,6 @@ async function handleCreateAuction(id){
     reportTransactionOutcome(e,transactionConfirmed,'handleCreateAuction');
   }
 }
-/* =========================================================
-   JNC v2.3.11-2 — BID RECOVERY
-   ---------------------------------------------------------
-   BID no longer trusts the cached auction ID, highest bid, reserve price,
-   seller, phase or minimum increment. The active auction and the deployed
-   Marketplace minimum are read again immediately before prompting and again
-   before payment submission. The confirmed amount then uses the same single
-   ERC20 approval/payment route as BUY. No legacy BID payment fallback remains.
-   ========================================================= */
 async function prepareActiveAuctionBid(nft,bidder){
   if(!nft||!isOnChainNFT(nft))throw new Error(t('marketTx.notActiveAuction'));
   const auction=await readAuthoritativeAuctionForAction(nft);
@@ -4394,15 +4121,6 @@ async function handleUnlist(id){
     reportTransactionOutcome(e,transactionConfirmed,'handleUnlist');
   }
 }
-/* =========================================================
-   JNC v2.3.11-2 — BUY RECOVERY
-   ---------------------------------------------------------
-   BUY never trusts cached listing price or listing identity. Immediately
-   before approval/payment, the active listing is read again from the
-   Marketplace and validated against the selected NFT. The confirmed on-chain
-   listingId and price are then passed through the single Marketplace payment
-   route. No local BUY payment fallback is retained.
-   ========================================================= */
 async function prepareActiveBuyListing(nft){
   if(!nft||!isOnChainNFT(nft))throw new Error(t('marketTx.notListed'));
   await switchToConfiguredChain(resolveMarketplacePaymentRoute(nft).chain);
