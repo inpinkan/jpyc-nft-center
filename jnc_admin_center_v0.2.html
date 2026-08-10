@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1.7</title>
+<title>JNC Admin Center v1.1.8</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -23,14 +23,14 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.7</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.8</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
 <div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplaceへの書き込み操作は運営Fee WalletのMetaMask承認が必要です。読み取り確認ではWallet接続を要求しません。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
-<div class="flow"><strong>v1.1.7の登録経路：</strong> 入力 → ERC20 decimals取得 → 対象チェーンのMarketplace確認 → 書き込み時だけFee Wallet確認 → Marketplaceへ登録・有効維持 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。終了／再開はJNCの新規Shop / NFT受付だけを切り替え、Marketplace Payment Tokenは有効のまま維持します。</div>
+<div class="flow"><strong>v1.1.8の登録経路：</strong> 新規登録・編集はMarketplace設定をオンチェーン確認してJNCへ保存します。終了／再開だけはJNC Registry（KV）の新規Shop / NFT受付状態だけを切り替えます。終了／再開ではMetaMask接続・チェーン切替・Marketplace書き込みを要求せず、Marketplace Payment Tokenは有効のまま維持します。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -437,16 +437,16 @@ async function toggleLifecycle(item){
   if(!ok)return;
   try{
     message(`${action}処理を開始します…`);
-    const {d}=await prepareItemContext(item);
-    const current=await readPaymentTokenConfig();
-    if(!current.configured)throw new Error("Marketplace側にPayment Token登録がありません。Lifecycle変更は行いません。");
-    if(!current.enabled)throw new Error("Marketplace Payment Tokenが無効です。既存NFTの取引継続のため、先に「編集」→「Marketplace更新 + JNC保存」でMarketplaceを有効化してください。");
 
-    // Lifecycle only controls whether JNC accepts NEW Shop / NFT creation.
-    // Do not call setPaymentTokenEnabled here: existing assets must remain tradable.
+    // Lifecycle is a JNC Registry/KV concern only.
+    // Do not require MetaMask, chain switching, eth_call, or Marketplace writes here.
+    const chainKey=item.chain?.key;
+    const d=MARKETPLACE_DEPLOYMENTS[chainKey]||null;
+    if(!chainKey)throw new Error("このPayment Profileにはチェーン情報がありません。");
+    if(!d?.enabled||!isAddress(d.marketplace))throw new Error(`${item.chain?.name||chainKey}のMarketplace設定を確認できません。Lifecycle変更は行いません。`);
+
     const saved=await saveLifecycleState(item,targetEnabled,d);
-    setOnchain("登録済み / 有効","ok");
-    message(`${saved.paymentToken.displaySymbol||saved.paymentToken.symbol} を${action}しました。Marketplace Payment Tokenは有効のままです。`);
+    message(`${saved.paymentToken.displaySymbol||saved.paymentToken.symbol} を${action}しました。新規Shop / NFT受付だけを変更し、Marketplace Payment Tokenには触れていません。`);
     await loadRegistry();
   }catch(error){
     message(error.message,false);
