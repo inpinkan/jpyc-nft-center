@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1.6</title>
+<title>JNC Admin Center v1.1.7</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -23,14 +23,14 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.6</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.7</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
 <div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplaceへの書き込み操作は運営Fee WalletのMetaMask承認が必要です。読み取り確認ではWallet接続を要求しません。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
-<div class="flow"><strong>v1.1.6の登録経路：</strong> 入力 → ERC20 decimals取得 → 対象チェーンのMarketplace確認 → 書き込み時だけFee Wallet確認 → Marketplaceへ登録 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。オンチェーン登録が失敗した場合はKVへ公開しません。終了／再開もMarketplaceとKVを同じ状態へ同期します。</div>
+<div class="flow"><strong>v1.1.7の登録経路：</strong> 入力 → ERC20 decimals取得 → 対象チェーンのMarketplace確認 → 書き込み時だけFee Wallet確認 → Marketplaceへ登録・有効維持 → オンチェーン確認 → ロゴ保存 → KV保存 → JNCへ反映。終了／再開はJNCの新規Shop / NFT受付だけを切り替え、Marketplace Payment Tokenは有効のまま維持します。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -54,7 +54,7 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 <div class="field"><label for="minimumAmount">運営設定の最低価格 <span class="req">*</span></label><input id="minimumAmount" inputmode="decimal" value="1" required><p class="hint">ユーザーのList / Offer / Auction開始価格はこの値以上。登録後もAdmin Centerから変更できます。</p></div>
 
 <div class="field"><label for="logoFile">トークンロゴ画像 <span class="req">*</span></label><input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml"><p class="hint">新規登録時は必須。編集時に未選択なら現在の画像を維持します。</p></div>
-<div class="field check"><input id="enabled" type="checkbox" checked><label for="enabled">JNCの選択肢へ表示し、Marketplaceでも有効化する</label></div>
+<div class="field check"><input id="enabled" type="checkbox" checked><label for="enabled">JNCの新規Shop / NFTの選択肢へ表示する</label></div>
 
 <div class="runtime">
 <div class="runtime-row"><span>Marketplace</span><strong id="marketplaceRuntime">—</strong></div>
@@ -79,7 +79,7 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 <div class="logo" id="logoPreview">LOGO</div>
 <span class="badge" id="chainPreview">チェーン未選択</span><span class="badge" id="gasPreview">Gas: —</span>
 <h3 id="namePreview">Token Name</h3><div class="symbol" id="symbolPreview">$TOKEN</div><div class="address" id="addressPreview">0x...</div>
-<div class="status on" id="statusPreview">● JNCへ表示 / Marketplace有効</div>
+<div class="status on" id="statusPreview">● 新規Shop / NFTで利用可能 / Marketplace有効</div>
 <div class="runtime">
 <div class="runtime-row"><span>Absolute Floor</span><strong id="floorPreview">1</strong></div>
 <div class="runtime-row"><span>Operator Minimum</span><strong id="minimumPreview">1</strong></div>
@@ -88,7 +88,7 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </aside>
 </section>
 
-<section class="panel list-panel"><div class="head"><h2>登録済みチェーン・決済トークン</h2><p>同じチェーンとERC20アドレスは一つのPayment Profileとして管理します。終了しても履歴は削除せず、既存NFTの参照を保持します。</p></div><div class="inside"><div class="cards" id="cards"><div class="empty">管理キーを入力して一覧を読み込んでください。</div></div></div></section>
+<section class="panel list-panel"><div class="head"><h2>登録済みチェーン・決済トークン</h2><p>同じチェーンとERC20アドレスは一つのPayment Profileとして管理します。終了すると新規Shop / NFTでは選択できなくなりますが、Marketplace Payment Tokenは有効のまま維持され、既存NFTの取引と参照は継続します。</p></div><div class="inside"><div class="cards" id="cards"><div class="empty">管理キーを入力して一覧を読み込んでください。</div></div></div></section>
 </main>
 
 <script>
@@ -198,7 +198,7 @@ function preview(){
   $("namePreview").textContent=f.tokenName.value.trim()||"Token Name";
   $("symbolPreview").textContent=s?`$${s}`:"$TOKEN";
   $("addressPreview").textContent=normalizeAddress(f.tokenAddress.value)||"0x...";
-  $("statusPreview").textContent=f.enabled.checked?"● JNCへ表示 / Marketplace有効":"● JNC非表示 / Marketplace無効";
+  $("statusPreview").textContent=f.enabled.checked?"● 新規Shop / NFTで利用可能 / Marketplace有効":"● 新規Shop / NFTは受付終了 / Marketplace有効";
   $("statusPreview").className=`status ${f.enabled.checked?"on":"off"}`;
   $("floorPreview").textContent=f.floorAmount.value||"—";
   $("minimumPreview").textContent=f.minimumAmount.value||"—";
@@ -336,10 +336,14 @@ async function syncMarketplace(){
   if(minimum<floor)throw new Error("運営設定の最低価格は絶対下限以上にしてください。");
   const current=await readPaymentTokenConfig();
 
+  // Marketplace availability and JNC collaboration lifecycle are separate.
+  // Once configured, the Payment Token stays enabled so existing NFTs can keep trading.
+  const marketplaceEnabled=true;
+
   if(!current.configured){
-    const data=SELECTOR.configurePaymentToken+addrWord(f.tokenAddress.value)+uintWord(floor)+uintWord(minimum)+boolWord(f.enabled.checked);
+    const data=SELECTOR.configurePaymentToken+addrWord(f.tokenAddress.value)+uintWord(floor)+uintWord(minimum)+boolWord(marketplaceEnabled);
     await sendTx(data,"Payment Token登録");
-    await waitConfig({floor,minimum,enabled:f.enabled.checked});
+    await waitConfig({floor,minimum,enabled:marketplaceEnabled});
     return{decimals,floor,minimum};
   }
 
@@ -348,10 +352,10 @@ async function syncMarketplace(){
     await sendTx(SELECTOR.updatePaymentTokenMinimum+addrWord(f.tokenAddress.value)+uintWord(minimum),"最低価格更新");
   }
   const afterMinimum=await readPaymentTokenConfig();
-  if(afterMinimum.enabled!==f.enabled.checked){
-    await sendTx(SELECTOR.setPaymentTokenEnabled+addrWord(f.tokenAddress.value)+boolWord(f.enabled.checked),"有効状態更新");
+  if(!afterMinimum.enabled){
+    await sendTx(SELECTOR.setPaymentTokenEnabled+addrWord(f.tokenAddress.value)+boolWord(true),"Marketplace Payment Token有効化");
   }
-  await waitConfig({floor,minimum,enabled:f.enabled.checked});
+  await waitConfig({floor,minimum,enabled:true});
   return{decimals,floor,minimum};
 }
 
@@ -429,24 +433,20 @@ async function toggleLifecycle(item){
   const targetEnabled=item.enabled===false;
   const action=targetEnabled?"再開":"終了";
   const p=item.paymentToken||{};
-  const ok=window.confirm(`${p.displaySymbol||p.symbol||"このトークン"} を${action}します。\n\n${targetEnabled?"新規Shop / NFTで再び選択可能になります。":"新規Shop / NFTでは選択できなくなります。既存NFTのPayment Profile情報は保持されます。"}\n\n続行しますか？`);
+  const ok=window.confirm(`${p.displaySymbol||p.symbol||"このトークン"} を${action}します。\n\n${targetEnabled?"新規Shop / NFTで再び選択可能になります。Marketplace Payment Tokenは引き続き有効です。":"新規Shop / NFTでは選択できなくなります。既存NFTは保存済みPayment Profileを使い、Marketplaceでの取引を継続できます。"}\n\n続行しますか？`);
   if(!ok)return;
   try{
     message(`${action}処理を開始します…`);
     const {d}=await prepareItemContext(item);
     const current=await readPaymentTokenConfig();
     if(!current.configured)throw new Error("Marketplace側にPayment Token登録がありません。Lifecycle変更は行いません。");
-    if(current.enabled!==targetEnabled){
-      await sendTx(SELECTOR.setPaymentTokenEnabled+addrWord(f.tokenAddress.value)+boolWord(targetEnabled),targetEnabled?"Payment Token再開":"Payment Token終了");
-    }
-    const decimals=p.decimals??await readDecimals();
-    const verified=await waitConfig({
-      floor:current.floorPaymentAmount,
-      minimum:current.minimumPaymentAmount,
-      enabled:targetEnabled
-    });
+    if(!current.enabled)throw new Error("Marketplace Payment Tokenが無効です。既存NFTの取引継続のため、先に「編集」→「Marketplace更新 + JNC保存」でMarketplaceを有効化してください。");
+
+    // Lifecycle only controls whether JNC accepts NEW Shop / NFT creation.
+    // Do not call setPaymentTokenEnabled here: existing assets must remain tradable.
     const saved=await saveLifecycleState(item,targetEnabled,d);
-    message(`${saved.paymentToken.displaySymbol||saved.paymentToken.symbol} を${action}しました。`);
+    setOnchain("登録済み / 有効","ok");
+    message(`${saved.paymentToken.displaySymbol||saved.paymentToken.symbol} を${action}しました。Marketplace Payment Tokenは有効のままです。`);
     await loadRegistry();
   }catch(error){
     message(error.message,false);
@@ -463,10 +463,11 @@ async function syncRegistryItemFromChain(item){
     const decimals=await readDecimals();
     const c=await readPaymentTokenConfig();
     if(!c.configured)throw new Error("MarketplaceにはこのPayment Tokenが登録されていません。");
+    const lifecycleEnabled=item.enabled!==false;
     const synced={
       projectId:item.projectId,
-      enabled:c.enabled,
-      lifecycle:{...(item.lifecycle||{}),status:c.enabled?"active":"stopped",updatedAt:new Date().toISOString()},
+      enabled:lifecycleEnabled,
+      lifecycle:{...(item.lifecycle||{}),status:lifecycleEnabled?"active":"stopped",updatedAt:new Date().toISOString()},
       chain:item.chain,
       marketplace:{
         ...(item.marketplace||{}),
@@ -487,7 +488,7 @@ async function syncRegistryItemFromChain(item){
     const response=await fetch(API.save,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Key":f.adminKey.value},body:JSON.stringify(synced)});
     const data=await response.json();
     if(!response.ok||!data.ok)throw new Error(data.error||"オンチェーン同期の保存に失敗しました。");
-    message(`${p.displaySymbol||p.symbol} のDecimals / Floor / Minimum / Enabledをオンチェーンから同期しました。`);
+    message(`${p.displaySymbol||p.symbol} のDecimals / Floor / Minimumをオンチェーンから同期しました。JNCの公開／終了状態は変更していません。`);
     await loadRegistry();
   }catch(error){
     message(error.message,false);
@@ -510,10 +511,10 @@ async function startEdit(item){
       f.decimals.value=String(decimals);
       f.floorAmount.value=formatUnits(current.floorPaymentAmount,decimals);
       f.minimumAmount.value=formatUnits(current.minimumPaymentAmount,decimals);
-      f.enabled.checked=current.enabled;
+      // Keep the JNC lifecycle checkbox from KV; on-chain enabled is a separate state.
       setOnchain(current.enabled?"登録済み / 有効":"登録済み / 無効",current.enabled?"ok":"wait");
       preview();
-      message(`${p.displaySymbol||p.symbol}を編集中です。絶対下限はオンチェーン値 ${f.floorAmount.value} に同期され、変更できません。運営設定の最低価格は変更できます。`);
+      message(`${p.displaySymbol||p.symbol}を編集中です。絶対下限はオンチェーン値 ${f.floorAmount.value} に同期され、変更できません。運営設定の最低価格は変更できます。${current.enabled?"":" Marketplace Payment Tokenは現在無効です。保存すると有効へ復旧します。"}`);
     }else{
       setOnchain("未登録","bad");
       message(`${p.displaySymbol||p.symbol}はMarketplace未登録です。`,false);
