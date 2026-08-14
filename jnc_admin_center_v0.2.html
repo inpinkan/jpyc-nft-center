@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1.8</title>
+<title>JNC Admin Center v1.1.9</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -23,14 +23,14 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.8</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.9</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
 <div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplaceへの書き込み操作は運営Fee WalletのMetaMask承認が必要です。読み取り確認ではWallet接続を要求しません。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
-<div class="flow"><strong>v1.1.8の登録経路：</strong> 新規登録・編集はMarketplace設定をオンチェーン確認してJNCへ保存します。終了／再開だけはJNC Registry（KV）の新規Shop / NFT受付状態だけを切り替えます。終了／再開ではMetaMask接続・チェーン切替・Marketplace書き込みを要求せず、Marketplace Payment Tokenは有効のまま維持します。</div>
+<div class="flow"><strong>v1.1.9 / Marketplace v2.23.0対応：</strong> 新規登録・編集はMarketplace設定をオンチェーン確認してJNCへ保存します。運営設定の最低価格とAuction最低入札増加額を別項目として管理し、v2.23.0では両方をMarketplaceへ同期します。まだv2.22.0のチェーンではAuction最低入札増加額はJNC Registry値を維持し、Marketplace移行後にオンチェーン同期します。終了／再開はJNC Registry（KV）の新規Shop / NFT受付状態だけを切り替えます。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -51,7 +51,10 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 <div class="field"><label for="decimals">Decimals</label><input id="decimals" placeholder="自動取得" readonly><p class="hint">ERC20の decimals() から取得します。</p></div>
 <div class="field"><label for="floorAmount">絶対下限 <span class="req">*</span></label><input id="floorAmount" inputmode="decimal" value="1" required><p class="hint">運営でも下回れない下限。新規登録後は変更不可です。</p></div>
 </div>
+<div class="row">
 <div class="field"><label for="minimumAmount">運営設定の最低価格 <span class="req">*</span></label><input id="minimumAmount" inputmode="decimal" value="1" required><p class="hint">ユーザーのList / Offer / Auction開始価格はこの値以上。登録後もAdmin Centerから変更できます。</p></div>
+<div class="field"><label for="auctionBidIncrement">Auction最低入札増加額 <span class="req">*</span></label><input id="auctionBidIncrement" inputmode="decimal" value="1" required><p class="hint">次の入札で最低限上乗せする額。最低価格とは独立管理です。Marketplace v2.23.0ではオンチェーンへ同期し、JNC Registryにも同じ値を保存します。</p></div>
+</div>
 
 <div class="field"><label for="logoFile">トークンロゴ画像 <span class="req">*</span></label><input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml"><p class="hint">新規登録時は必須。編集時に未選択なら現在の画像を維持します。</p></div>
 <div class="field check"><input id="enabled" type="checkbox" checked><label for="enabled">JNCの新規Shop / NFTの選択肢へ表示する</label></div>
@@ -62,7 +65,7 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 <div class="runtime-row"><span>Wallet Provider</span><strong id="providerRuntime">未検出</strong></div>
 <div class="runtime-row"><span>MetaMask</span><strong id="walletRuntime">未接続</strong></div>
 <div class="runtime-row"><span>On-chain</span><strong id="onchainRuntime"><span class="pill">未確認</span></strong></div>
-<div class="runtime-note">Wallet表示は参考情報です。Marketplaceへの書き込み時に、その瞬間の接続アカウントを再確認します。</div>
+<div class="runtime-note">Wallet表示は参考情報です。Marketplaceへの書き込み時に、その瞬間の接続アカウントを再確認します。Marketplace v2.23.0ではAuction最低入札増加額もオンチェーン設定として同期します。v2.22.0のチェーンは移行完了までRegistry値を維持します。</div>
 </div>
 
 <div class="actions">
@@ -83,6 +86,7 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 <div class="runtime">
 <div class="runtime-row"><span>Absolute Floor</span><strong id="floorPreview">1</strong></div>
 <div class="runtime-row"><span>Operator Minimum</span><strong id="minimumPreview">1</strong></div>
+<div class="runtime-row"><span>Auction Bid Increment</span><strong id="bidIncrementPreview">1</strong></div>
 <div class="runtime-row"><span>Decimals</span><strong id="decimalsPreview">—</strong></div>
 </div>
 </aside>
@@ -99,22 +103,24 @@ const API=Object.freeze({upload:"/api/pinata-upload",save:"/api/save-collaborati
 const SELECTOR=Object.freeze({
   decimals:"0x313ce567",
   paymentTokenConfigs:"0xcf120c6a",
-  configurePaymentToken:"0x879af0ff",
+  configurePaymentTokenV222:"0x879af0ff",
+  configurePaymentTokenV223:"0xa866275b",
   updatePaymentTokenMinimum:"0x673c1ad7",
+  updatePaymentTokenBidIncrement:"0x10b9befa",
   setPaymentTokenEnabled:"0xcb2ea11a"
 });
 
 /* 1 Marketplace per chain. Future chains stay fail-closed until their
    verified deployment addresses are added here. */
 const MARKETPLACE_DEPLOYMENTS=Object.freeze({
-  polygon:Object.freeze({chainId:137,chainHex:"0x89",name:"Polygon",marketplace:"0x7120910884379E0C6c5AADcc56c888436ef5eB81",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",enabled:true}),
-  ethereum:Object.freeze({chainId:1,chainHex:"0x1",name:"Ethereum",marketplace:"",feeWallet:"",enabled:false}),
-  avalanche:Object.freeze({chainId:43114,chainHex:"0xa86a",name:"Avalanche C-Chain",marketplace:"",feeWallet:"",enabled:false}),
-  bnb:Object.freeze({chainId:56,chainHex:"0x38",name:"BNB Smart Chain",marketplace:"0xAdAcd3ceef3629f4031E9d4F189Fbd198691f044",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",enabled:true})
+  polygon:Object.freeze({chainId:137,chainHex:"0x89",name:"Polygon",marketplace:"0xf689F1f0cC3604FE4D7502192d875B8A013C54e9",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",version:"2.23.0",enabled:true}),
+  ethereum:Object.freeze({chainId:1,chainHex:"0x1",name:"Ethereum",marketplace:"",feeWallet:"",version:"",enabled:false}),
+  avalanche:Object.freeze({chainId:43114,chainHex:"0xa86a",name:"Avalanche C-Chain",marketplace:"",feeWallet:"",version:"",enabled:false}),
+  bnb:Object.freeze({chainId:56,chainHex:"0x38",name:"BNB Smart Chain",marketplace:"0xAdAcd3ceef3629f4031E9d4F189Fbd198691f044",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",version:"2.22.0",enabled:true})
 });
 
 const $=id=>document.getElementById(id);
-const f={adminKey:$("adminKey"),chain:$("chain"),tokenName:$("tokenName"),tokenSymbol:$("tokenSymbol"),tokenAddress:$("tokenAddress"),decimals:$("decimals"),floorAmount:$("floorAmount"),minimumAmount:$("minimumAmount"),logoFile:$("logoFile"),enabled:$("enabled")};
+const f={adminKey:$("adminKey"),chain:$("chain"),tokenName:$("tokenName"),tokenSymbol:$("tokenSymbol"),tokenAddress:$("tokenAddress"),decimals:$("decimals"),floorAmount:$("floorAmount"),minimumAmount:$("minimumAmount"),auctionBidIncrement:$("auctionBidIncrement"),logoFile:$("logoFile"),enabled:$("enabled")};
 let registry=[],editingId="",existingLogoUrl="",existingLogoCid="",walletAddress="",editingOriginal=null;
 let walletProvider=null,walletProviderInfo=null;
 const discoveredProviders=[];
@@ -202,8 +208,9 @@ function preview(){
   $("statusPreview").className=`status ${f.enabled.checked?"on":"off"}`;
   $("floorPreview").textContent=f.floorAmount.value||"—";
   $("minimumPreview").textContent=f.minimumAmount.value||"—";
+  $("bidIncrementPreview").textContent=f.auctionBidIncrement.value||"—";
   $("decimalsPreview").textContent=f.decimals.value||"—";
-  $("marketplaceRuntime").textContent=d?.enabled&&isAddress(d.marketplace)?short(d.marketplace):"未Deploy";
+  $("marketplaceRuntime").textContent=d?.enabled&&isAddress(d.marketplace)?`${short(d.marketplace)}${d.version?` / v${d.version}`:""}`:"未Deploy";
   $("feeWalletRuntime").textContent=d?.enabled&&isAddress(d.feeWallet)?short(d.feeWallet):"—";
   $("providerRuntime").textContent=providerLabel();
   $("walletRuntime").textContent=walletAddress?short(walletAddress):"未接続";
@@ -223,7 +230,9 @@ function validate(){
   if(!isAddress(f.tokenAddress.value))return"コントラクトアドレスの形式を確認してください。";
   if(duplicateExists())return"同じチェーンとコントラクトアドレスはすでに登録されています。";
   if(!existingLogoUrl&&!f.logoFile.files[0])return"トークンロゴ画像を選択してください。";
-  if(!f.floorAmount.value.trim()||!f.minimumAmount.value.trim())return"絶対下限と運営設定の最低価格を入力してください。";
+  if(!f.floorAmount.value.trim()||!f.minimumAmount.value.trim()||!f.auctionBidIncrement.value.trim())return"絶対下限・運営設定の最低価格・Auction最低入札増加額を入力してください。";
+  const decimals=f.decimals.value?Number(f.decimals.value):18;
+  try{if(parseUnits(f.auctionBidIncrement.value,decimals)<=0n)return"Auction最低入札増加額は0より大きくしてください。";}catch(error){return error.message;}
   return"";
 }
 function parseUnits(value,decimals){
@@ -277,8 +286,17 @@ async function readPaymentTokenConfig(){
   const d=deployment();if(!d?.enabled||!isAddress(d.marketplace))throw new Error("Marketplace未Deployです。");
   await ensureChain();
   const raw=await ethCall(d.marketplace,SELECTOR.paymentTokenConfigs+addrWord(f.tokenAddress.value));
-  if(String(raw||"").replace(/^0x/,"").length<256)throw new Error("Payment Token設定を読み取れませんでした。");
-  return{configured:boolAt(raw,0),enabled:boolAt(raw,1),floorPaymentAmount:uintAt(raw,2),minimumPaymentAmount:uintAt(raw,3)};
+  const hex=String(raw||"").replace(/^0x/,"");
+  if(hex.length<256)throw new Error("Payment Token設定を読み取れませんでした。");
+  const supportsBidIncrement=hex.length>=320;
+  return{
+    configured:boolAt(raw,0),
+    enabled:boolAt(raw,1),
+    floorPaymentAmount:uintAt(raw,2),
+    minimumPaymentAmount:uintAt(raw,3),
+    minimumBidIncrement:supportsBidIncrement?uintAt(raw,4):null,
+    supportsBidIncrement
+  };
 }
 async function verifyOnChain(show=true){
   try{
@@ -287,7 +305,10 @@ async function verifyOnChain(show=true){
     const c=await readPaymentTokenConfig();
     if(!c.configured){setOnchain("未登録","bad");if(show)message("Marketplaceにはまだ登録されていません。",false);return c}
     setOnchain(c.enabled?"登録済み / 有効":"登録済み / 無効",c.enabled?"ok":"wait");
-    if(show)message(`オンチェーン：Floor ${formatUnits(c.floorPaymentAmount,decimals)} / Minimum ${formatUnits(c.minimumPaymentAmount,decimals)} / ${c.enabled?"有効":"無効"}`);
+    if(show){
+      const bid=c.supportsBidIncrement?` / Bid Increment ${formatUnits(c.minimumBidIncrement,decimals)}`:" / Bid Increment Registry管理（v2.22.0）";
+      message(`オンチェーン：Floor ${formatUnits(c.floorPaymentAmount,decimals)} / Minimum ${formatUnits(c.minimumPaymentAmount,decimals)}${bid} / ${c.enabled?"有効":"無効"}`);
+    }
     return c;
   }catch(error){setOnchain("確認失敗","bad");if(show)message(error.message,false);throw error}
 }
@@ -322,7 +343,8 @@ async function waitConfig(expected,timeout=90000){
   const start=Date.now();
   while(Date.now()-start<timeout){
     const c=await readPaymentTokenConfig();
-    if(c.configured&&c.enabled===expected.enabled&&c.floorPaymentAmount===expected.floor&&c.minimumPaymentAmount===expected.minimum){
+    const bidOk=expected.bidIncrement==null||!c.supportsBidIncrement||c.minimumBidIncrement===expected.bidIncrement;
+    if(c.configured&&c.enabled===expected.enabled&&c.floorPaymentAmount===expected.floor&&c.minimumPaymentAmount===expected.minimum&&bidOk){
       setOnchain(c.enabled?"登録済み / 有効":"登録済み / 無効",c.enabled?"ok":"wait");return c;
     }
     await new Promise(resolve=>setTimeout(resolve,1500));
@@ -331,9 +353,10 @@ async function waitConfig(expected,timeout=90000){
 }
 async function syncMarketplace(){
   const decimals=f.decimals.value?Number(f.decimals.value):await readDecimals();
-  const floor=parseUnits(f.floorAmount.value,decimals),minimum=parseUnits(f.minimumAmount.value,decimals);
+  const floor=parseUnits(f.floorAmount.value,decimals),minimum=parseUnits(f.minimumAmount.value,decimals),bidIncrement=parseUnits(f.auctionBidIncrement.value,decimals);
   if(floor<=0n)throw new Error("絶対下限は0より大きくしてください。");
   if(minimum<floor)throw new Error("運営設定の最低価格は絶対下限以上にしてください。");
+  if(bidIncrement<=0n)throw new Error("Auction最低入札増加額は0より大きくしてください。");
   const current=await readPaymentTokenConfig();
 
   // Marketplace availability and JNC collaboration lifecycle are separate.
@@ -341,22 +364,28 @@ async function syncMarketplace(){
   const marketplaceEnabled=true;
 
   if(!current.configured){
-    const data=SELECTOR.configurePaymentToken+addrWord(f.tokenAddress.value)+uintWord(floor)+uintWord(minimum)+boolWord(marketplaceEnabled);
+    const data=current.supportsBidIncrement
+      ?SELECTOR.configurePaymentTokenV223+addrWord(f.tokenAddress.value)+uintWord(floor)+uintWord(minimum)+uintWord(bidIncrement)+boolWord(marketplaceEnabled)
+      :SELECTOR.configurePaymentTokenV222+addrWord(f.tokenAddress.value)+uintWord(floor)+uintWord(minimum)+boolWord(marketplaceEnabled);
     await sendTx(data,"Payment Token登録");
-    await waitConfig({floor,minimum,enabled:marketplaceEnabled});
-    return{decimals,floor,minimum};
+    await waitConfig({floor,minimum,bidIncrement:current.supportsBidIncrement?bidIncrement:null,enabled:marketplaceEnabled});
+    return{decimals,floor,minimum,bidIncrement,supportsBidIncrement:current.supportsBidIncrement};
   }
 
   if(current.floorPaymentAmount!==floor)throw new Error(`絶対下限は登録後に変更できません。現在のFloorは ${formatUnits(current.floorPaymentAmount,decimals)} です。`);
   if(current.minimumPaymentAmount!==minimum){
     await sendTx(SELECTOR.updatePaymentTokenMinimum+addrWord(f.tokenAddress.value)+uintWord(minimum),"最低価格更新");
   }
-  const afterMinimum=await readPaymentTokenConfig();
-  if(!afterMinimum.enabled){
+  let after=await readPaymentTokenConfig();
+  if(after.supportsBidIncrement&&after.minimumBidIncrement!==bidIncrement){
+    await sendTx(SELECTOR.updatePaymentTokenBidIncrement+addrWord(f.tokenAddress.value)+uintWord(bidIncrement),"Auction最低入札増加額更新");
+    after=await readPaymentTokenConfig();
+  }
+  if(!after.enabled){
     await sendTx(SELECTOR.setPaymentTokenEnabled+addrWord(f.tokenAddress.value)+boolWord(true),"Marketplace Payment Token有効化");
   }
-  await waitConfig({floor,minimum,enabled:true});
-  return{decimals,floor,minimum};
+  await waitConfig({floor,minimum,bidIncrement:after.supportsBidIncrement?bidIncrement:null,enabled:true});
+  return{decimals,floor,minimum,bidIncrement,supportsBidIncrement:after.supportsBidIncrement};
 }
 
 async function uploadLogo(file){
@@ -382,7 +411,7 @@ function renderRegistry(){
     const lifecycleClass=lifecycleStatus==="stopped"?"stopped":"active";
     const actionLabel=lifecycleStatus==="stopped"?"再開":"終了";
     const actionClass=lifecycleStatus==="stopped"?"secondary":"danger";
-    card.innerHTML=`<img class="card-logo" src="${gateway(p.logoUrl)}" alt=""><div><h3>${p.name||""} ${p.displaySymbol||("$"+(p.symbol||""))}</h3><div class="meta">${item.chain?.name||""} / ${p.address||""}<br>Decimals: ${p.decimals??"—"} / Floor: ${p.floorAmount??"—"} / Minimum: ${p.minimumAmount??"—"}<br><span class="lifecycle ${lifecycleClass}">${lifecycleLabel}</span></div></div><div class="card-actions"><button class="secondary small" data-edit>編集</button><button class="${actionClass} small" data-lifecycle>${actionLabel}</button><button class="secondary small" data-sync>On-chain同期</button></div>`;
+    card.innerHTML=`<img class="card-logo" src="${gateway(p.logoUrl)}" alt=""><div><h3>${p.name||""} ${p.displaySymbol||("$"+(p.symbol||""))}</h3><div class="meta">${item.chain?.name||""} / ${p.address||""}<br>Decimals: ${p.decimals??"—"} / Floor: ${p.floorAmount??"—"} / Minimum: ${p.minimumAmount??"—"} / Bid Increment: ${p.auctionBidIncrement??"1"}<br><span class="lifecycle ${lifecycleClass}">${lifecycleLabel}</span></div></div><div class="card-actions"><button class="secondary small" data-edit>編集</button><button class="${actionClass} small" data-lifecycle>${actionLabel}</button><button class="secondary small" data-sync>On-chain同期</button></div>`;
     card.querySelector("[data-edit]").onclick=()=>startEdit(item);
     card.querySelector("[data-lifecycle]").onclick=()=>toggleLifecycle(item);
     card.querySelector("[data-sync]").onclick=()=>syncRegistryItemFromChain(item);
@@ -482,13 +511,17 @@ async function syncRegistryItemFromChain(item){
         floorAmount:formatUnits(c.floorPaymentAmount,decimals),
         minimumAmount:formatUnits(c.minimumPaymentAmount,decimals),
         floorBaseUnits:c.floorPaymentAmount.toString(),
-        minimumBaseUnits:c.minimumPaymentAmount.toString()
+        minimumBaseUnits:c.minimumPaymentAmount.toString(),
+        auctionBidIncrement:c.supportsBidIncrement?formatUnits(c.minimumBidIncrement,decimals):(p.auctionBidIncrement??"1"),
+        auctionBidIncrementBaseUnits:c.supportsBidIncrement?c.minimumBidIncrement.toString():(p.auctionBidIncrementBaseUnits??parseUnits(p.auctionBidIncrement??"1",decimals).toString())
       }
     };
     const response=await fetch(API.save,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Key":f.adminKey.value},body:JSON.stringify(synced)});
     const data=await response.json();
     if(!response.ok||!data.ok)throw new Error(data.error||"オンチェーン同期の保存に失敗しました。");
-    message(`${p.displaySymbol||p.symbol} のDecimals / Floor / Minimumをオンチェーンから同期しました。JNCの公開／終了状態は変更していません。`);
+    message(c.supportsBidIncrement
+      ?`${p.displaySymbol||p.symbol} のDecimals / Floor / Minimum / Auction Bid Incrementをv2.23.0オンチェーン値から同期しました。JNCの公開／終了状態は変更していません。`
+      :`${p.displaySymbol||p.symbol} のDecimals / Floor / Minimumをv2.22.0オンチェーン値から同期しました。Auction Bid IncrementはRegistry値を維持しています。`);
     await loadRegistry();
   }catch(error){
     message(error.message,false);
@@ -500,7 +533,7 @@ async function syncRegistryItemFromChain(item){
 async function startEdit(item){
   const p=item.paymentToken||{};editingId=item.projectId;editingOriginal=item;
   f.chain.value=item.chain?.key||"";f.tokenName.value=p.name||"";f.tokenSymbol.value=p.symbol||"";f.tokenAddress.value=p.address||"";
-  f.decimals.value=p.decimals??"";f.floorAmount.value=p.floorAmount??"1";f.minimumAmount.value=p.minimumAmount??"1";f.enabled.checked=item.enabled!==false;
+  f.decimals.value=p.decimals??"";f.floorAmount.value=p.floorAmount??"1";f.minimumAmount.value=p.minimumAmount??"1";f.auctionBidIncrement.value=p.auctionBidIncrement??"1";f.enabled.checked=item.enabled!==false;
   existingLogoUrl=p.logoUrl||"";existingLogoCid=p.logoCid||"";f.chain.disabled=true;f.tokenAddress.readOnly=true;f.floorAmount.readOnly=true;
   $("logoPreview").innerHTML=existingLogoUrl?`<img src="${gateway(existingLogoUrl)}" alt="">`:"LOGO";$("saveBtn").textContent="Marketplace更新 + JNC保存";
   preview();window.scrollTo({top:0,behavior:"smooth"});message(`${p.displaySymbol||p.symbol}を編集中です。オンチェーンの絶対下限を確認しています…`);
@@ -511,10 +544,13 @@ async function startEdit(item){
       f.decimals.value=String(decimals);
       f.floorAmount.value=formatUnits(current.floorPaymentAmount,decimals);
       f.minimumAmount.value=formatUnits(current.minimumPaymentAmount,decimals);
+      if(current.supportsBidIncrement)f.auctionBidIncrement.value=formatUnits(current.minimumBidIncrement,decimals);
       // Keep the JNC lifecycle checkbox from KV; on-chain enabled is a separate state.
       setOnchain(current.enabled?"登録済み / 有効":"登録済み / 無効",current.enabled?"ok":"wait");
       preview();
-      message(`${p.displaySymbol||p.symbol}を編集中です。絶対下限はオンチェーン値 ${f.floorAmount.value} に同期され、変更できません。運営設定の最低価格は変更できます。${current.enabled?"":" Marketplace Payment Tokenは現在無効です。保存すると有効へ復旧します。"}`);
+      message(current.supportsBidIncrement
+        ?`${p.displaySymbol||p.symbol}を編集中です。Floor / Minimum / Auction Bid IncrementをMarketplace v2.23.0から同期しました。絶対下限は変更できません。`
+        :`${p.displaySymbol||p.symbol}を編集中です。Floor / Minimumはv2.22.0から同期しました。Auction Bid IncrementはMarketplace移行までRegistry値を維持します。`);
     }else{
       setOnchain("未登録","bad");
       message(`${p.displaySymbol||p.symbol}はMarketplace未登録です。`,false);
@@ -525,7 +561,7 @@ async function startEdit(item){
   }
 }
 function resetForm(){
-  const key=f.adminKey.value;$("form").reset();f.adminKey.value=key;f.enabled.checked=true;f.floorAmount.value="1";f.minimumAmount.value="1";f.decimals.value="";
+  const key=f.adminKey.value;$("form").reset();f.adminKey.value=key;f.enabled.checked=true;f.floorAmount.value="1";f.minimumAmount.value="1";f.auctionBidIncrement.value="1";f.decimals.value="";
   f.chain.disabled=false;f.tokenAddress.readOnly=false;f.floorAmount.readOnly=false;editingId=existingLogoUrl=existingLogoCid="";editingOriginal=null;
   $("logoPreview").textContent="LOGO";$("saveBtn").textContent="Marketplace登録 + JNC保存";setOnchain("未確認","");preview();message("新規入力へ切り替えました。");
 }
@@ -550,8 +586,8 @@ $("form").onsubmit=async event=>{
       marketplace:{address:d.marketplace,feeWallet:d.feeWallet,registered:true,verifiedAt:new Date().toISOString()},
       paymentToken:{
         name:f.tokenName.value.trim(),symbol,displaySymbol:`$${symbol}`,address:normalizeAddress(f.tokenAddress.value),decimals:sync.decimals,
-        floorAmount:f.floorAmount.value.trim(),minimumAmount:f.minimumAmount.value.trim(),
-        floorBaseUnits:sync.floor.toString(),minimumBaseUnits:sync.minimum.toString(),
+        floorAmount:formatUnits(sync.floor,sync.decimals),minimumAmount:formatUnits(sync.minimum,sync.decimals),auctionBidIncrement:formatUnits(sync.bidIncrement,sync.decimals),
+        floorBaseUnits:sync.floor.toString(),minimumBaseUnits:sync.minimum.toString(),auctionBidIncrementBaseUnits:sync.bidIncrement.toString(),
         logoUrl:logo?.url||existingLogoUrl,logoCid:logo?.cid||existingLogoCid
       }
     };
