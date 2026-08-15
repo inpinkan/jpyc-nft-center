@@ -575,6 +575,12 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 
 
 <script>
+/* v2.6.3 CORRECTION
+   Polygon deployment route now points to Marketplace v2.23.0:
+   0xf689F1f0cC3604FE4D7502192d875B8A013C54e9
+   paymentTokenConfigs remains backward-compatible with BNB v2.22.0 (4 fields).
+*/
+
 /* JNC v2.6.3 — Marketplace v2.23.0 Bid Increment Integration
    - paymentTokenConfigs decoder updated for independent minimumBidIncrement
    - auction bid minimum remains highestBid + auction snapshot increment
@@ -1224,7 +1230,7 @@ const JNC_DEPLOYMENT_REGISTRY=Object.freeze({
     enabled:true,verified:true,multiToken:true,
     contracts:Object.freeze({
       nft:'0xeFf5f71E382E8668Db8a0894ED12D6e4c741b370',
-      marketplace:'0x7120910884379E0C6c5AADcc56c888436ef5eB81',
+      marketplace:'0xf689F1f0cC3604FE4D7502192d875B8A013C54e9',
       feeWallet:'0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5'
     })
   }),
@@ -2623,13 +2629,13 @@ async function readPaymentTokenConfig(paymentToken,marketplaceAddress=PNC_CONFIG
   if(!isValidEvmAddress(token))throw new Error('Payment token address is invalid.');
   const raw=await ethCall(marketplaceAddress,sig4('paymentTokenConfigs(address)')+addrWord(token));
   const w=words(raw);
-  if(w.length<5)throw new Error('Payment token configuration returned malformed data.');
+  if(w.length<4)throw new Error('Payment token configuration returned malformed data.');
   return Object.freeze({
     configured:BigInt('0x'+w[0])===1n,
     enabled:BigInt('0x'+w[1])===1n,
     floorPaymentAmount:BigInt('0x'+w[2]).toString(),
     minimumPaymentAmount:BigInt('0x'+w[3]).toString(),
-    minimumBidIncrement:BigInt('0x'+w[4]).toString()
+    minimumBidIncrement:w.length>=5?BigInt('0x'+w[4]).toString():null
   });
 }
 async function readMinimumNativeWei(nftOrProfile=null){
@@ -2646,6 +2652,9 @@ async function readMinimumBidIncrementWei(nftOrProfile=null){
   const marketplaceAddress=route?.deployment?.contracts?.marketplace||PNC_CONFIG.contracts.marketplace;
   const config=await readPaymentTokenConfig(tokenAddress,marketplaceAddress);
   if(!config.configured||!config.enabled)throw new Error(`${currencyUnit(nftOrProfile)} is not enabled in the active Marketplace.`);
+  if(config.minimumBidIncrement===null){
+    throw new Error('The active Marketplace does not expose an independent Auction bid increment.');
+  }
   const increment=BigInt(config.minimumBidIncrement||'0');
   if(increment<=0n)throw new Error(t('marketTx.minimumPrice'));
   return increment.toString();
