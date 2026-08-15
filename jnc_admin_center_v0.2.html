@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1.9</title>
+<title>JNC Admin Center v1.1.10</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -23,14 +23,14 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.9</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.10</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
 <div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplaceへの書き込み操作は運営Fee WalletのMetaMask承認が必要です。読み取り確認ではWallet接続を要求しません。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
-<div class="flow"><strong>v1.1.9 / Marketplace v2.23.0対応：</strong> 新規登録・編集はMarketplace設定をオンチェーン確認してJNCへ保存します。運営設定の最低価格とAuction最低入札増加額を別項目として管理し、v2.23.0では両方をMarketplaceへ同期します。まだv2.22.0のチェーンではAuction最低入札増加額はJNC Registry値を維持し、Marketplace移行後にオンチェーン同期します。終了／再開はJNC Registry（KV）の新規Shop / NFT受付状態だけを切り替えます。</div>
+<div class="flow"><strong>v1.1.10 / Polygon Marketplace v2.23.1対応：</strong> 新規登録・編集はMarketplace設定をオンチェーン確認してJNCへ保存します。運営設定の最低価格とAuction最低入札増加額を別項目として管理し、v2.23.1では両方をMarketplaceへ同期します。まだv2.22.0のチェーンではAuction最低入札増加額はJNC Registry値を維持し、Marketplace移行後にオンチェーン同期します。終了／再開はJNC Registry（KV）の新規Shop / NFT受付状態だけを切り替えます。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -65,7 +65,7 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 <div class="runtime-row"><span>Wallet Provider</span><strong id="providerRuntime">未検出</strong></div>
 <div class="runtime-row"><span>MetaMask</span><strong id="walletRuntime">未接続</strong></div>
 <div class="runtime-row"><span>On-chain</span><strong id="onchainRuntime"><span class="pill">未確認</span></strong></div>
-<div class="runtime-note">Wallet表示は参考情報です。Marketplaceへの書き込み時に、その瞬間の接続アカウントを再確認します。Marketplace v2.23.0ではAuction最低入札増加額もオンチェーン設定として同期します。v2.22.0のチェーンは移行完了までRegistry値を維持します。</div>
+<div class="runtime-note">Wallet表示は参考情報です。Marketplaceへの書き込み時に、その瞬間の接続アカウントを再確認します。Marketplace v2.23.1ではAuction最低入札増加額もオンチェーン設定として同期します。v2.22.0のチェーンは移行完了までRegistry値を維持します。</div>
 </div>
 
 <div class="actions">
@@ -113,7 +113,7 @@ const SELECTOR=Object.freeze({
 /* 1 Marketplace per chain. Future chains stay fail-closed until their
    verified deployment addresses are added here. */
 const MARKETPLACE_DEPLOYMENTS=Object.freeze({
-  polygon:Object.freeze({chainId:137,chainHex:"0x89",name:"Polygon",marketplace:"0xf689F1f0cC3604FE4D7502192d875B8A013C54e9",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",version:"2.23.0",enabled:true}),
+  polygon:Object.freeze({chainId:137,chainHex:"0x89",name:"Polygon",marketplace:"0xaB6659Ae04a556Dd848A0B16e6037928Ea2124B1",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",version:"2.23.1",enabled:true}),
   ethereum:Object.freeze({chainId:1,chainHex:"0x1",name:"Ethereum",marketplace:"",feeWallet:"",version:"",enabled:false}),
   avalanche:Object.freeze({chainId:43114,chainHex:"0xa86a",name:"Avalanche C-Chain",marketplace:"",feeWallet:"",version:"",enabled:false}),
   bnb:Object.freeze({chainId:56,chainHex:"0x38",name:"BNB Smart Chain",marketplace:"0xAdAcd3ceef3629f4031E9d4F189Fbd198691f044",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",version:"2.22.0",enabled:true})
