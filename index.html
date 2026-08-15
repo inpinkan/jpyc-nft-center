@@ -582,9 +582,9 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
    Global KV remains the fast display snapshot. After first render, on-chain NFT state is synchronized sequentially in the background through the same localized refreshNFT path used by Detail and confirmed transactions.
    Manual refresh also uses this shared localized synchronization path; the old parallel full-NFT verification path is no longer used by refreshPlatform.
    Background synchronization updates UI in small batches and persists the resulting shared snapshot once per completed pass.
-   Polygon Marketplace is migrated to v2.23.1. Auction minimum bid increment is independent from the operator minimum and is read from the auction snapshot.
-   Existing Polygon NFT creator / primary-sale state is read migration-safely from the immediately previous Marketplace until v2.23.1 lazily imports it on first market use.
-   BNB Marketplace, Wallet, Pinata, Mint contract, demand-driven synchronization, and unrelated transaction paths are unchanged. */
+   Polygon and BNB Marketplaces are migrated to v2.23.1. Auction minimum bid increment is independent from the operator minimum and is read from the auction snapshot.
+   Existing Polygon / BNB NFT creator and primary-sale state is read migration-safely from each immediately previous Marketplace until v2.23.1 lazily imports it on first market use.
+   Wallet, Pinata, Mint contracts, demand-driven synchronization, and unrelated transaction paths are unchanged. */
 
 
 
@@ -1232,8 +1232,12 @@ const JNC_DEPLOYMENT_REGISTRY=Object.freeze({
     enabled:true,verified:true,multiToken:true,
     contracts:Object.freeze({
       nft:'0x621AEECB9374E2A57F767564E1dc999478d440c7',
-      marketplace:'0xAdAcd3ceef3629f4031E9d4F189Fbd198691f044',
+      marketplace:'0xab83444A0f35D5388Fa2B6161aC177aA4Aabb1Eb',
       feeWallet:'0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5'
+    }),
+    migration:Object.freeze({
+      previousMarketplace:'0xAdAcd3ceef3629f4031E9d4F189Fbd198691f044',
+      marketplaceVersion:'2.23.1'
     })
   })
 });
