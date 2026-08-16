@@ -552,7 +552,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 @media(max-width:640px){.permission-box{padding:12px;border-radius:17px}.permission-title{font-size:19px}.permission-step{padding:9px}}
 
 
-/* v2.7.0 scalable rendering controls */
+/* v2.7.1 scalable rendering controls */
 .render-more{display:flex;justify-content:center;margin:14px 0 4px}
 .render-more button{min-width:150px}
 .render-count{color:var(--muted);font-size:11px;text-align:center;margin-top:7px}
@@ -566,7 +566,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
   <div class="menu" id="menu" aria-hidden="true"><div class="menu-inner"><div class="menu-title" data-i18n="nav.title"></div><button onclick="showPage('homePage')">🏠 <span data-i18n="nav.home"></span></button><button onclick="showPage('collectionsPage')">🏪 <span data-i18n="nav.collections"></span></button><button onclick="showPage('vaultPage')">🏦 <span data-i18n="nav.vault"></span></button><button onclick="showPage('creatorPage')">🎨 <span data-i18n="nav.creator"></span></button><div class="menu-title" data-i18n="appearance.title"></div><button onclick="setTheme('light')">☀️ <span data-i18n="appearance.light"></span></button><button onclick="setTheme('dark')">🌙 <span data-i18n="appearance.dark"></span></button><div class="menu-title" data-i18n="language.title"></div><div class="language-panel"><div class="language-current-summary"><span data-i18n="language.currentLanguage"></span><strong id="currentLanguageName">English</strong></div><div class="language-list" role="group"><button class="language-option" type="button" data-language="en" onclick="selectLanguage('en')"><span class="language-option-main"><span aria-hidden="true">🇺🇸</span><span class="language-option-label">English</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ja" onclick="selectLanguage('ja')"><span class="language-option-main"><span aria-hidden="true">🇯🇵</span><span class="language-option-label">日本語</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ko" onclick="selectLanguage('ko')"><span class="language-option-main"><span aria-hidden="true">🇰🇷</span><span class="language-option-label">한국어</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ru" onclick="selectLanguage('ru')"><span class="language-option-main"><span aria-hidden="true">🇷🇺</span><span class="language-option-label">Русский</span></span><span class="language-option-status"></span></button></div></div></div></div>
 </header>
 <main>
-  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.7.0</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
+  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.7.1</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
   <div class="page" id="collectionsPage"><div class="hero"><h1 data-i18n="nav.collections"></h1><p data-i18n="collections.hero"></p></div><section class="section"><div class="grid" id="allCollections"></div></section></div>
   <div class="page" id="collectionPage"><div id="collectionDetail"></div></div>
   <div class="page" id="vaultPage"><div class="hero vault-hero"><h1 data-i18n="nav.vault"></h1><p id="vaultStats"></p><div class="vault-tabs" role="tablist"><button class="vault-tab active" id="vaultTabOwned" type="button" onclick="setVaultTab('owned')"></button><button class="vault-tab" id="vaultTabSend" type="button" onclick="setVaultTab('send')"></button><button class="vault-tab" id="vaultTabReceive" type="button" onclick="setVaultTab('receive')"></button></div></div><section class="section"><div id="vaultContent"></div></section></div>
@@ -583,11 +583,13 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 <script>
 'use strict';
 
-/* JNC v2.7.0 — DEMAND-DRIVEN RENDERING / SCALABLE UI / MARKETPLACE v2.23.1
+/* JNC v2.7.1 — PROGRESSIVE DETAIL MEDIA / DEMAND-DRIVEN RENDERING / MARKETPLACE v2.23.1
    Based on v2.6.1-2 Shared Market State Read Architecture.
    Global KV remains the fast display snapshot. Only the currently visible page and bounded card windows are rendered to DOM.
    Visible NFT cards are synchronized on demand through the shared localized refreshNFT path used by Detail and confirmed transactions.
    Initial load no longer hydrates metadata for every stored NFT; metadata is hydrated when an NFT becomes visible or is opened.
+   Detail images render the already-available thumbnail immediately, then promote to the display image only after the display CID actually loads.
+   Transient Pinata Gateway 404 responses keep the thumbnail visible while the display image is retried in the background.
    Manual refresh synchronizes only visible NFT surfaces; the old full-NFT verification/render path remains disabled.
    Polygon and BNB Marketplaces are migrated to v2.23.1. Auction minimum bid increment is independent from the operator minimum and is read from the auction snapshot.
    Existing Polygon / BNB NFT creator and primary-sale state is read migration-safely from each immediately previous Marketplace until v2.23.1 lazily imports it on first market use.
@@ -836,7 +838,7 @@ function sleep(ms){return new Promise(resolve=>window.setTimeout(resolve,Math.ma
 
 
 
-const JNC_CONFIGURATION_VERSION='2.7.0';
+const JNC_CONFIGURATION_VERSION='2.7.1';
 const JNC_ADMIN_REGISTRY_ENDPOINT='/api/load-collaboration';
 let JNC_ADMIN_PAYMENT_TOKEN_REGISTRY=Object.freeze([]);
 let JNC_ADMIN_REGISTRY_STATUS=Object.freeze({
@@ -1661,7 +1663,7 @@ function canAuctionNFT(nft,state=PNC_STATE){const c=marketplacePermissionContext
    applies creation-time minimum rules from JNC_MARKETPLACE_RULES, and keeps
    payment settlement delegated to executeMarketplacePayment(). */
 const PNC_CONFIG={
-  app:{version:'v2.7.0-demand-driven-rendering',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
+  app:{version:'v2.7.1-progressive-detail-media',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
   production:{
     deploymentKey:JNC_CONFIGURATION.productionDeploymentKey,
     chainKey:JNC_CONFIGURATION.launchTarget.chainKey,
@@ -2371,6 +2373,43 @@ function renderMediaImage(primaryUrl,fallbackUrl,altText){
   const fallbackAttr=fallback&&fallback!==primary?` data-fallback-src="${esc(fallback)}"`:'';
   return`<img src="${esc(primary)}"${fallbackAttr} alt="${esc(altText||'NFT')}" onerror="const f=this.dataset.fallbackSrc;if(f&&this.src!==f){this.dataset.fallbackSrc='';this.src=f;return;}this.onerror=null;this.style.display='none';">`;
 }
+function renderProgressiveDetailImage(thumbnailUrl,displayUrl,altText){
+  const thumbnail=String(thumbnailUrl||displayUrl||'');
+  const display=String(displayUrl||'');
+  if(!thumbnail)return'';
+  const displayAttr=display&&display!==thumbnail?` data-display-src="${esc(display)}"`:'';
+  const fallbackAttr=display&&display!==thumbnail?` data-fallback-src="${esc(display)}"`:'';
+  return`<img src="${esc(thumbnail)}"${displayAttr}${fallbackAttr} data-progressive-detail="1" alt="${esc(altText||'NFT')}" onerror="const f=this.dataset.fallbackSrc;if(f&&this.src!==f){this.dataset.fallbackSrc='';this.src=f;return;}this.onerror=null;this.style.display='none';">`;
+}
+function activateProgressiveDetailMedia(scope=document){
+  scope.querySelectorAll('img[data-progressive-detail="1"][data-display-src]').forEach(img=>{
+    if(img.dataset.progressiveStarted==='1')return;
+    img.dataset.progressiveStarted='1';
+    const display=String(img.dataset.displaySrc||'');
+    if(!display)return;
+    const retryDelays=[0,4000,9000,17000,30000];
+    let attempt=0;
+    const tryDisplay=()=>{
+      if(!img.isConnected||!img.dataset.displaySrc)return;
+      const probe=new Image();
+      probe.onload=()=>{
+        if(!img.isConnected)return;
+        img.src=probe.src;
+        img.removeAttribute('data-display-src');
+        img.removeAttribute('data-fallback-src');
+      };
+      probe.onerror=()=>{
+        attempt+=1;
+        if(attempt<retryDelays.length&&img.isConnected&&img.dataset.displaySrc){
+          window.setTimeout(tryDisplay,retryDelays[attempt]);
+        }
+      };
+      const separator=display.includes('?')?'&':'?';
+      probe.src=`${display}${separator}jnc_media_retry=${Date.now()}_${attempt}`;
+    };
+    tryDisplay();
+  });
+}
 function renderNFTMedia(item,mode='card'){
   const media=resolveNFTMedia(item);
   const cls=mode==='detail'?'nft-media nft-media-detail':'nft-media nft-media-card';
@@ -2380,9 +2419,15 @@ function renderNFTMedia(item,mode='card'){
     if(videoPoster)return`<div class="${cls}">${renderMediaImage(videoPoster,media.imageUrl,item?.name||'Video NFT')}<span class="media-play-badge">▶</span></div>`;
     return`<div class="${cls}"><video src="${esc(media.animationUrl)}" muted playsinline preload="metadata"></video><span class="media-play-badge">▶</span></div>`;
   }
-  const primary=mode==='detail'?(media.imageUrl||media.thumbnailUrl):(media.thumbnailUrl||media.imageUrl);
-  const fallback=mode==='detail'?media.thumbnailUrl:media.imageUrl;
-  if(primary)return`<div class="${cls}">${renderMediaImage(primary,fallback,item?.name||'NFT')}</div>`;
+  if(mode==='detail'){
+    const preview=media.thumbnailUrl||media.imageUrl;
+    const display=media.imageUrl||preview;
+    if(preview)return`<div class="${cls}">${renderProgressiveDetailImage(preview,display,item?.name||'NFT')}</div>`;
+  }else{
+    const primary=media.thumbnailUrl||media.imageUrl;
+    const fallback=media.imageUrl;
+    if(primary)return`<div class="${cls}">${renderMediaImage(primary,fallback,item?.name||'NFT')}</div>`;
+  }
   return`<div class="${cls}">${esc(item?.icon||'🖼')}</div>`;
 }
 function currencyUnit(nftOrProfile=null){const profile=nftOrProfile?getMarketplacePaymentProfile(nftOrProfile):null;return profile?.paymentToken?.displaySymbol||profile?.paymentToken?.symbol||PNC_CONFIG.currency.activeSymbol||'JPYC';}
@@ -3079,7 +3124,7 @@ async function createMarketState(walletSnapshot,creatorSnapshot,chainSnapshot=''
   if(!verifyAllOnChain){
     for(const nft of state.nfts){
       nft.status=nft.status||'not_for_sale';
-      // v2.7.0: use persisted/cached metadata immediately; network hydration is demand-driven.
+      // v2.7.1: use persisted/cached metadata immediately; network hydration remains demand-driven.
       applyCachedMetadata(nft);
       if(nft.status==='listed'&&nft.listingId&&String(nft.listingId)!=='0'){
         state.market.listings.push({listingId:String(nft.listingId),nftId:nft.id,priceWei:String(nft.priceWei||'0'),seller:nft.seller||''});
@@ -4848,7 +4893,7 @@ function closeLegal(event){
   if(event&&event.target&&event.target.id!=='legalModal')return;
   closeModalElement($('legalModal'),()=>{document.body.style.overflow='';});
 }
-function clearSearchUI(){const input=$('searchInput'),box=$('searchResults');if(input){input.value='';input.blur();}if(box){box.classList.remove('show');box.innerHTML='';}}function selectSearchCollection(collectionId){clearSearchUI();openCollection(collectionId);}function selectSearchNFT(id){clearSearchUI();showDetailById(id);}function openCollection(collectionId){if(PNC_STATE.activeCollectionId!==collectionId)JNC_RENDER_WINDOWS.collection=JNC_RENDER_LIMITS.collectionInitial;renderCollectionPage(PNC_STATE,collectionId);showPage('collectionPage');scheduleDemandMarketObserver();}function showDetailById(id,options={}){const n=resolveNftReference(id);if(!n)return;const detailBox=$('nftDetailBox');detailBox.dataset.nftRef=nftReference(n);const c=PNC_STATE.collections.find(x=>x.id===n.collectionId)||{};const desc=n.description||(n.metadata&&n.metadata.description)||'';$('nftDetailBox').innerHTML=`<div class="detail-toolbar"><button class="detail-close" onclick="closeNftDetail()">×</button></div><div class="detail-head">${renderNFTMedia(n,'detail')}<div class="detail-summary"><div class="detail-title">${esc(n.name)}</div><div class="meta">${esc(c.name||n.collectionName||'-')} ${c.verified?'<span class="badge">✔</span>':''}</div>${priceLine(n)}${shopSocialHtml(c)}<div class="badge-row"><span class="badge ${statusClass(n)}">${esc(statusLabel(n))}</span>${chainBadgeHtml(n)}${paymentTokenBadgeHtml(n,true)}</div></div></div>${desc?`<div class="detail-section"><div class="detail-section-title">${esc(t('detail.description'))}</div><div class="meta">${esc(desc)}</div></div>`:''}<div class="detail-section"><div class="detail-section-title">${esc(t('detail.information'))}</div><div class="detail-info-grid"><div>${utilityPlainInfoRow(t('detail.nftId'),displayNFTId(n),t('detail.nftId'))}${infoRow(t('common.chain'),getNFTPaymentProfile(n).chain.name)}${infoRow('Payment Token',getNFTPaymentProfile(n).paymentToken.symbol||getNFTPaymentProfile(n).paymentToken.displaySymbol)}${infoRow(t('detail.mediaType'),resolveNFTMedia(n).mediaType==='video'?t('detail.videoNft'):t('detail.imageNft'))}${utilityPlainInfoRow(t('common.tokenId'),n.tokenId||'-',t('common.tokenId'))}${infoRow(t('detail.collection'),c.name||n.collectionName||'-')}${utilityInfoRow(t('common.contract'),n.contractAddress,t('common.contract'))}</div><div>${utilityStaticAddressRow(t('common.owner'),n.owner)}${utilityStaticAddressRow(t('common.creator'),n.creator)}${infoRow(t('detail.primarySale'),n.primarySaleCompleted?t('detail.completed'):t('detail.notCompleted'))}${n.utility?infoRow(t('creator.utility'),n.utility):''}${infoRow(t('detail.seller'),displayAddress(n.seller))}${infoRow(t('detail.listingId'),n.listingId||'-')}${infoRow(t('detail.activeOffers'),(n.offers||[]).length)}${n.auction?infoRow(t('marketUi.auctionId'),n.auction.auctionId):''}${n.auction?infoRow(t('detail.auctionSeller'),displayAddress(n.auction.seller)):''}</div></div></div>${nftUtilityPanelHtml(n)}<div class="detail-section"><div class="detail-section-title">${esc(t('common.offers'))}</div>${offerListHtml(n)}</div><div class="detail-section"><div class="detail-section-title">${esc(t('common.auction'))}</div>${auctionListHtml(n)}</div>${bidRefundHtml(n)}${detailActionButtons(n)}`;const modal=$('nftDetailOverlay');prepareModalOpen(modal);modal.classList.add('show');if(!options.skipRefresh&&isOnChainNFT(n)){const ref=nftReference(n);Promise.resolve().then(async()=>{const refreshed=await refreshNFT(ref);if(refreshed)await persistConfirmedNFTSnapshot(refreshed,'detail-read');}).catch(error=>console.warn('Localized detail Marketplace refresh failed:',error));}}function closeNftDetail(ev){if(ev&&ev.target&&ev.target.id!=='nftDetailOverlay')return;closeModalElement($('nftDetailOverlay'));}function searchPNC(){const q=lc($('searchInput').value).trim(),box=$('searchResults');if(!q){box.classList.remove('show');box.innerHTML='';return;}const cs=[],ns=[];for(const c of PNC_STATE.collections){if(lc(c.name).includes(q)){cs.push(c);if(cs.length>=JNC_RENDER_LIMITS.search)break;}}for(const n of PNC_STATE.nfts){if(lc(n.name).includes(q)){ns.push(n);if(ns.length>=JNC_RENDER_LIMITS.search)break;}}box.innerHTML=cs.map(c=>`<div class="search-item" onclick="selectSearchCollection('${esc(c.id)}')">🏪 ${esc(c.name)}<div class="meta">${esc(t('search.collection'))}</div></div>`).join('')+ns.map(n=>`<div class="search-item" onclick="selectSearchNFT('${esc(nftReference(n))}')">🖼 ${esc(n.name)}<div class="meta">NFT</div></div>`).join('');box.classList.toggle('show',!!box.innerHTML);}
+function clearSearchUI(){const input=$('searchInput'),box=$('searchResults');if(input){input.value='';input.blur();}if(box){box.classList.remove('show');box.innerHTML='';}}function selectSearchCollection(collectionId){clearSearchUI();openCollection(collectionId);}function selectSearchNFT(id){clearSearchUI();showDetailById(id);}function openCollection(collectionId){if(PNC_STATE.activeCollectionId!==collectionId)JNC_RENDER_WINDOWS.collection=JNC_RENDER_LIMITS.collectionInitial;renderCollectionPage(PNC_STATE,collectionId);showPage('collectionPage');scheduleDemandMarketObserver();}function showDetailById(id,options={}){const n=resolveNftReference(id);if(!n)return;const detailBox=$('nftDetailBox');detailBox.dataset.nftRef=nftReference(n);const c=PNC_STATE.collections.find(x=>x.id===n.collectionId)||{};const desc=n.description||(n.metadata&&n.metadata.description)||'';$('nftDetailBox').innerHTML=`<div class="detail-toolbar"><button class="detail-close" onclick="closeNftDetail()">×</button></div><div class="detail-head">${renderNFTMedia(n,'detail')}<div class="detail-summary"><div class="detail-title">${esc(n.name)}</div><div class="meta">${esc(c.name||n.collectionName||'-')} ${c.verified?'<span class="badge">✔</span>':''}</div>${priceLine(n)}${shopSocialHtml(c)}<div class="badge-row"><span class="badge ${statusClass(n)}">${esc(statusLabel(n))}</span>${chainBadgeHtml(n)}${paymentTokenBadgeHtml(n,true)}</div></div></div>${desc?`<div class="detail-section"><div class="detail-section-title">${esc(t('detail.description'))}</div><div class="meta">${esc(desc)}</div></div>`:''}<div class="detail-section"><div class="detail-section-title">${esc(t('detail.information'))}</div><div class="detail-info-grid"><div>${utilityPlainInfoRow(t('detail.nftId'),displayNFTId(n),t('detail.nftId'))}${infoRow(t('common.chain'),getNFTPaymentProfile(n).chain.name)}${infoRow('Payment Token',getNFTPaymentProfile(n).paymentToken.symbol||getNFTPaymentProfile(n).paymentToken.displaySymbol)}${infoRow(t('detail.mediaType'),resolveNFTMedia(n).mediaType==='video'?t('detail.videoNft'):t('detail.imageNft'))}${utilityPlainInfoRow(t('common.tokenId'),n.tokenId||'-',t('common.tokenId'))}${infoRow(t('detail.collection'),c.name||n.collectionName||'-')}${utilityInfoRow(t('common.contract'),n.contractAddress,t('common.contract'))}</div><div>${utilityStaticAddressRow(t('common.owner'),n.owner)}${utilityStaticAddressRow(t('common.creator'),n.creator)}${infoRow(t('detail.primarySale'),n.primarySaleCompleted?t('detail.completed'):t('detail.notCompleted'))}${n.utility?infoRow(t('creator.utility'),n.utility):''}${infoRow(t('detail.seller'),displayAddress(n.seller))}${infoRow(t('detail.listingId'),n.listingId||'-')}${infoRow(t('detail.activeOffers'),(n.offers||[]).length)}${n.auction?infoRow(t('marketUi.auctionId'),n.auction.auctionId):''}${n.auction?infoRow(t('detail.auctionSeller'),displayAddress(n.auction.seller)):''}</div></div></div>${nftUtilityPanelHtml(n)}<div class="detail-section"><div class="detail-section-title">${esc(t('common.offers'))}</div>${offerListHtml(n)}</div><div class="detail-section"><div class="detail-section-title">${esc(t('common.auction'))}</div>${auctionListHtml(n)}</div>${bidRefundHtml(n)}${detailActionButtons(n)}`;activateProgressiveDetailMedia(detailBox);const modal=$('nftDetailOverlay');prepareModalOpen(modal);modal.classList.add('show');if(!options.skipRefresh&&isOnChainNFT(n)){const ref=nftReference(n);Promise.resolve().then(async()=>{const refreshed=await refreshNFT(ref);if(refreshed)await persistConfirmedNFTSnapshot(refreshed,'detail-read');}).catch(error=>console.warn('Localized detail Marketplace refresh failed:',error));}}function closeNftDetail(ev){if(ev&&ev.target&&ev.target.id!=='nftDetailOverlay')return;closeModalElement($('nftDetailOverlay'));}function searchPNC(){const q=lc($('searchInput').value).trim(),box=$('searchResults');if(!q){box.classList.remove('show');box.innerHTML='';return;}const cs=[],ns=[];for(const c of PNC_STATE.collections){if(lc(c.name).includes(q)){cs.push(c);if(cs.length>=JNC_RENDER_LIMITS.search)break;}}for(const n of PNC_STATE.nfts){if(lc(n.name).includes(q)){ns.push(n);if(ns.length>=JNC_RENDER_LIMITS.search)break;}}box.innerHTML=cs.map(c=>`<div class="search-item" onclick="selectSearchCollection('${esc(c.id)}')">🏪 ${esc(c.name)}<div class="meta">${esc(t('search.collection'))}</div></div>`).join('')+ns.map(n=>`<div class="search-item" onclick="selectSearchNFT('${esc(nftReference(n))}')">🖼 ${esc(n.name)}<div class="meta">NFT</div></div>`).join('');box.classList.toggle('show',!!box.innerHTML);}
 document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeLegal();closeNftDetail();closeWalletModal();}});
 document.addEventListener('DOMContentLoaded',async()=>{
   try{
