@@ -75,10 +75,9 @@ main{width:100%;max-width:950px;margin:0 auto;padding:18px 14px 42px;flex:1 0 au
   box-shadow:0 14px 34px rgba(0,0,0,.20);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 }.hero h1{margin:0 0 8px;color:var(--jpyc-secondary);font-size:28px}.hero p{margin:0;line-height:1.5;color:#dceffc}.beta{font-size:18px}.section{margin:25px 0}.section-title{font-size:24px;font-weight:950;margin-bottom:9px}.panel,.card,.collection-list{background:color-mix(in srgb,var(--card) 94%,transparent);border:1px solid var(--border);border-radius:20px;padding:14px;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.collection-list{display:grid;gap:0}.collection-row{display:grid;grid-template-columns:30px 104px 1fr;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer}.collection-row:last-child{border-bottom:0}.rank{font-size:18px;font-weight:950}.media,.nft-img,.collection-banner,.collection-detail-banner,.top-banner,.detail-image{background:radial-gradient(circle at top left,var(--jpyc-secondary),var(--jpyc-primary));display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center}.nft-img{height:140px;font-size:40px}.collection-banner{height:118px;font-size:38px}.collection-detail-banner{height:236px;width:100%;font-size:48px;border-radius:18px;margin-bottom:0}.top-banner{height:58px;width:104px;border-radius:14px;font-size:22px}.detail-image{width:120px;height:120px;border-radius:18px;font-size:46px}.has-image{color:transparent}
-.nft-media{position:relative;overflow:hidden;background:#000}
+.nft-media{position:relative;overflow:hidden;background:radial-gradient(circle at top left,rgba(97,183,232,.20),rgba(7,22,37,.96))}
+.nft-media img[data-media-pending="1"]{visibility:hidden}
 .nft-media img,.nft-media video{width:100%;height:100%;display:block;object-fit:cover}
-.nft-media.media-pending::after{content:"🖼";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--muted);background:linear-gradient(110deg,#071625 20%,#10263d 45%,#071625 70%);background-size:220% 100%;animation:jncMediaPending 1.6s ease-in-out infinite;pointer-events:none}
-@keyframes jncMediaPending{0%{background-position:100% 0}100%{background-position:-100% 0}}
 .nft-media-card{height:140px}
 .nft-media-detail{width:100%;height:360px;min-height:0;max-height:58vh;border-radius:18px}
 .nft-media-detail img,.nft-media-detail video{width:100%;height:100%;max-height:58vh;object-fit:contain;background:#000}
@@ -554,7 +553,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 @media(max-width:640px){.permission-box{padding:12px;border-radius:17px}.permission-title{font-size:19px}.permission-step{padding:9px}}
 
 
-/* v2.7.2 scalable rendering controls */
+/* v2.7.0 scalable rendering controls */
 .render-more{display:flex;justify-content:center;margin:14px 0 4px}
 .render-more button{min-width:150px}
 .render-count{color:var(--muted);font-size:11px;text-align:center;margin-top:7px}
@@ -568,7 +567,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
   <div class="menu" id="menu" aria-hidden="true"><div class="menu-inner"><div class="menu-title" data-i18n="nav.title"></div><button onclick="showPage('homePage')">🏠 <span data-i18n="nav.home"></span></button><button onclick="showPage('collectionsPage')">🏪 <span data-i18n="nav.collections"></span></button><button onclick="showPage('vaultPage')">🏦 <span data-i18n="nav.vault"></span></button><button onclick="showPage('creatorPage')">🎨 <span data-i18n="nav.creator"></span></button><div class="menu-title" data-i18n="appearance.title"></div><button onclick="setTheme('light')">☀️ <span data-i18n="appearance.light"></span></button><button onclick="setTheme('dark')">🌙 <span data-i18n="appearance.dark"></span></button><div class="menu-title" data-i18n="language.title"></div><div class="language-panel"><div class="language-current-summary"><span data-i18n="language.currentLanguage"></span><strong id="currentLanguageName">English</strong></div><div class="language-list" role="group"><button class="language-option" type="button" data-language="en" onclick="selectLanguage('en')"><span class="language-option-main"><span aria-hidden="true">🇺🇸</span><span class="language-option-label">English</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ja" onclick="selectLanguage('ja')"><span class="language-option-main"><span aria-hidden="true">🇯🇵</span><span class="language-option-label">日本語</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ko" onclick="selectLanguage('ko')"><span class="language-option-main"><span aria-hidden="true">🇰🇷</span><span class="language-option-label">한국어</span></span><span class="language-option-status"></span></button><button class="language-option" type="button" data-language="ru" onclick="selectLanguage('ru')"><span class="language-option-main"><span aria-hidden="true">🇷🇺</span><span class="language-option-label">Русский</span></span><span class="language-option-status"></span></button></div></div></div></div>
 </header>
 <main>
-  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.7.2</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
+  <div class="page show" id="homePage"><div class="hero"><div class="hero-brand"><img class="hero-logo" id="heroBrandLogo" alt=""><h1>JPYC NFT Center <span class="beta">v2.7.1</span></h1></div><p data-i18n="home.hero"></p></div><section class="section"><div class="section-title" data-i18n="home.topCollections"></div><div class="collection-list" id="topCollections"></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.hotNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="hotNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="hotNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="hotNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.liveAuctions"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="liveAuctions">◀</button><button class="carousel-btn" type="button" data-carousel-next="liveAuctions">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="liveAuctions" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newNfts"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newNfts">◀</button><button class="carousel-btn" type="button" data-carousel-next="newNfts">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newNfts" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.newCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="newCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="newCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="newCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section><section class="section carousel-section"><div class="carousel-header"><div class="section-title" data-i18n="home.featuredCollections"></div><div class="carousel-controls"><button class="carousel-btn" type="button" data-carousel-prev="featuredCollections">◀</button><button class="carousel-btn" type="button" data-carousel-next="featuredCollections">▶</button></div></div><div class="carousel-shell"><span class="carousel-edge left"></span><div class="grid carousel-track" id="featuredCollections" tabindex="0"></div><span class="carousel-edge right"></span></div></section></div>
   <div class="page" id="collectionsPage"><div class="hero"><h1 data-i18n="nav.collections"></h1><p data-i18n="collections.hero"></p></div><section class="section"><div class="grid" id="allCollections"></div></section></div>
   <div class="page" id="collectionPage"><div id="collectionDetail"></div></div>
   <div class="page" id="vaultPage"><div class="hero vault-hero"><h1 data-i18n="nav.vault"></h1><p id="vaultStats"></p><div class="vault-tabs" role="tablist"><button class="vault-tab active" id="vaultTabOwned" type="button" onclick="setVaultTab('owned')"></button><button class="vault-tab" id="vaultTabSend" type="button" onclick="setVaultTab('send')"></button><button class="vault-tab" id="vaultTabReceive" type="button" onclick="setVaultTab('receive')"></button></div></div><section class="section"><div id="vaultContent"></div></section></div>
@@ -585,7 +584,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 <script>
 'use strict';
 
-/* JNC v2.7.2 — UNIFIED RESILIENT MEDIA LOADER / DEMAND-DRIVEN RENDERING / MARKETPLACE v2.23.1
+/* JNC v2.7.1 — DEMAND-DRIVEN RENDERING / MEDIA ERROR RECOVERY / MARKETPLACE v2.23.1
    Based on v2.6.1-2 Shared Market State Read Architecture.
    Global KV remains the fast display snapshot. Only the currently visible page and bounded card windows are rendered to DOM.
    Visible NFT cards are synchronized on demand through the shared localized refreshNFT path used by Detail and confirmed transactions.
@@ -838,7 +837,7 @@ function sleep(ms){return new Promise(resolve=>window.setTimeout(resolve,Math.ma
 
 
 
-const JNC_CONFIGURATION_VERSION='2.7.2';
+const JNC_CONFIGURATION_VERSION='2.7.1';
 const JNC_ADMIN_REGISTRY_ENDPOINT='/api/load-collaboration';
 let JNC_ADMIN_PAYMENT_TOKEN_REGISTRY=Object.freeze([]);
 let JNC_ADMIN_REGISTRY_STATUS=Object.freeze({
@@ -1663,7 +1662,7 @@ function canAuctionNFT(nft,state=PNC_STATE){const c=marketplacePermissionContext
    applies creation-time minimum rules from JNC_MARKETPLACE_RULES, and keeps
    payment settlement delegated to executeMarketplacePayment(). */
 const PNC_CONFIG={
-  app:{version:'v2.7.2-unified-resilient-media-loader',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
+  app:{version:'v2.7.1-media-error-recovery-clean',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
   production:{
     deploymentKey:JNC_CONFIGURATION.productionDeploymentKey,
     chainKey:JNC_CONFIGURATION.launchTarget.chainKey,
@@ -2366,90 +2365,16 @@ function resolveNFTMedia(item){
   return{mediaType,imageUrl,thumbnailUrl,animationUrl,mimeType:item?.mimeType||pnc.mimeType||''};
 }
 function resolveMediaUrl(item){return resolveNFTMedia(item).imageUrl;}function mediaUrlFrom(item){return resolveMediaUrl(item);}
-const JNC_MEDIA_RETRY_DELAYS=Object.freeze([1500,3500,7000,12000,20000,30000]);
-const JNC_MEDIA_PENDING_PROBES=new Map();
-const JNC_MEDIA_READY_URLS=new Map();
-function mediaRetryUrl(url,attempt=0){
-  const raw=String(url||'').trim();
-  if(!raw)return'';
-  const separator=raw.includes('?')?'&':'?';
-  return `${raw}${separator}jnc_media_retry=${Date.now()}_${Math.max(0,Number(attempt)||0)}`;
-}
-function probeMediaUrl(url,attempt=0){
-  const canonical=String(url||'').trim();
-  if(!canonical)return Promise.reject(new Error('Empty media URL.'));
-  if(JNC_MEDIA_READY_URLS.has(canonical))return Promise.resolve(JNC_MEDIA_READY_URLS.get(canonical));
-  if(JNC_MEDIA_PENDING_PROBES.has(canonical))return JNC_MEDIA_PENDING_PROBES.get(canonical);
-  const promise=new Promise((resolve,reject)=>{
-    const probe=new Image();
-    probe.decoding='async';
-    probe.onload=()=>{JNC_MEDIA_READY_URLS.set(canonical,probe.src);resolve(probe.src);};
-    probe.onerror=()=>reject(new Error('Media URL is not ready yet.'));
-    probe.src=mediaRetryUrl(canonical,attempt);
-  }).finally(()=>JNC_MEDIA_PENDING_PROBES.delete(canonical));
-  JNC_MEDIA_PENDING_PROBES.set(canonical,promise);
-  return promise;
-}
-function mediaCandidateUrls(img){
-  return [img?.dataset?.primarySrc,img?.dataset?.fallbackSrc].map(value=>String(value||'').trim()).filter((value,index,array)=>value&&array.indexOf(value)===index);
-}
-function setMediaPending(img,pending){
-  const wrapper=img?.closest?.('.nft-media');
-  if(wrapper)wrapper.classList.toggle('media-pending',!!pending);
-  if(img){img.style.visibility=pending?'hidden':'visible';img.style.opacity=pending?'0':'1';}
-}
-function scheduleMediaRecovery(img){
-  if(!img||img.dataset.mediaRecoveryScheduled==='1')return;
-  img.dataset.mediaRecoveryScheduled='1';
-  const run=async()=>{
-    if(!img.isConnected){delete img.dataset.mediaRecoveryScheduled;return;}
-    const candidates=mediaCandidateUrls(img);
-    if(!candidates.length){delete img.dataset.mediaRecoveryScheduled;return;}
-    let attempt=Number(img.dataset.mediaRetryAttempt||0);
-    for(const candidate of candidates){
-      try{
-        const ready=await probeMediaUrl(candidate,attempt);
-        if(!img.isConnected)return;
-        img.dataset.mediaRetryAttempt='0';
-        img.dataset.mediaRecoveryScheduled='0';
-        img.src=ready;
-        return;
-      }catch(_){ }
-    }
-    attempt+=1;
-    img.dataset.mediaRetryAttempt=String(attempt);
-    const delay=JNC_MEDIA_RETRY_DELAYS[Math.min(attempt-1,JNC_MEDIA_RETRY_DELAYS.length-1)];
-    window.setTimeout(()=>{img.dataset.mediaRecoveryScheduled='0';scheduleMediaRecovery(img);},delay);
-  };
-  run();
-}
-function jncHandleMediaError(img){
-  if(!img)return;
-  setMediaPending(img,true);
-  scheduleMediaRecovery(img);
-}
-function jncHandleMediaLoad(img){
-  if(!img)return;
-  setMediaPending(img,false);
-  img.dataset.mediaRetryAttempt='0';
-  const preferred=String(img.dataset.preferredSrc||'').trim();
-  const current=String(img.dataset.currentCanonical||img.dataset.primarySrc||'').trim();
-  if(!preferred||preferred===current||img.dataset.preferredProbe==='1')return;
-  img.dataset.preferredProbe='1';
-  probeMediaUrl(preferred,0).then(ready=>{
-    if(!img.isConnected)return;
-    img.dataset.currentCanonical=preferred;
-    img.src=ready;
-  }).catch(()=>{}).finally(()=>{if(img.isConnected)img.dataset.preferredProbe='0';});
-}
-function renderMediaImage(primaryUrl,fallbackUrl,altText,preferredUrl=''){
-  const primary=String(primaryUrl||'').trim();
-  const fallback=String(fallbackUrl||'').trim();
-  const preferred=String(preferredUrl||'').trim();
+function renderMediaImage(primaryUrl,fallbackUrl,altText){
+  const primary=String(primaryUrl||'');
+  const fallback=String(fallbackUrl||'');
   if(!primary)return'';
   const fallbackAttr=fallback&&fallback!==primary?` data-fallback-src="${esc(fallback)}"`:'';
-  const preferredAttr=preferred&&preferred!==primary?` data-preferred-src="${esc(preferred)}"`:'';
-  return`<img src="${esc(primary)}" data-primary-src="${esc(primary)}" data-current-canonical="${esc(primary)}"${fallbackAttr}${preferredAttr} alt="${esc(altText||'NFT')}" loading="lazy" decoding="async" onload="jncHandleMediaLoad(this)" onerror="jncHandleMediaError(this)">`;
+  /* v2.7.1: a Pinata gateway 404 immediately after Mint can be temporary.
+     Try the alternate persisted media URL once, but never convert a temporary
+     delivery failure into a permanent display:none state. A later normal
+     render / page refresh / Detail reopen creates a fresh image request. */
+  return`<img src="${esc(primary)}"${fallbackAttr} alt="${esc(altText||'NFT')}" decoding="async" onload="this.style.visibility='visible';this.removeAttribute('data-media-pending');" onerror="const f=this.dataset.fallbackSrc;if(f&&this.src!==f){this.dataset.fallbackSrc='';this.src=f;return;}this.onerror=null;this.setAttribute('data-media-pending','1');this.style.visibility='hidden';">`;
 }
 function renderNFTMedia(item,mode='card'){
   const media=resolveNFTMedia(item);
@@ -2460,11 +2385,10 @@ function renderNFTMedia(item,mode='card'){
     if(videoPoster)return`<div class="${cls}">${renderMediaImage(videoPoster,media.imageUrl,item?.name||'Video NFT')}<span class="media-play-badge">▶</span></div>`;
     return`<div class="${cls}"><video src="${esc(media.animationUrl)}" muted playsinline preload="metadata"></video><span class="media-play-badge">▶</span></div>`;
   }
-  const thumbnail=media.thumbnailUrl||media.imageUrl;
-  const display=media.imageUrl||thumbnail;
-  if(!thumbnail)return`<div class="${cls}">${esc(item?.icon||'🖼')}</div>`;
-  if(mode==='detail')return`<div class="${cls}">${renderMediaImage(thumbnail,display,item?.name||'NFT',display)}</div>`;
-  return`<div class="${cls}">${renderMediaImage(thumbnail,display,item?.name||'NFT')}</div>`;
+  const primary=mode==='detail'?(media.imageUrl||media.thumbnailUrl):(media.thumbnailUrl||media.imageUrl);
+  const fallback=mode==='detail'?media.thumbnailUrl:media.imageUrl;
+  if(primary)return`<div class="${cls}">${renderMediaImage(primary,fallback,item?.name||'NFT')}</div>`;
+  return`<div class="${cls}">${esc(item?.icon||'🖼')}</div>`;
 }
 function currencyUnit(nftOrProfile=null){const profile=nftOrProfile?getMarketplacePaymentProfile(nftOrProfile):null;return profile?.paymentToken?.displaySymbol||profile?.paymentToken?.symbol||PNC_CONFIG.currency.activeSymbol||'JPYC';}
 function toHex(n){return'0x'+BigInt(n).toString(16).padStart(64,'0');}function addrWord(a){return String(a).toLowerCase().replace(/^0x/,'').padStart(64,'0');}function decodeAddress(hex){return hex&&hex!=='0x'?'0x'+hex.slice(-40):'';}function decodeUint(hex){return hex&&hex!=='0x'?BigInt(hex).toString():'0';}function words(hex){const h=String(hex||'').replace(/^0x/,'');return h?h.match(/.{1,64}/g)||[]:[];}
@@ -3160,7 +3084,7 @@ async function createMarketState(walletSnapshot,creatorSnapshot,chainSnapshot=''
   if(!verifyAllOnChain){
     for(const nft of state.nfts){
       nft.status=nft.status||'not_for_sale';
-      // v2.7.2: use persisted/cached metadata immediately; network hydration is demand-driven.
+      // v2.7.0: use persisted/cached metadata immediately; network hydration is demand-driven.
       applyCachedMetadata(nft);
       if(nft.status==='listed'&&nft.listingId&&String(nft.listingId)!=='0'){
         state.market.listings.push({listingId:String(nft.listingId),nftId:nft.id,priceWei:String(nft.priceWei||'0'),seller:nft.seller||''});
