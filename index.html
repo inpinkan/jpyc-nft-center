@@ -573,7 +573,7 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
 <script>
 'use strict';
 
-/* JNC v2.7.11 — EXPLICIT WALLET CONNECT / BROWSER HISTORY NAVIGATION / LOCALIZED REFRESH RENDERING / DEMAND-DRIVEN RENDERING / SIMPLE MEDIA PATH / MARKETPLACE v2.23.1
+/* JNC v2.7.11 — PUBLIC BROWSE WALLET ISOLATION / BROWSER HISTORY NAVIGATION / LOCALIZED REFRESH RENDERING / DEMAND-DRIVEN RENDERING / SIMPLE MEDIA PATH / MARKETPLACE v2.23.1
    Based on v2.6.1-2 Shared Market State Read Architecture.
    Global KV remains the fast display snapshot. Only the currently visible page and bounded card windows are rendered to DOM.
    Visible NFT cards are synchronized on demand through the shared localized refreshNFT path used by Detail and confirmed transactions.
@@ -582,8 +582,8 @@ body.light header .menu .language-option.is-active{background:rgba(84,208,143,.1
    Browser Back / Forward uses a single History Manager that records page, collection and NFT-detail state without touching transaction paths.
    Polygon and BNB Marketplaces are migrated to v2.23.1. Auction minimum bid increment is independent from the operator minimum and is read from the auction snapshot.
    Existing Polygon / BNB NFT creator and primary-sale state is read migration-safely from each immediately previous Marketplace until v2.23.1 lazily imports it on first market use.
-   Public browsing no longer performs automatic wallet-account recovery or eth_accounts queries on page load, focus, pageshow, or visibility return.
-   Wallet listeners are installed only after the user explicitly connects. Pinata, Mint contracts, Marketplace writes, demand-driven synchronization, and unrelated transaction paths are unchanged. */
+   Public browsing is isolated from injected EVM wallet providers: when no JNC wallet session is active, public reads use configured public RPC endpoints and do not request eth_chainId / eth_accounts from browser wallets.
+   Wallet provider access begins only after an explicit Connect action. Pinata, Mint contracts, Marketplace writes, demand-driven synchronization, and unrelated transaction paths are unchanged. */
 
 
 
@@ -1653,7 +1653,7 @@ function canAuctionNFT(nft,state=PNC_STATE){const c=marketplacePermissionContext
    applies creation-time minimum rules from JNC_MARKETPLACE_RULES, and keeps
    payment settlement delegated to executeMarketplacePayment(). */
 const PNC_CONFIG={
-  app:{version:'v2.7.11-explicit-wallet-connect',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
+  app:{version:'v2.7.11-public-browse-wallet-isolation',environment:JNC_ACTIVE_ARCHITECTURE.environment.id},
   production:{
     deploymentKey:JNC_CONFIGURATION.productionDeploymentKey,
     chainKey:JNC_CONFIGURATION.launchTarget.chainKey,
@@ -2162,7 +2162,7 @@ let PNC_STATE={wallet:null,collections:[],nfts:[],market:{listings:[],offers:[],
 let PNC_CREATOR_TAB='dashboard';
 let PNC_VAULT_TAB='owned';
 let PNC_EDIT_SHOP_ID='';let PNC_WALLET_CONNECTING=false;
-let PNC_REFRESHING=false;let PNC_REFRESH_QUEUED=false;let PNC_REFRESH_PROMISE=null;let PNC_REFRESH_GENERATION=0;let PNC_WALLET_EVENT_TIMER=null;
+let PNC_REFRESHING=false;let PNC_REFRESH_QUEUED=false;let PNC_REFRESH_PROMISE=null;let PNC_REFRESH_GENERATION=0;let PNC_WALLET_EVENT_TIMER=null;let PNC_WALLET_RECOVERY_TIMER=null;let PNC_WALLET_RECOVERING=false;
 const JNC_MANUAL_LOGOUT_KEY='JNC_MANUAL_LOGOUT_V1';
 const JNC_CREATOR_WORK_PREFIX='JNC_CREATOR_WORK_V1';
 const JNC_CREATOR_SESSION_WORK_PREFIX='JNC_CREATOR_SESSION_WORK_V1';
@@ -2527,8 +2527,9 @@ async function ethCall(to,data,chainOrKey=null){
   const targetChainKey=chainOrKey||getTargetChainKey(to);
   const targetChain=chainConfigFrom(targetChainKey);
   let result;
-  const active=window.ethereum?await getActiveChainId():'';
-  if(window.ethereum&&isConfiguredChain(active,targetChain)){
+  const walletSessionActive=!!PNC_STATE.wallet;
+  const active=(walletSessionActive&&window.ethereum)?await getActiveChainId():'';
+  if(walletSessionActive&&window.ethereum&&isConfiguredChain(active,targetChain)){
     result=await ethereum.request({method:'eth_call',params:[{to,data},'latest']});
   }else{
     result=await publicRpcRequest(targetChain,'eth_call',[{to,data},'latest']);
@@ -3134,9 +3135,10 @@ async function loadBlockchainState(options={}){
   const generation=++PNC_REFRESH_GENERATION;
   const walletSnapshot=PNC_STATE.wallet||null;
   const creatorSnapshot=structuredCopy(PNC_STATE.creator||emptyCreatorState());
-  const chainSnapshot=window.ethereum?await getActiveChainId():'';
+  const walletSessionActive=!!walletSnapshot;
+  const chainSnapshot=(walletSessionActive&&window.ethereum)?await getActiveChainId():'';
   const nextState=await createMarketState(walletSnapshot,creatorSnapshot,chainSnapshot,options);
-  const chainNow=window.ethereum?await getActiveChainId():'';
+  const chainNow=(walletSessionActive&&window.ethereum)?await getActiveChainId():'';
   if(generation!==PNC_REFRESH_GENERATION||lc(PNC_STATE.wallet)!==lc(walletSnapshot)||chainNow!==chainSnapshot){
     PNC_REFRESH_QUEUED=true;
     return null;
@@ -3344,11 +3346,50 @@ function scheduleWalletStateRefresh(){
     }catch(e){console.warn('Wallet state refresh failed:',e);}
   },180);
 }
+async function recoverAuthorizedWallet(options={}){
+  if(!window.ethereum||PNC_WALLET_CONNECTING||PNC_WALLET_RECOVERING||isManualWalletLogout())return false;
+  captureActiveCreatorWork();
+  PNC_WALLET_RECOVERING=true;
+  try{
+    const accounts=await ethereum.request({method:'eth_accounts'});
+    const authorized=accounts&&accounts[0]?accounts[0]:null;
+    if(!authorized)return false;
+    const previous=PNC_STATE.wallet;
+    const changed=lc(previous)!==lc(authorized);
+    if(previous&&changed)clearCreatorWork(previous);
+    prepareCreatorWorkRecovery(authorized);
+    if(changed){
+      applyWalletIdentity(authorized);
+      if(options.render!==false)renderAll(PNC_STATE);
+      if(options.refreshOnChange!==false){
+        const chain=await getActiveChainId();
+        if(isLiveDeploymentChain(chain))await refreshPlatform();
+      }
+    }
+    restoreCreatorWorkUIStable(authorized);
+    return true;
+  }catch(e){
+    console.warn('Authorized wallet recovery skipped:',e);
+    return false;
+  }finally{PNC_WALLET_RECOVERING=false;}
+}
+function scheduleAuthorizedWalletRecovery(){
+  if(isManualWalletLogout())return;
+  captureActiveCreatorWork();
+  clearTimeout(PNC_WALLET_RECOVERY_TIMER);
+  PNC_WALLET_RECOVERY_TIMER=setTimeout(()=>recoverAuthorizedWallet({render:true,refreshOnChange:true}),220);
+}
+function handleVisibleWalletRecovery(){
+  if(document.visibilityState==='visible')scheduleAuthorizedWalletRecovery();
+}
 function installWalletListeners(){
   if(!window.ethereum||window.__PNC_WALLET_LISTENERS__)return;
   window.__PNC_WALLET_LISTENERS__=true;
   ethereum.on?.('accountsChanged',scheduleWalletStateRefresh);
   ethereum.on?.('chainChanged',scheduleWalletStateRefresh);
+  window.addEventListener('pageshow',scheduleAuthorizedWalletRecovery);
+  window.addEventListener('focus',scheduleAuthorizedWalletRecovery);
+  document.addEventListener('visibilitychange',handleVisibleWalletRecovery);
 }
 function setRefreshButtonState(mode){
   const btn=$('platformRefreshBtn');
