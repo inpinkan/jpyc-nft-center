@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 /*
-    JNCMarketplace_v2.22.0_MultiToken_ERC20
+    JNCMarketplace_v2.24.0_MultiToken_ERC20
 
     JPYC NFT Center multi-token ERC20 marketplace.
 
@@ -16,7 +16,11 @@ pragma solidity ^0.8.24;
       with the payment token stored in each market position.
     - Each ERC20 payment token has an immutable absolute floor and an operator minimum.
     - The operator minimum can be raised or lowered, but never below the absolute floor.
-    - Auction bid increment is snapshotted when the auction is created.
+    - Auction bid increment is configured independently per payment token and snapshotted when the auction is created.
+    - Verified origins are registered explicitly; historical sale status remains readable.
+    - NFT origins require fee-wallet verification; ownership alone never proves creator identity.
+    - Previous-market sale state is read across a bounded, deployment-time source list.
+    - Proceeds are credited for separate withdrawal; ended auctions deliver by claimant request.
     - Primary sale: seller 95%, marketplace 5% by default.
     - Resale: seller 85%, creator 10%, marketplace 5% by default.
 */
@@ -35,12 +39,19 @@ interface IERC20JNC {
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
 }
 
+interface IJNCMarketplaceOrigin {
+    function originRegistered(address nft, uint256 tokenId) external view returns (bool);
+    function originalCreator(address nft, uint256 tokenId) external view returns (address);
+    function primarySaleCompleted(address nft, uint256 tokenId) external view returns (bool);
+}
+
 contract JNCMarketplace {
     struct PaymentTokenConfig {
         bool configured;
         bool enabled;
         uint256 floorPaymentAmount;
         uint256 minimumPaymentAmount;
+        uint256 minimumBidIncrement;
     }
 
     struct Listing {
@@ -78,6 +89,12 @@ contract JNCMarketplace {
         bool active;
     }
 
+    struct RateConfig {
+        uint16 fee;
+        uint16 royalty;
+        address recipient;
+    }
+
     struct Sale {
         address nft;
         uint256 tokenId;
@@ -87,6 +104,7 @@ contract JNCMarketplace {
         address paymentToken;
         uint256 price;
         bool resale;
+        RateConfig rates;
     }
 
     error Unauthorized();
@@ -103,8 +121,33 @@ contract JNCMarketplace {
     error PaymentTokenAlreadyConfigured();
     error PaymentTokenDisabled();
     error Reentrant();
+    error OriginVerificationRequired();
+    error NewPositionsPaused();
+
+    uint256 public constant marketplaceVersion = 22400;
+    bool public newPositionsEnabled;
+    address public pendingFeeWallet;
+    address[] public legacyMarketplaces;
+    mapping(address => mapping(address => uint256)) public pendingProceeds;
+    mapping(uint256 => address) public auctionNFTClaimant;
+    mapping(address => mapping(uint256 => uint256)) public heldAuctionByNFT;
+    mapping(uint256 => RateConfig) private _listingRates;
+    mapping(uint256 => RateConfig) private _offerRates;
+    mapping(uint256 => RateConfig) private _auctionRates;
+    address private _expectedNFT;
+    address private _expectedFrom;
+    uint256 private _expectedTokenId;
+
+    event NewPositionsEnabled(bool enabled);
+    event FeeWalletProposed(address indexed current, address indexed proposed);
+    event ProceedsCredited(address indexed paymentToken, address indexed account, uint256 amount);
+    event ProceedsWithdrawn(address indexed paymentToken, address indexed account, address indexed recipient, uint256 amount);
+    event AuctionNFTClaimable(uint256 indexed auctionId, address indexed claimant);
+    event AuctionNFTClaimed(uint256 indexed auctionId, address indexed claimant, address indexed recipient);
+    event LegacySourceAdded(address indexed source);
 
     address public feeWallet;
+    address public immutable previousMarketplace;
     uint16 public feeBps;
     uint16 public royaltyBps;
 
@@ -128,7 +171,7 @@ contract JNCMarketplace {
     mapping(address => mapping(address => uint256)) public pendingBidRefunds;
 
     mapping(address => mapping(uint256 => address)) public originalCreator;
-    mapping(address => mapping(uint256 => bool)) public primarySaleCompleted;
+    mapping(address => mapping(uint256 => bool)) private _primarySaleCompleted;
     mapping(address => mapping(uint256 => bool)) public originRegistered;
 
     uint64 public constant ANTI_SNIPING_WINDOW = 5 minutes;
@@ -147,6 +190,7 @@ contract JNCMarketplace {
         address indexed paymentToken,
         uint256 floorPaymentAmount,
         uint256 minimumPaymentAmount,
+        uint256 minimumBidIncrement,
         bool enabled
     );
 
@@ -265,36 +309,48 @@ contract JNCMarketplace {
     }
 
     /*
-        The initial token is registered here only as the first supported ERC20.
-        It is NOT immutable and it is NOT the only token this marketplace can use.
-
-        This keeps deployment close to v2.21.0:
-        1. initialPaymentToken
-        2. initialFeeWallet
-        3. initialFeeBps
-        4. initialRoyaltyBps
-        5. initialFloorPaymentAmount
-
-        At deployment, the operator minimum starts equal to the immutable floor.
-        The operator minimum can later be raised with updatePaymentTokenMinimum().
+        previousMarketplace is the immediately preceding JNC Marketplace on the same chain.
+        It is used only to preserve existing NFT creator / primary-sale state during migration.
+        Use address(0) only when there is no previous Marketplace to import from.
     */
     constructor(
         address initialPaymentToken,
         address initialFeeWallet,
         uint16 initialFeeBps,
         uint16 initialRoyaltyBps,
-        uint256 initialFloorPaymentAmount
+        uint256 initialFloorPaymentAmount,
+        address initialPreviousMarketplace,
+        address[] memory additionalLegacyMarketplaces
     ) {
         if (
             initialPaymentToken == address(0) ||
             initialPaymentToken.code.length == 0 ||
             initialFeeWallet == address(0) ||
-            initialFloorPaymentAmount == 0
+            initialFloorPaymentAmount == 0 ||
+            (
+                initialPreviousMarketplace != address(0) &&
+                initialPreviousMarketplace.code.length == 0
+            )
         ) revert InvalidInput();
 
         _checkRates(initialFeeBps, initialRoyaltyBps);
 
         feeWallet = initialFeeWallet;
+        previousMarketplace = initialPreviousMarketplace;
+        if (initialPreviousMarketplace != address(0)) {
+            legacyMarketplaces.push(initialPreviousMarketplace);
+            emit LegacySourceAdded(initialPreviousMarketplace);
+        }
+        if (additionalLegacyMarketplaces.length > 7) revert InvalidInput();
+        for (uint256 i; i < additionalLegacyMarketplaces.length; ++i) {
+            address source = additionalLegacyMarketplaces[i];
+            if (source == address(0) || source.code.length == 0) revert InvalidInput();
+            for (uint256 j; j < legacyMarketplaces.length; ++j) {
+                if (legacyMarketplaces[j] == source) revert InvalidInput();
+            }
+            legacyMarketplaces.push(source);
+            emit LegacySourceAdded(source);
+        }
         feeBps = initialFeeBps;
         royaltyBps = initialRoyaltyBps;
 
@@ -302,11 +358,13 @@ contract JNCMarketplace {
             configured: true,
             enabled: true,
             floorPaymentAmount: initialFloorPaymentAmount,
-            minimumPaymentAmount: initialFloorPaymentAmount
+            minimumPaymentAmount: initialFloorPaymentAmount,
+            minimumBidIncrement: initialFloorPaymentAmount
         });
 
         emit PaymentTokenConfigured(
             initialPaymentToken,
+            initialFloorPaymentAmount,
             initialFloorPaymentAmount,
             initialFloorPaymentAmount,
             true
@@ -326,10 +384,19 @@ contract JNCMarketplace {
         _register(nft, tokenId, creator, completed);
     }
 
-    function registerNFTOriginByOwner(address nft, uint256 tokenId) external {
-        if (nft == address(0)) revert InvalidInput();
+    // Retained ABI: an owner can synchronize a verified origin, never self-assign one.
+    function registerNFTOriginByOwner(address nft, uint256 tokenId) external nonReentrant {
         if (IERC721JNC(nft).ownerOf(tokenId) != msg.sender) revert NotOwner();
-        _register(nft, tokenId, msg.sender, false);
+        if (!originRegistered[nft][tokenId]) revert OriginVerificationRequired();
+        if (primarySaleCompleted(nft, tokenId)) _primarySaleCompleted[nft][tokenId] = true;
+    }
+
+    function primarySaleCompleted(address nft, uint256 tokenId) public view returns (bool) {
+        return _primarySaleCompleted[nft][tokenId] || _legacySaleCompleted(nft, tokenId);
+    }
+
+    function legacyMarketplaceCount() external view returns (uint256) {
+        return legacyMarketplaces.length;
     }
 
     // ---------------------------------------------------------------------
@@ -341,7 +408,7 @@ contract JNCMarketplace {
         uint256 tokenId,
         uint256 price,
         address paymentToken
-    ) external returns (uint256 id) {
+    ) external nonReentrant returns (uint256 id) {
         _checkNewPositionPrice(paymentToken, price);
         if (_auctionActive(nft, tokenId)) revert InvalidState();
 
@@ -360,6 +427,7 @@ contract JNCMarketplace {
             true
         );
         listingIdByNFT[nft][tokenId] = id;
+        _listingRates[id] = _currentRates();
 
         emit ListingCreated(
             id,
@@ -371,7 +439,7 @@ contract JNCMarketplace {
         );
     }
 
-    function cancelListing(uint256 id) external {
+    function cancelListing(uint256 id) external nonReentrant {
         Listing storage listing = listings[id];
         if (!listing.active || listing.seller != msg.sender) revert Unauthorized();
         _cancelListing(id, listing);
@@ -394,7 +462,8 @@ contract JNCMarketplace {
             listing.seller,
             msg.sender,
             listing.paymentToken,
-            listing.price
+            listing.price,
+            _listingRates[id]
         );
 
         _pullPayment(listing.paymentToken, msg.sender, listing.price);
@@ -436,6 +505,7 @@ contract JNCMarketplace {
             true
         );
 
+        _offerRates[id] = _currentRates();
         uint256[] storage ids = _offerIds[nft][tokenId];
         ids.push(id);
         _offerPos[id] = ids.length;
@@ -452,6 +522,15 @@ contract JNCMarketplace {
     }
 
     function cancelOffer(uint256 id) external nonReentrant {
+        _cancelOfferTo(id, msg.sender);
+    }
+
+    function cancelOfferTo(uint256 id, address recipient) external nonReentrant {
+        _cancelOfferTo(id, recipient);
+    }
+
+    function _cancelOfferTo(uint256 id, address recipient) internal {
+        if (recipient == address(0) || recipient == address(this)) revert InvalidInput();
         Offer storage offer = offers[id];
         if (!offer.active || offer.buyer != msg.sender) revert Unauthorized();
 
@@ -462,7 +541,7 @@ contract JNCMarketplace {
         address paymentToken = offer.paymentToken;
 
         _removeOffer(id, offer);
-        _pushPayment(paymentToken, buyer, amount);
+        _pushPayment(paymentToken, recipient, amount);
 
         emit OfferCancelled(
             id,
@@ -493,7 +572,8 @@ contract JNCMarketplace {
             msg.sender,
             offer.buyer,
             offer.paymentToken,
-            offer.amount
+            offer.amount,
+            _offerRates[id]
         );
 
         _removeOffer(id, offer);
@@ -508,10 +588,6 @@ contract JNCMarketplace {
         return _offerIds[nft][tokenId];
     }
 
-    function isOfferExpired(uint256 id) external view returns (bool) {
-        Offer storage offer = offers[id];
-        return offer.active && block.timestamp >= offer.expiresAt;
-    }
 
     // ---------------------------------------------------------------------
     // Auction
@@ -537,8 +613,7 @@ contract JNCMarketplace {
             startAt < block.timestamp ||
             durationDays == 0 ||
             durationDays > 30 ||
-            _auctionActive(nft, tokenId) ||
-            _offerIds[nft][tokenId].length != 0
+            _auctionActive(nft, tokenId)
         ) revert InvalidState();
 
         uint256 calculatedEnd =
@@ -553,7 +628,7 @@ contract JNCMarketplace {
         _cancelListingByNFT(nft, tokenId);
 
         uint256 minimumBidIncrement =
-            paymentTokenConfigs[paymentToken].minimumPaymentAmount;
+            paymentTokenConfigs[paymentToken].minimumBidIncrement;
 
         id = ++nextAuctionId;
 
@@ -575,7 +650,15 @@ contract JNCMarketplace {
 
         auctionIdByNFT[nft][tokenId] = id;
 
+        _auctionRates[id] = _currentRates();
+        heldAuctionByNFT[nft][tokenId] = id;
+        _expectedNFT = nft;
+        _expectedFrom = msg.sender;
+        _expectedTokenId = tokenId;
         token.safeTransferFrom(msg.sender, address(this), tokenId);
+        delete _expectedNFT;
+        delete _expectedFrom;
+        delete _expectedTokenId;
 
         emit AuctionCreated(
             id,
@@ -657,53 +740,45 @@ contract JNCMarketplace {
             msg.sender == auction.seller
         ) revert InvalidState();
 
-        address nft = auction.nftContract;
-        uint256 tokenId = auction.tokenId;
-        address seller = auction.seller;
-        address paymentToken = auction.paymentToken;
-        uint256 price = auction.buyNowPrice;
-        address previousBidder = auction.highestBidder;
-        uint256 previousBid = auction.highestBid;
-
-        _pullPayment(paymentToken, msg.sender, price);
+        Sale memory sale = _sale(
+            auction.nftContract, auction.tokenId, auction.seller, msg.sender,
+            auction.paymentToken, auction.buyNowPrice, _auctionRates[id]
+        );
+        _pullPayment(sale.paymentToken, msg.sender, sale.price);
         _clearAuction(auction);
 
-        if (previousBidder != address(0)) {
-            pendingBidRefunds[paymentToken][previousBidder] += previousBid;
+        if (auction.highestBidder != address(0)) {
+            pendingBidRefunds[sale.paymentToken][auction.highestBidder] += auction.highestBid;
         }
 
-        _settle(
-            _sale(
-                nft,
-                tokenId,
-                seller,
-                msg.sender,
-                paymentToken,
-                price
-            ),
-            address(this),
-            3,
-            id
-        );
+        _settle(sale, address(this), 3, id);
 
         emit AuctionBuyNowCompleted(
             id,
             msg.sender,
-            paymentToken,
-            price
+            sale.paymentToken,
+            sale.price
         );
     }
 
     function withdrawBidRefund(
         address paymentToken
     ) external nonReentrant {
-        uint256 amount =
-            pendingBidRefunds[paymentToken][msg.sender];
+        _withdrawBidRefundTo(paymentToken, msg.sender);
+    }
+
+    function withdrawBidRefundTo(address paymentToken, address recipient) external nonReentrant {
+        _withdrawBidRefundTo(paymentToken, recipient);
+    }
+
+    function _withdrawBidRefundTo(address paymentToken, address recipient) internal {
+        if (recipient == address(0) || recipient == address(this)) revert InvalidInput();
+        uint256 amount = pendingBidRefunds[paymentToken][msg.sender];
 
         if (amount == 0) revert InvalidState();
 
         pendingBidRefunds[paymentToken][msg.sender] = 0;
-        _pushPayment(paymentToken, msg.sender, amount);
+        _pushPayment(paymentToken, recipient, amount);
 
         emit BidRefundWithdrawn(
             msg.sender,
@@ -726,11 +801,7 @@ contract JNCMarketplace {
         address seller = auction.seller;
 
         _clearAuction(auction);
-        IERC721JNC(nft).safeTransferFrom(
-            address(this),
-            seller,
-            tokenId
-        );
+        _makeAuctionClaimable(id, seller);
 
         emit AuctionCancelled(id, nft, tokenId);
     }
@@ -743,31 +814,21 @@ contract JNCMarketplace {
             block.timestamp < auction.endsAt
         ) revert InvalidState();
 
-        address nft = auction.nftContract;
-        uint256 tokenId = auction.tokenId;
-        address seller = auction.seller;
-        address winner = auction.highestBidder;
-        address paymentToken = auction.paymentToken;
-        uint256 amount = auction.highestBid;
-
         _clearAuction(auction);
 
-        if (winner == address(0)) {
-            IERC721JNC(nft).safeTransferFrom(
-                address(this),
-                seller,
-                tokenId
-            );
-            emit AuctionCancelled(id, nft, tokenId);
+        if (auction.highestBidder == address(0)) {
+            _makeAuctionClaimable(id, auction.seller);
+            emit AuctionCancelled(id, auction.nftContract, auction.tokenId);
         } else {
             _settle(
                 _sale(
-                    nft,
-                    tokenId,
-                    seller,
-                    winner,
-                    paymentToken,
-                    amount
+                    auction.nftContract,
+                    auction.tokenId,
+                    auction.seller,
+                    auction.highestBidder,
+                    auction.paymentToken,
+                    auction.highestBid,
+                    _auctionRates[id]
                 ),
                 address(this),
                 2,
@@ -824,15 +885,6 @@ contract JNCMarketplace {
         );
     }
 
-    function isAuctionStarted(uint256 id) external view returns (bool) {
-        Auction storage auction = _auctions[id];
-        return auction.active && block.timestamp >= auction.startAt;
-    }
-
-    function isAuctionEnded(uint256 id) external view returns (bool) {
-        Auction storage auction = _auctions[id];
-        return auction.active && block.timestamp >= auction.endsAt;
-    }
 
     // ---------------------------------------------------------------------
     // Settlement
@@ -844,7 +896,8 @@ contract JNCMarketplace {
         address seller,
         address buyer,
         address paymentToken,
-        uint256 price
+        uint256 price,
+        RateConfig memory rates
     ) internal view returns (Sale memory sale) {
         if (!originRegistered[nft][tokenId]) revert InvalidState();
 
@@ -859,7 +912,8 @@ contract JNCMarketplace {
             creator,
             paymentToken,
             price,
-            primarySaleCompleted[nft][tokenId]
+            primarySaleCompleted(nft, tokenId) || seller != creator,
+            rates
         );
     }
 
@@ -870,45 +924,28 @@ contract JNCMarketplace {
         uint256 referenceId
     ) internal {
         uint256 fee =
-            sale.price * feeBps / 10_000;
+            sale.price * sale.rates.fee / 10_000;
 
         uint256 royalty =
             sale.resale
-                ? sale.price * royaltyBps / 10_000
+                ? sale.price * sale.rates.royalty / 10_000
                 : 0;
 
         uint256 sellerAmount =
             sale.price - fee - royalty;
 
-        if (!sale.resale) {
-            primarySaleCompleted[sale.nft][sale.tokenId] = true;
+        _primarySaleCompleted[sale.nft][sale.tokenId] = true;
+
+        if (saleType == 2) {
+            _makeAuctionClaimable(referenceId, sale.buyer);
+        } else {
+            if (saleType == 3) delete heldAuctionByNFT[sale.nft][sale.tokenId];
+            IERC721JNC(sale.nft).safeTransferFrom(nftHolder, sale.buyer, sale.tokenId);
         }
 
-        IERC721JNC(sale.nft).safeTransferFrom(
-            nftHolder,
-            sale.buyer,
-            sale.tokenId
-        );
-
-        _pushPayment(
-            sale.paymentToken,
-            feeWallet,
-            fee
-        );
-
-        if (royalty != 0) {
-            _pushPayment(
-                sale.paymentToken,
-                sale.creator,
-                royalty
-            );
-        }
-
-        _pushPayment(
-            sale.paymentToken,
-            sale.seller,
-            sellerAmount
-        );
+        _creditProceeds(sale.paymentToken, sale.rates.recipient, fee);
+        _creditProceeds(sale.paymentToken, sale.creator, royalty);
+        _creditProceeds(sale.paymentToken, sale.seller, sellerAmount);
 
         emit SaleCompleted(
             saleType,
@@ -944,6 +981,7 @@ contract JNCMarketplace {
         address paymentToken,
         uint256 amount
     ) internal view {
+        if (!newPositionsEnabled) revert NewPositionsPaused();
         PaymentTokenConfig storage config =
             paymentTokenConfigs[paymentToken];
 
@@ -1040,19 +1078,18 @@ contract JNCMarketplace {
         delete _offerPos[id];
     }
 
-    function _registerIfNeeded(
-        address nft,
-        uint256 tokenId,
-        address creator
-    ) internal {
-        if (!originRegistered[nft][tokenId]) {
-            _register(
-                nft,
-                tokenId,
-                creator,
-                false
-            );
+    function _registerIfNeeded(address nft, uint256 tokenId, address) internal view {
+        if (!originRegistered[nft][tokenId]) revert OriginVerificationRequired();
+    }
+
+    // Fail closed if a configured historical source cannot be read. The source list
+    // is fixed at deployment and bounded to eight contracts, avoiding unbounded walks.
+    function _legacySaleCompleted(address nft, uint256 tokenId) internal view returns (bool) {
+        for (uint256 i; i < legacyMarketplaces.length; ++i) {
+            IJNCMarketplaceOrigin legacy = IJNCMarketplaceOrigin(legacyMarketplaces[i]);
+            if (legacy.originRegistered(nft, tokenId) && legacy.primarySaleCompleted(nft, tokenId)) return true;
         }
+        return false;
     }
 
     function _register(
@@ -1070,15 +1107,17 @@ contract JNCMarketplace {
             originRegistered[nft][tokenId]
         ) revert InvalidState();
 
+        // Verify that the NFT exists before an irreversible admin registration.
+        IERC721JNC(nft).ownerOf(tokenId);
         originalCreator[nft][tokenId] = creator;
-        primarySaleCompleted[nft][tokenId] = completed;
+        _primarySaleCompleted[nft][tokenId] = completed || _legacySaleCompleted(nft, tokenId);
         originRegistered[nft][tokenId] = true;
 
         emit NFTOriginRegistered(
             nft,
             tokenId,
             creator,
-            completed
+            _primarySaleCompleted[nft][tokenId]
         );
     }
 
@@ -1175,13 +1214,15 @@ contract JNCMarketplace {
         address paymentToken,
         uint256 floorPaymentAmount,
         uint256 minimumPaymentAmount,
+        uint256 minimumBidIncrement,
         bool enabled
     ) external onlyFeeWallet {
         if (
             paymentToken == address(0) ||
             paymentToken.code.length == 0 ||
             floorPaymentAmount == 0 ||
-            minimumPaymentAmount < floorPaymentAmount
+            minimumPaymentAmount < floorPaymentAmount ||
+            minimumBidIncrement == 0
         ) revert InvalidInput();
 
         if (paymentTokenConfigs[paymentToken].configured) {
@@ -1193,13 +1234,15 @@ contract JNCMarketplace {
                 configured: true,
                 enabled: enabled,
                 floorPaymentAmount: floorPaymentAmount,
-                minimumPaymentAmount: minimumPaymentAmount
+                minimumPaymentAmount: minimumPaymentAmount,
+                minimumBidIncrement: minimumBidIncrement
             });
 
         emit PaymentTokenConfigured(
             paymentToken,
             floorPaymentAmount,
             minimumPaymentAmount,
+            minimumBidIncrement,
             enabled
         );
     }
@@ -1221,6 +1264,7 @@ contract JNCMarketplace {
             paymentToken,
             config.floorPaymentAmount,
             config.minimumPaymentAmount,
+            config.minimumBidIncrement,
             enabled
         );
     }
@@ -1247,6 +1291,34 @@ contract JNCMarketplace {
             paymentToken,
             config.floorPaymentAmount,
             minimumPaymentAmount,
+            config.minimumBidIncrement,
+            config.enabled
+        );
+    }
+
+    function updatePaymentTokenBidIncrement(
+        address paymentToken,
+        uint256 minimumBidIncrement
+    ) external onlyFeeWallet {
+        PaymentTokenConfig storage config =
+            paymentTokenConfigs[paymentToken];
+
+        if (!config.configured) {
+            revert PaymentTokenNotConfigured();
+        }
+
+        if (minimumBidIncrement == 0) {
+            revert InvalidInput();
+        }
+
+        config.minimumBidIncrement =
+            minimumBidIncrement;
+
+        emit PaymentTokenConfigured(
+            paymentToken,
+            config.floorPaymentAmount,
+            config.minimumPaymentAmount,
+            minimumBidIncrement,
             config.enabled
         );
     }
@@ -1256,6 +1328,7 @@ contract JNCMarketplace {
     ) external view returns (
         uint256 floorPaymentAmount,
         uint256 minimumPaymentAmount,
+        uint256 minimumBidIncrement,
         bool enabled
     ) {
         PaymentTokenConfig storage config =
@@ -1268,6 +1341,7 @@ contract JNCMarketplace {
         return (
             config.floorPaymentAmount,
             config.minimumPaymentAmount,
+            config.minimumBidIncrement,
             config.enabled
         );
     }
@@ -1279,8 +1353,8 @@ contract JNCMarketplace {
             revert InvalidInput();
         }
 
-        feeWallet = value;
-        emit ConfigUpdated(0, value, 0);
+        pendingFeeWallet = value;
+        emit FeeWalletProposed(feeWallet, value);
     }
 
     function updateFeeBps(
@@ -1320,12 +1394,57 @@ contract JNCMarketplace {
         ) revert InvalidInput();
     }
 
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
+    function acceptFeeWallet() external {
+        if (msg.sender != pendingFeeWallet) revert Unauthorized();
+        feeWallet = msg.sender;
+        delete pendingFeeWallet;
+        emit ConfigUpdated(0, msg.sender, 0);
+    }
+
+    function setNewPositionsEnabled(bool enabled) external onlyFeeWallet {
+        newPositionsEnabled = enabled;
+        emit NewPositionsEnabled(enabled);
+    }
+
+    function _currentRates() internal view returns (RateConfig memory) {
+        return RateConfig(feeBps, royaltyBps, feeWallet);
+    }
+
+    function _creditProceeds(address token, address account, uint256 amount) internal {
+        if (amount == 0) return;
+        pendingProceeds[token][account] += amount;
+        emit ProceedsCredited(token, account, amount);
+    }
+
+    function withdrawProceeds(address paymentToken, address recipient) external nonReentrant {
+        if (recipient == address(0) || recipient == address(this)) revert InvalidInput();
+        uint256 amount = pendingProceeds[paymentToken][msg.sender];
+        if (amount == 0) revert InvalidState();
+        pendingProceeds[paymentToken][msg.sender] = 0;
+        _pushPayment(paymentToken, recipient, amount);
+        emit ProceedsWithdrawn(paymentToken, msg.sender, recipient, amount);
+    }
+
+    function _makeAuctionClaimable(uint256 id, address claimant) internal {
+        auctionNFTClaimant[id] = claimant;
+        emit AuctionNFTClaimable(id, claimant);
+    }
+
+    function claimAuctionNFT(uint256 id, address recipient) external nonReentrant {
+        if (recipient == address(0) || recipient == address(this)) revert InvalidInput();
+        if (auctionNFTClaimant[id] != msg.sender) revert Unauthorized();
+        Auction storage auction = _auctions[id];
+        delete auctionNFTClaimant[id];
+        delete heldAuctionByNFT[auction.nftContract][auction.tokenId];
+        IERC721JNC(auction.nftContract).safeTransferFrom(address(this), recipient, auction.tokenId);
+        emit AuctionNFTClaimed(id, msg.sender, recipient);
+    }
+
+    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata)
+        external view returns (bytes4)
+    {
+        if (msg.sender != _expectedNFT || from != _expectedFrom ||
+            tokenId != _expectedTokenId || operator != address(this)) revert InvalidState();
         return 0x150b7a02;
     }
 }

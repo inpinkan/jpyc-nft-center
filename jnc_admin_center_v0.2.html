@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JNC Admin Center v1.1.11</title>
+<title>JNC Admin Center v1.2.0</title>
 <style>
 :root{--bg:#f4f8fd;--panel:#fff;--text:#172033;--muted:#687386;--line:#dbe4ef;--blue:#1473e6;--blue2:#0d5ebf;--green:#067647;--red:#b42318;--amber:#9a6700;--shadow:0 16px 42px rgba(33,57,89,.11)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:linear-gradient(#eaf4ff,#f7f9fc 360px);color:var(--text)}
@@ -20,17 +20,20 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 .runtime{display:grid;gap:8px;margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:#f8fbff}.runtime-row{display:flex;justify-content:space-between;gap:12px;font-size:12px}.runtime-row span{color:var(--muted)}.runtime-row strong{text-align:right;overflow-wrap:anywhere}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf3fa;color:#52627a;font-size:11px}.pill.ok{background:#e7f6ee;color:var(--green)}.pill.wait{background:#fff8e7;color:var(--amber)}.pill.bad{background:#fff0ef;color:var(--red)}.runtime-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:-4px}
 @media(max-width:820px){.grid{grid-template-columns:1fr}.preview{position:static}}@media(max-width:560px){.row{grid-template-columns:1fr}.card{grid-template-columns:44px 1fr}.card-actions{grid-column:1/-1;justify-content:flex-start}.hero h1{font-size:23px}}
 </style>
+<script src="/vendor/ethers.umd.min.js"></script>
+<script src="/deployment-config.js"></script>
+<script src="/release.js"></script>
 </head>
 <body>
 <main class="shell">
-<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.1.11</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
+<header class="hero"><div class="mark">JNC</div><div><h1>JNC Admin Center <small>v1.2.0</small></h1><p>Admin Centerからチェーン・決済トークン・Marketplace登録を一元管理します。</p></div></header>
 
 <section class="grid">
 <div class="panel">
 <div class="head"><h2>決済トークン登録</h2><p>オンチェーン登録を確認してからJNC設定を保存します。</p></div>
 <form id="form">
 <div class="security">管理キーはVercel環境変数 <strong>JNC_ADMIN_KEY</strong> と同じ値を入力します。ブラウザには保存しません。Marketplaceへの書き込み操作は運営Fee WalletのMetaMask承認が必要です。読み取り確認ではWallet接続を要求しません。複数Wallet拡張がある環境でもMetaMask Providerを明示選択します。</div>
-<div class="flow"><strong>v1.1.11 / Polygon・BNB Marketplace v2.23.1対応：</strong> 新規登録・編集はMarketplace設定をオンチェーン確認してJNCへ保存します。運営設定の最低価格とAuction最低入札増加額を別項目として管理し、v2.23.1では両方をMarketplaceへ同期します。まだv2.22.0のチェーンではAuction最低入札増加額はJNC Registry値を維持し、Marketplace移行後にオンチェーン同期します。終了／再開はJNC Registry（KV）の新規Shop / NFT受付状態だけを切り替えます。</div>
+<div class="flow"><strong>v1.2.0 / Marketplace v2.24.0対応：</strong> 本体と共通の配置設定を使用します。新しいMarketplaceの配置と確認が終わるまで書込みは停止します。Creatorの確認登録・売上の受取り・旧市場の取消しや返金は、上の手続き画面を利用してください。決済トークンの設定とJNC Registryの受付状態は別々に管理します。</div>
 
 <div class="field"><label for="adminKey">管理キー <span class="req">*</span></label><input id="adminKey" type="password" autocomplete="off" required></div>
 <div class="field"><label for="chain">チェーン <span class="req">*</span></label><select id="chain" required>
@@ -53,7 +56,7 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 </div>
 <div class="row">
 <div class="field"><label for="minimumAmount">運営設定の最低価格 <span class="req">*</span></label><input id="minimumAmount" inputmode="decimal" value="1" required><p class="hint">ユーザーのList / Offer / Auction開始価格はこの値以上。登録後もAdmin Centerから変更できます。</p></div>
-<div class="field"><label for="auctionBidIncrement">Auction最低入札増加額 <span class="req">*</span></label><input id="auctionBidIncrement" inputmode="decimal" value="1" required><p class="hint">次の入札で最低限上乗せする額。最低価格とは独立管理です。Marketplace v2.23.1ではオンチェーンへ同期し、JNC Registryにも同じ値を保存します。</p></div>
+<div class="field"><label for="auctionBidIncrement">Auction最低入札増加額 <span class="req">*</span></label><input id="auctionBidIncrement" inputmode="decimal" value="1" required><p class="hint">次の入札で最低限上乗せする額。最低価格とは独立管理です。Marketplace v2.24.0ではオンチェーンへ同期し、JNC Registryにも同じ値を保存します。</p></div>
 </div>
 
 <div class="field"><label for="logoFile">トークンロゴ画像 <span class="req">*</span></label><input id="logoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml"><p class="hint">新規登録時は必須。編集時に未選択なら現在の画像を維持します。</p></div>
@@ -65,7 +68,7 @@ input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-ra
 <div class="runtime-row"><span>Wallet Provider</span><strong id="providerRuntime">未検出</strong></div>
 <div class="runtime-row"><span>MetaMask</span><strong id="walletRuntime">未接続</strong></div>
 <div class="runtime-row"><span>On-chain</span><strong id="onchainRuntime"><span class="pill">未確認</span></strong></div>
-<div class="runtime-note">Wallet表示は参考情報です。Marketplaceへの書き込み時に、その瞬間の接続アカウントを再確認します。Marketplace v2.23.1ではAuction最低入札増加額もオンチェーン設定として同期します。Polygon / JPYC と BNB / PICH はともにv2.23.1を使用します。</div>
+<div class="runtime-note">Wallet表示は参考情報です。Marketplaceへの書き込み時に、その瞬間の接続アカウントを再確認します。Marketplace v2.24.0ではAuction最低入札増加額もオンチェーン設定として同期します。チェーンごとの新市場アドレスと公開状態は共通の配置設定で確認します。</div>
 </div>
 
 <div class="actions">
@@ -112,12 +115,12 @@ const SELECTOR=Object.freeze({
 
 /* 1 Marketplace per chain. Future chains stay fail-closed until their
    verified deployment addresses are added here. */
-const MARKETPLACE_DEPLOYMENTS=Object.freeze({
-  polygon:Object.freeze({chainId:137,chainHex:"0x89",name:"Polygon",marketplace:"0xaB6659Ae04a556Dd848A0B16e6037928Ea2124B1",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",version:"2.23.1",enabled:true}),
-  ethereum:Object.freeze({chainId:1,chainHex:"0x1",name:"Ethereum",marketplace:"",feeWallet:"",version:"",enabled:false}),
-  avalanche:Object.freeze({chainId:43114,chainHex:"0xa86a",name:"Avalanche C-Chain",marketplace:"",feeWallet:"",version:"",enabled:false}),
-  bnb:Object.freeze({chainId:56,chainHex:"0x38",name:"BNB Smart Chain",marketplace:"0xab83444A0f35D5388Fa2B6161aC177aA4Aabb1Eb",feeWallet:"0x7f60cbDb0CCdbf65E9a67dBbE53ea06910bCaeB5",version:"2.23.1",enabled:true})
-});
+const MARKETPLACE_DEPLOYMENTS=Object.freeze(Object.fromEntries(['polygon','bnb','ethereum','avalanche'].map(key=>{
+  if(!['polygon','bnb'].includes(key))return[key,Object.freeze({enabled:false})];
+  const d=JNCRelease.read(key);
+  return[key,Object.freeze({...d,enabled:true})];
+})));
+JNCRelease.banner();
 
 const $=id=>document.getElementById(id);
 const f={adminKey:$("adminKey"),chain:$("chain"),tokenName:$("tokenName"),tokenSymbol:$("tokenSymbol"),tokenAddress:$("tokenAddress"),decimals:$("decimals"),floorAmount:$("floorAmount"),minimumAmount:$("minimumAmount"),auctionBidIncrement:$("auctionBidIncrement"),logoFile:$("logoFile"),enabled:$("enabled")};
@@ -314,6 +317,7 @@ async function verifyOnChain(show=true){
 }
 async function sendTx(data,label){
   const d=deployment();
+  JNCRelease.requireLive(f.chain.value);
   await ensureChain();
 
   // Single privileged-wallet path:
@@ -324,8 +328,11 @@ async function sendTx(data,label){
     throw new Error(`現在このサイトに接続されているMetaMask ${currentWallet} では承認できません。Marketplace Fee Wallet ${d.feeWallet} を接続してから、もう一度実行してください。`);
   }
 
+  await JNCRelease.verify(f.chain.value,d.marketplace,args=>getProvider().request(args));
+  const rpcTx={from:currentWallet,to:d.marketplace,data,value:"0x0",chainId:d.chainHex};
+  await getProvider().request({method:'eth_estimateGas',params:[rpcTx]});
   setOnchain(`${label} 承認待ち`,"wait");
-  const hash=await getProvider().request({method:"eth_sendTransaction",params:[{from:currentWallet,to:d.marketplace,data,value:"0x0"}]});
+  const hash=await getProvider().request({method:"eth_sendTransaction",params:[{from:currentWallet,to:d.marketplace,data,value:"0x0",chainId:d.chainHex}]});
   message(`${label}を送信しました。確定待ち…\n${hash}`);
   await waitReceipt(hash);
   return hash;
@@ -549,7 +556,7 @@ async function startEdit(item){
       setOnchain(current.enabled?"登録済み / 有効":"登録済み / 無効",current.enabled?"ok":"wait");
       preview();
       message(current.supportsBidIncrement
-        ?`${p.displaySymbol||p.symbol}を編集中です。Floor / Minimum / Auction Bid IncrementをMarketplace v2.23.1から同期しました。絶対下限は変更できません。`
+        ?`${p.displaySymbol||p.symbol}を編集中です。Floor / Minimum / Auction Bid IncrementをMarketplace v2.24.0から同期しました。絶対下限は変更できません。`
         :`${p.displaySymbol||p.symbol}を編集中です。Floor / Minimumはv2.22.0から同期しました。Auction Bid IncrementはMarketplace移行までRegistry値を維持します。`);
     }else{
       setOnchain("未登録","bad");

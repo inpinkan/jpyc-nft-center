@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JNC 受取り・管理手続き</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#193149;font:15px/1.7 system-ui,sans-serif}main{max-width:940px;margin:30px auto;padding:0 20px}h1{font-size:26px}h2{font-size:19px;margin-top:0}section{padding:24px;background:white;border:1px solid #dce5ee;border-radius:15px;margin:20px 0}label{display:block;margin:12px 0 4px;font-weight:600}input,select,button{font:inherit;padding:10px;border:1px solid #b4c4d5;border-radius:8px;max-width:100%}input,select{width:100%}button{cursor:pointer;background:#164b81;color:white;margin:12px 8px 0 0}button:disabled{opacity:.5;cursor:wait}a{color:#14559a}.row{display:grid;grid-template-columns:1fr 1fr;gap:20px}.note{color:#52677e;font-size:14px}.status{white-space:pre-wrap;overflow-wrap:anywhere;padding:15px;background:#edf4fb;border-radius:9px}#result[role=alert]{border-left:4px solid #bc3c38}.check{display:flex;align-items:center;gap:10px}.check input{width:auto}@media(max-width:600px){.row{grid-template-columns:1fr}main{margin:20px auto}}
+#account{display:block;overflow-wrap:anywhere;margin-top:10px}</style>
+<script src="/vendor/ethers.umd.min.js"></script><script src="/deployment-config.js"></script><script src="/release.js"></script>
+<script defer src="/marketplace-tools.js"></script>
+</head><body><main>
+<a href="/">← NFTセンター</a>　<a href="/jnc_admin_center_v0.2.html">Admin Center</a>
+<h1>受取り・Creator確認・旧市場の手続き</h1>
+<p>売上の引出し、確定したNFTの受取り、旧市場に残る取引を操作します。接続したウォレット本人の権利だけを処理します。</p>
+<section><h2>操作する市場</h2><div class="row"><div><label for="chain">チェーン</label><select id="chain"><option value="polygon">Polygon</option><option value="bnb">BNB Smart Chain</option></select></div><div><label for="generation">市場</label><select id="generation"></select></div></div>
+<p id="target" class="status"></p><button id="connect">ウォレット接続</button><span id="account">未接続</span>
+<p class="note">旧市場では新規売買を作成せず、取消し・返金・終了手続きだけを行います。NFTをこの画面のアドレスへ直接送る必要はありません。</p></section>
+<section><h2>手続きを選ぶ</h2><label for="action">操作</label><select id="action"></select>
+<div id="tokenField"><label for="token">決済トークンのアドレス</label><input id="token" placeholder="0x..." spellcheck="false"></div>
+<div id="idField"><label for="itemId" id="idLabel">取引ID</label><input id="itemId" inputmode="numeric" placeholder="例：1"></div>
+<div id="recipientField"><label for="recipient">受取先</label><input id="recipient" placeholder="接続ウォレットを入力、または本人が指定する別の受取先" spellcheck="false"></div>
+<div id="originFields" hidden><label for="creator">確認したCreator</label><input id="creator" placeholder="0x..." spellcheck="false"><label for="mintTx">Mintの取引ハッシュ</label><input id="mintTx" placeholder="0x..." spellcheck="false"><p class="note">このチェーンの既存JNC NFTについて、Mint取引の成功とTransferイベントの発行先を確認します。運営者が履歴を確認した場合だけ登録してください。</p><label class="check"><input id="completed" type="checkbox">初回販売済みとして登録する</label><label for="saleTx">初回販売済みの場合：根拠となる旧市場の販売取引ハッシュ</label><input id="saleTx" placeholder="0x..." spellcheck="false"></div>
+<div id="tokenConfigFields" hidden><div class="row"><div><label for="floor">絶対下限</label><input id="floor" value="1"></div><div><label for="minimum">最低価格</label><input id="minimum" value="1"></div></div><label for="increment">最低入札増加額</label><input id="increment" value="1"><p class="note">トークンの通常の表示単位で入力してください。Decimalsはチェーンから確認します。新規登録は無効状態で作成し、確認後に別操作で有効化します。</p></div>
+<div id="feeField" hidden><label for="newFeeWallet">新しいFee Wallet</label><input id="newFeeWallet" placeholder="0x..."></div>
+<div id="amountField" hidden><label for="settingAmount" id="amountLabel">新しい設定値</label><input id="settingAmount" inputmode="decimal" placeholder="トークンの表示単位で入力"></div>
+<button id="inspect">状態を確認</button><button id="execute">内容を確認して実行</button>
+<p class="note" id="actionNote"></p><div id="result" class="status" aria-live="polite">状態を確認してから操作してください。</div></section>
+</main></body></html>

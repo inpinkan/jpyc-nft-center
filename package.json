@@ -1,0 +1,15 @@
+{
+  "name": "journey-nft-center",
+  "version": "2.24.0",
+  "private": true,
+  "scripts": {
+    "test": "node test/marketplace.cjs && node test/ui.cjs",
+    "build:contracts": "node scripts/build-contracts.cjs"
+  },
+  "devDependencies": {
+    "ethers": "6.15.0",
+    "ganache": "7.9.2",
+    "playwright-core": "1.56.1",
+    "solc": "0.8.24"
+  }
+}
