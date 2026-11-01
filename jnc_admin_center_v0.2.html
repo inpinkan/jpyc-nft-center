@@ -200,8 +200,14 @@ function gateway(v){return String(v||"").replace(/^ipfs:\/\//,"https://gateway.p
 function message(text,ok=true){$("message").textContent=text;$("message").style.color=ok?"var(--green)":"var(--red)"}
 function setOnchain(text,type=""){$("onchainRuntime").innerHTML=`<span class="pill ${type}">${text}</span>`}
 
+let onchainContextKey='';
 function preview(){
   const c=chainData(),s=f.tokenSymbol.value.trim().toUpperCase(),d=deployment();
+  const contextKey=c.key+':'+lc(d?.marketplace)+':'+lc(f.tokenAddress.value);
+  if(contextKey!==onchainContextKey){
+    onchainContextKey=contextKey;
+    setOnchain(d?.enabled&&isAddress(d.marketplace)?'未確認':c.key?'Marketplace未Deploy':'未確認',d?.enabled?'':'wait');
+  }
   $("chainPreview").textContent=c.name||"チェーン未選択";
   $("gasPreview").textContent=`Gas: ${c.nativeSymbol||"—"}`;
   $("namePreview").textContent=f.tokenName.value.trim()||"Token Name";

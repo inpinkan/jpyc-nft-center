@@ -114,6 +114,12 @@ ok('both entry points share deployment settings and preserve migration safeguard
     await page.goto(url+'/jnc_admin_center_v0.2.html');
     await page.locator('aside').filter({hasText:'Marketplace更新準備中'}).first().waitFor();
     await page.selectOption('#chain','polygon');
+    await page.selectOption('#chain','ethereum');
+    await page.locator('#onchainRuntime').filter({hasText:'Marketplace未Deploy'}).waitFor();
+    await page.selectOption('#chain','bnb');
+    assert.equal((await page.locator('#onchainRuntime').innerText()).trim(),'未確認');
+    await page.selectOption('#chain','polygon');
+    ok('Admin chain switch resets stale undeployed status for a configured marketplace');
     await page.screenshot({path:path.join(root,'test-results/admin-desktop.png'),fullPage:true});
     assert.equal(errors.length,0,errors.join('\n'));
     ok('Admin Center loads shared release settings without script errors');
