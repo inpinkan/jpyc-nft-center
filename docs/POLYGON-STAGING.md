@@ -1,5 +1,9 @@
 # Polygon配置後の確認（2026-11-01）
 
+## 新規受付開始
+
+本人がsetNewPositionsEnabled(true)を承認後、ブロック `0x5c135ed` でnewPositionsEnabled=trueを確認。JPYC設定の追加同期は不要。公開設定readyはfalse、本番main・サイトは旧版のまま。旧出品の取消しはまだ行っていない。以下の停止状態の記述はこの操作より前の記録。
+
 ## 登録済み状態を使ったローカル複製テスト
 
 `node scripts/fork-polygon-smoke.cjs` でPolygonの最新状態をメモリ上のGanacheへ複製し、NFT #15の再販と#38の初回販売を試験した。旧出品取消し、新市場承認・出品、100 JPYCでの購入、所有者更新、再販85/10/5・初回95/5の残高配賦、売主の引出し、Creator固定を確認し成功。本番RPCは読み取りにのみ使用し、取引送信はローカルGanacheのみ。本番の受付開始、出品取消し、承認、売買は未実施。

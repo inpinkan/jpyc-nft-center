@@ -22,8 +22,11 @@ function configContext(override) {
 }
 const stagedConfig=configContext();
 assert.equal(stagedConfig.JNCRelease.read('polygon').version,'2.24.0');
-assert.equal(stagedConfig.JNCRelease.read('polygon').live,false);
-assert.throws(()=>stagedConfig.JNCRelease.requireLive('polygon'));
+assert.equal(stagedConfig.JNCRelease.read('polygon').live,true);
+assert.equal(stagedConfig.JNCRelease.read('bnb').live,true);
+assert.equal(stagedConfig.JNCRelease.requireLive('polygon').marketplace,stagedConfig.JNC_DEPLOYMENTS.polygon.newMarketplace);
+const paused=configContext(x=>{x.polygon.ready=false;});
+assert.throws(()=>paused.JNCRelease.requireLive('polygon'));
 const clearDeployments=x=>{for(const d of Object.values(x)){d.newMarketplace='';d.runtimeCodeHash='';d.ready=false;}};
 const config=configContext(clearDeployments);
 assert.equal(config.JNCRelease.read('polygon').version,'2.23.1');

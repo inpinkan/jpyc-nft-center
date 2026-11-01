@@ -1,5 +1,9 @@
 # BNB配置後の確認
 
+## 新規受付開始
+
+本人がsetNewPositionsEnabled(true)を実行後、ブロック `0x7cf65b9` で受付true、決済設定の差分0件を確認。Polygonも受付trueを確認済み。公開設定ready=trueの更新候補を準備し、UI18項目とPreview保存制限2ハンドラの検証が成功。以下の停止状態の記録はこの操作前の経緯。
+
 ## Creator登録完了
 
 本人の登録操作後、ブロック `0x7ce7a56` でToken ID1の登録済み状態を照合。CreatorはMint発行先の `0xfB9831EF4B1F2C1d23A38B91e436D84FCa1B629A` と一致。初回販売未完了は旧市場2世代とも一致。不一致0件。新規受付は停止中。結果は `artifacts/origin-verification-bnb.json`。これによりPolygon38枚とBNB1枚のCreator移行確認が完了した。本番切替は未実施。
