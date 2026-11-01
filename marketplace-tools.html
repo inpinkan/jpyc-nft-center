@@ -13,6 +13,7 @@
 <section><h2>操作する市場</h2><div class="row"><div><label for="chain">チェーン</label><select id="chain"><option value="polygon">Polygon</option><option value="bnb">BNB Smart Chain</option></select></div><div><label for="generation">市場</label><select id="generation"></select></div></div>
 <p id="target" class="status"></p><button id="connect">ウォレット接続</button><span id="account">未接続</span>
 <p class="note">旧市場では新規売買を作成せず、取消し・返金・終了手続きだけを行います。NFTをこの画面のアドレスへ直接送る必要はありません。</p></section>
+<section><h2>既存NFTのCreator移行</h2><p id="migrationIntro">Polygonの既存38件を確認して、未登録の1件を下の入力欄へ読み込みます。読込みだけでは取引を送信しません。登録は1件ずつ内容を確認し、運営ウォレットで承認してください。</p><button id="loadMigration">台帳と登録状況を読み込む</button><button id="nextMigration" disabled>次の未登録NFTを入力</button><div id="migrationStatus" class="status" aria-live="polite">台帳は未読込みです。</div></section>
 <section><h2>手続きを選ぶ</h2><label for="action">操作</label><select id="action"></select>
 <div id="tokenField"><label for="token">決済トークンのアドレス</label><input id="token" placeholder="0x..." spellcheck="false"></div>
 <div id="idField"><label for="itemId" id="idLabel">取引ID</label><input id="itemId" inputmode="numeric" placeholder="例：1"></div>

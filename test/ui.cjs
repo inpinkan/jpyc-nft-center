@@ -20,13 +20,18 @@ function configContext(override) {
   if(override)override(context.window.JNC_DEPLOYMENTS);
   vm.runInContext(read('release.js'),context);return context.window;
 }
-const config=configContext();
+const stagedConfig=configContext();
+assert.equal(stagedConfig.JNCRelease.read('polygon').version,'2.24.0');
+assert.equal(stagedConfig.JNCRelease.read('polygon').live,false);
+assert.throws(()=>stagedConfig.JNCRelease.requireLive('polygon'));
+const clearDeployments=x=>{for(const d of Object.values(x)){d.newMarketplace='';d.runtimeCodeHash='';d.ready=false;}};
+const config=configContext(clearDeployments);
 assert.equal(config.JNCRelease.read('polygon').version,'2.23.1');
 assert.throws(()=>config.JNCRelease.requireLive('polygon'));
 assert.throws(()=>config.JNCRelease.requireLive('bnb'));
-assert.throws(()=>configContext(x=>x.polygon.ready=true));
+assert.throws(()=>configContext(x=>{clearDeployments(x);x.polygon.ready=true;}));
 assert.throws(()=>configContext(x=>x.polygon.newMarketplace=x.polygon.legacyMarketplaces[0]));
-assert.throws(()=>configContext(x=>x.polygon.newMarketplace='0x1111111111111111111111111111111111111111'));
+assert.throws(()=>configContext(x=>{clearDeployments(x);x.polygon.newMarketplace='0x1111111111111111111111111111111111111111';}));
 ok('unconfigured release is read-only and malformed deployments are rejected');
 const main=read('index.html'),admin=read('jnc_admin_center_v0.2.html');
 for(const text of ['readMarketplaceOriginState','isLegacyResaleMigration','registerLegacyResaleOrigin'])assert(main.includes(text));
@@ -38,6 +43,11 @@ ok('both entry points share deployment settings and preserve migration safeguard
   const from='0x1111111111111111111111111111111111111111';
   const token='0x2222222222222222222222222222222222222222';
   const newAddress='0x3333333333333333333333333333333333333333';
+  const fixtureConfig=override=>{
+    const data=JSON.parse(JSON.stringify(config.JNC_DEPLOYMENTS));
+    if(override)override(data);
+    return 'window.JNC_DEPLOYMENTS = '+JSON.stringify(data)+';';
+  };
   const types={'.html':'text/html','.js':'text/javascript','.png':'image/png'};
   const server=http.createServer((req,res)=>{
     const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
@@ -55,6 +65,7 @@ ok('both entry points share deployment settings and preserve migration safeguard
     const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
     page.on('pageerror',e=>errors.push(e.message));
     await page.route('**/*',route=>{
+      if(route.request().url()===url+'/deployment-config.js')return route.fulfill({contentType:'text/javascript',body:fixtureConfig()});
       if(route.request().url().startsWith(url))return route.continue();
       const request=route.request();
       if(request.method()==='POST') {
@@ -112,6 +123,29 @@ ok('both entry points share deployment settings and preserve migration safeguard
     assert.equal(errors.length,0,errors.join('\n'));
     await page.screenshot({path:path.join(root,'test-results/market-desktop.png'),fullPage:true});
     ok('NFT Center loads with maintenance banner and no uncaught script errors');
+    const cacheCheck=await page.evaluate(()=>{
+      const original=getDeploymentByNftContract;
+      try{
+        getDeploymentByNftContract=()=>({contracts:{marketplace:'0x3333333333333333333333333333333333333333'}});
+        const stale={contractAddress:'0x1111111111111111111111111111111111111111',listingId:'2',status:'listed',offers:[{offerId:'7'}],auction:{auctionId:'1'},priceWei:'500',originRegistered:true,marketStateSyncedAt:Date.now()};
+        const invalidated=invalidateForeignMarketplaceState(stale);
+        const fresh={...stale,listingId:'9',status:'listed',marketplaceSnapshotAddress:'0x3333333333333333333333333333333333333333'};
+        return {invalidated,stale,preserved:!invalidateForeignMarketplaceState(fresh)&&fresh.listingId==='9'};
+      }finally{getDeploymentByNftContract=original;}
+    });
+    assert(cacheCheck.invalidated);assert.equal(cacheCheck.stale.listingId,'0');assert.equal(cacheCheck.stale.auction,null);assert.equal(cacheCheck.stale.offers.length,0);assert.equal(cacheCheck.stale.originRegistered,false);assert(cacheCheck.preserved);
+    ok('old-market cached listing, offer and auction IDs are discarded while current-market cache is preserved');
+    const nextSteps=await page.evaluate(()=>{
+      const original=resolveMarketplacePaymentRoute;
+      try{
+        resolveMarketplacePaymentRoute=()=>({chain:{id:'polygon'},tokenAddress:'0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29'});
+        return {pending:marketplaceNextStepsHtml({tokenId:'15',originRegistered:false}),registered:marketplaceNextStepsHtml({tokenId:'15',originRegistered:true})};
+      }finally{resolveMarketplacePaymentRoute=original;}
+    });
+    assert(nextSteps.pending.includes('action=registerOrigin&tokenId=15'));
+    assert(!nextSteps.registered.includes('action=registerOrigin'));
+    assert(nextSteps.registered.includes('action=proceeds&paymentToken=0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29'));
+    ok('NFT details explain pending verification and link to proceeds with the correct token');
     const pendingResult=await page.evaluate(async()=>{try{await executeMarketplaceTransaction({});return 'unexpected';}catch(e){return e.message;}});
     assert(pendingResult.includes('upgrade in progress'));
     assert.equal(await page.evaluate(()=>window.__sends.length),0);
@@ -121,9 +155,17 @@ ok('both entry points share deployment settings and preserve migration safeguard
     await assert.rejects(()=>modern.JNCRelease.verify('polygon',newAddress,async({method})=>method==='eth_chainId'?'0x38':'0x6000'));
     await assert.rejects(()=>modern.JNCRelease.verify('polygon',newAddress,async({method})=>method==='eth_chainId'?'0x89':'0x6001'));
     ok('new marketplace verification requires correct chain, runtime hash and version');
-    const staged=read('deployment-config.js').replace("newMarketplace: '', runtimeCodeHash: '', ready: false",`newMarketplace: '${newAddress}', runtimeCodeHash: '${ethers.keccak256('0x6000')}', ready: false`);
+    const staged=fixtureConfig(d=>{for(const key of ['polygon','bnb']){d[key].newMarketplace=newAddress;d[key].runtimeCodeHash=ethers.keccak256('0x6000');}});
     await page.route('**/deployment-config.js',route=>route.fulfill({contentType:'text/javascript',body:staged}));
-    await page.goto(url+'/marketplace-tools.html');
+    await page.route('**/migration/polygon-origins.json',route=>route.fulfill({json:{chainId:137,target:newAddress,rows:[{tokenId:'15',creator:from,mintTransaction:'0x'+'b'.repeat(64)}]}}));
+    await page.route('**/migration/bnb-origins.json',route=>route.fulfill({json:{chainId:56,target:newAddress,rows:[{tokenId:'1',creator:token,mintTransaction:'0x'+'c'.repeat(64)}]}}));
+    await page.goto(url+'/marketplace-tools.html?action=proceeds&paymentToken='+token);
+    assert.equal((await page.inputValue('#token')).toLowerCase(),token.toLowerCase());
+    await page.click('#loadMigration');await page.locator('#migrationStatus').filter({hasText:'NFT #15：未登録'}).waitFor();
+    await page.click('#nextMigration');
+    assert.equal(await page.inputValue('#itemId'),'15');assert.equal(await page.inputValue('#creator'),from);
+    assert.equal(await page.evaluate(()=>window.__sends.length),0);
+    ok('migration queue loads reviewed fields and never submits on load or next');
     await page.selectOption('#action','claim');await page.fill('#itemId','1');await page.fill('#recipient',from);await page.click('#connect');
     page.once('dialog',dialog=>dialog.accept());await page.click('#execute');await page.locator('#result').filter({hasText:'取引が成功しました'}).waitFor();
     const claim=await page.evaluate(()=>window.__sends[0]);
@@ -132,6 +174,12 @@ ok('both entry points share deployment settings and preserve migration safeguard
     await page.selectOption('#action','registerOrigin');await page.fill('#creator',from);await page.fill('#mintTx','0x'+'b'.repeat(64));await page.click('#execute');
     await page.locator('#result').filter({hasText:'Mintイベントがありません'}).waitFor();assert.equal(await page.evaluate(()=>window.__sends.length),1);
     ok('creator registration refuses missing Mint evidence without submitting a transaction');
+    await page.selectOption('#chain','bnb');
+    assert(await page.locator('#nextMigration').isDisabled());
+    await page.click('#loadMigration');await page.locator('#migrationStatus').filter({hasText:'NFT #1：未登録'}).waitFor();
+    await page.click('#nextMigration');assert.equal(await page.inputValue('#itemId'),'1');assert.equal(await page.inputValue('#creator'),token);
+    assert.equal(await page.evaluate(()=>window.__sends.length),1);
+    ok('chain switch clears previous queue and BNB loads its own NFT without sending');
     assert.equal(errors.length,0,errors.join('\n'));
     fs.writeFileSync(path.join(root,'test-results/ui.json'),JSON.stringify({passed:messages.length,checks:messages},null,2)+'\n');
   }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}

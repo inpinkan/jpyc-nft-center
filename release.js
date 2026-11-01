@@ -33,6 +33,10 @@
   }
   const text = {
     ja: {
+      mintFlow:'Mint → Creator確認 → My Vaultから出品',
+      creatorPending:'Creator確認待ちです。NFTは発行済みです。確認登録後に出品・オファー・オークションを利用できます。',
+      creatorReview:'Creator確認の手続き',
+      proceedsLink:'売上・ロイヤリティを確認／受け取る',
       paused:'Marketplace更新準備中です。売買・新規Mintは再開前です。取消し・返金は「受取り・旧市場の手続き」を利用してください。',
       pending:'Marketplace更新準備中です。閲覧は利用できます。 ',
       proceeds:'売上・手数料・ロイヤリティは「受取り」から個別に引き出せます。',
@@ -44,6 +48,10 @@
       finalizeConfirm:'オークションの権利を確定しますか？NFTは権利者が別途受け取り、売上・手数料・ロイヤリティは個別に引き出します。'
     },
     en: {
+      mintFlow:'Mint → Creator verification → List from My Vault',
+      creatorPending:'Creator verification is pending. Your NFT has been minted. Listing, offers and auctions become available after verification and registration.',
+      creatorReview:'Creator verification',
+      proceedsLink:'Check / withdraw proceeds and royalties',
       paused:'Marketplace upgrade in progress. Trading and new minting have not reopened. Use Claims & legacy transactions for cancellations and refunds.',
       pending:'Marketplace upgrade in progress. Browsing remains available. ',
       proceeds:'Sale proceeds, fees and royalties are credited separately. Withdraw them from Claims.',

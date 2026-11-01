@@ -48,7 +48,39 @@
     proposeFee: { title:'運営：Fee Walletの変更先を提案', modern:true, fee:true },
     acceptFee: { title:'新管理者：Fee Walletの変更を受諾', modern:true }
   };
-  let wallet, busy=false;
+  let wallet, busy=false, migration=[];
+  function registrationKey(c,id){return 'jnc-origin-tx:'+c.d.chainId+':'+c.target.toLowerCase()+':'+id;}
+  async function loadMigration(){
+    const c=context();
+    if(!c.modern)throw Error('新市場を選んでください。');
+    const response=await fetch('/migration/'+c.key+'-origins.json');
+    if(!response.ok)throw Error('移行台帳を読み込めません。');
+    const data=await response.json();
+    if(data.chainId!==c.d.chainId||data.target.toLowerCase()!==c.target.toLowerCase())throw Error('台帳と操作先が一致しません。');
+    migration=[];
+    for(const row of data.rows){
+      if(!/^[1-9]\d*$/.test(row.tokenId)||!ethers.isAddress(row.creator)||!/^0x[0-9a-f]{64}$/i.test(row.mintTransaction))throw Error('台帳の形式が不正です。');
+      const registered=(await view(c,'originRegistered',[c.d.nft,row.tokenId]))[0];
+      let status='未登録';
+      if(registered){
+        const creator=(await view(c,'originalCreator',[c.d.nft,row.tokenId]))[0];
+        status=creator.toLowerCase()===row.creator.toLowerCase()?'登録済み':'Creator不一致：要確認';
+      }else{
+        const hash=localStorage.getItem(registrationKey(c,row.tokenId));
+        if(hash){const receipt=await read(c,'eth_getTransactionReceipt',[hash]);status=receipt&&BigInt(receipt.status)===0n?'未登録':'送信済み：再確認待ち';}
+      }
+      migration.push({...row,status,target:c.target,key:c.key});
+    }
+    $('migrationStatus').textContent='登録済み '+migration.filter(x=>x.status==='登録済み').length+' / '+migration.length+'件\n'+migration.map(x=>'NFT #'+x.tokenId+'：'+x.status).join('\n');
+  }
+  function nextMigration(){
+    const c=context(),row=migration.find(x=>x.status==='未登録'&&x.target===c.target&&x.key===c.key);
+    if(!row)throw Error('次の未登録NFTがありません。台帳と登録状況を読み直してください。');
+    $('action').value='registerOrigin';renderAction();
+    $('itemId').value=row.tokenId;$('creator').value=row.creator;$('mintTx').value=row.mintTransaction;$('completed').checked=false;$('saleTx').value='';
+    output('NFT #'+row.tokenId+' の登録候補を入力しました。Creator: '+row.creator+'\n内容を確認してから実行してください。');
+    $('originFields').scrollIntoView({block:'center'});
+  }
   function context() {
     const key=$('chain').value, d=JNCRelease.entry(key), generation=$('generation').value;
     const modern=generation==='new';
@@ -58,6 +90,9 @@
   }
   function renderMarket() {
     const d=JNCRelease.entry($('chain').value);
+    migration=[];$('nextMigration').disabled=true;
+    $('migrationStatus').textContent='台帳は未読込みです。';
+    $('migrationIntro').textContent=d.name+'の既存NFT（'+($('chain').value==='polygon'?'38':'1')+'件）を確認し、未登録の1件を入力します。読込みだけでは送信しません。登録は運営ウォレットで1件ずつ承認してください。';
     $('generation').replaceChildren();
     const add=(value,title)=>{const o=document.createElement('option');o.value=value;o.textContent=title;$('generation').append(o);};
     add('new',d.newMarketplace?'新市場 v2.24.0':'新市場：配置待ち');
@@ -159,6 +194,9 @@
     if(action==='finalize')return ['finalizeAuction',[idValue()]];
     if(action==='registerOrigin') {
       const creator=validAddress($('creator').value.trim(),'Creator'),id=idValue();
+      if((await view(c,'originRegistered',[c.d.nft,id]))[0])throw Error('このNFTは登録済みです。台帳を再読込みしてください。');
+      const previousHash=localStorage.getItem(registrationKey(c,id));
+      if(previousHash){const receipt=await read(c,'eth_getTransactionReceipt',[previousHash]);if(!receipt||BigInt(receipt.status)!==0n)throw Error('登録取引は送信済みです。再送せず台帳を再読込みしてください。tx: '+previousHash);}
       await originEvidence(c,id,creator);
       return ['registerNFTOrigin',[c.d.nft,id,creator,$('completed').checked]];
     }
@@ -191,6 +229,7 @@
     await p.request({method:'eth_call',params:[tx,'latest']});
     await p.request({method:'eth_estimateGas',params:[tx]});
     const hash=await p.request({method:'eth_sendTransaction',params:[tx]});
+    if(name==='registerNFTOrigin')localStorage.setItem(registrationKey(c,args[1]),hash);
     output('送信済みです。再送しないでください。\n'+hash+'\n確定を確認しています…');
     try { for(let i=0;i<90;i++) {
       const receipt=await read(c,'eth_getTransactionReceipt',[hash]);
@@ -210,11 +249,12 @@
     if(busy)return;busy=true;
     document.querySelectorAll('button,input,select').forEach(x=>x.disabled=true);
     try{await fn();}catch(e){output(e.shortMessage||e.message||String(e),true);}
-    finally{busy=false;document.querySelectorAll('button,input,select').forEach(x=>x.disabled=false);}
+    finally{busy=false;document.querySelectorAll('button,input,select').forEach(x=>x.disabled=false);$('nextMigration').disabled=!migration.some(x=>x.status==='未登録');}
   }
   $('chain').addEventListener('change',renderMarket);$('generation').addEventListener('change',renderActions);$('action').addEventListener('change',renderAction);
   $('connect').addEventListener('click',()=>run(()=>account(true)));
   $('inspect').addEventListener('click',()=>run(inspect));$('execute').addEventListener('click',()=>run(execute));
+  $('loadMigration').addEventListener('click',()=>run(loadMigration));$('nextMigration').addEventListener('click',()=>run(async()=>nextMigration()));
   const initial=new URLSearchParams(window.location.search);
   if(['polygon','bnb'].includes(initial.get('chain')))$('chain').value=initial.get('chain');
   renderMarket();
@@ -223,4 +263,6 @@
   }
   const initialId=initial.get('tokenId')||initial.get('auctionId');
   if(/^[1-9]\d*$/.test(initialId||''))$('itemId').value=initialId;
+  const initialToken=initial.get('paymentToken');
+  if(ethers.isAddress(initialToken||'')&&initialToken!==ethers.ZeroAddress)$('token').value=ethers.getAddress(initialToken);
 })();

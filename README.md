@@ -1,7 +1,7 @@
 # Journey NFT Center
 
 Marketplace 2.24.0 / 公開画面2.8.0 / Admin Center1.2.0の更新候補です。
-**新契約は未デプロイで、初期設定は閲覧・旧取引の手続きのみです。mainへの反映・本番切替はまだ行っていません。**
+**PolygonとBNBの新契約は配置・コード照合・決済設定の同期が完了し、Creator移行もPolygon38枚・BNB1枚の全39枚を照合済みです。両市場の新規受付は停止中、公開設定はready=falseです。旧出品の取消し・再出品、mainへの反映、本番切替はまだ行っていません。** 詳細は [Polygon配置後の確認](docs/POLYGON-STAGING.md) と [BNB配置後の確認](docs/BNB-STAGING.md) を参照してください。
 
 ## 更新内容
 
