@@ -1,0 +1,9 @@
+# 配備の読取り確認
+
+2026-11-01にGitHub公開APIで確認。作業ブランチのcommit20bbf7bはVercelのPreview環境へ配備成功。本番Productionの最新記録は旧mainの737148f。本番journeynftcenter.comはVercelから応答し、旧画面のまま（release.js未読込み）。
+
+PreviewのURLはVercelログインへリダイレクトし、公開GETでは更新後の実画面やPreview環境変数は確認できなかった。保護を回避せず、運営本人のChromeでVercelログインした状態から確認する。
+
+Previewで状態保存やAdmin登録を試しても本番KVへ書き込まないよう、save-stateとsave-collaborationはVERCEL_ENV=previewのPOSTを403にする。Productionでは既存の処理を保持する。ローカルの2ハンドラ検証でPreviewはネットワーク呼出しなし、Productionの既存入力／認証検証が維持されることを確認。
+
+main更新とProduction配備の関連は履歴上確認できるが、現時点のProduction Branch設定や環境変数そのものは未確認。旧出品取消し、ready=true、オンチェーン受付開始、main更新はまだ実施していない。プレビューでは実ウォレットによる取引操作を行わず、閲覧と配置情報の確認を先に行う。

@@ -5,6 +5,10 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
+  if (process.env.VERCEL_ENV === "preview" && req.method === "POST") {
+    return res.status(403).json({ ok: false, error: "Preview is read-only. Production data is not changed." });
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
