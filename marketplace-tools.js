@@ -48,7 +48,29 @@
     proposeFee: { title:'運営：Fee Walletの変更先を提案', modern:true, fee:true },
     acceptFee: { title:'新管理者：Fee Walletの変更を受諾', modern:true }
   };
-  let wallet, busy=false, migration=[];
+  let wallet, busy=false, migration=[], listingQueue=[];
+  async function loadListings(){
+    const c=context(),from=await account();
+    if(c.modern||c.key!=='polygon')throw Error('Polygonの旧市場を選んでください。');
+    const response=await fetch('/migration/polygon-listings.json');
+    if(!response.ok)throw Error('旧出品台帳を読み込めません。');
+    const data=await response.json();if(data.chainId!==c.d.chainId)throw Error('台帳のチェーンが一致しません。');
+    listingQueue=[];
+    for(const row of data.rows.filter(r=>r.marketplace.toLowerCase()===c.target.toLowerCase()&&r.seller.toLowerCase()===from.toLowerCase())){
+      const current=await view(c,'listings',[row.listingId]);
+      const matches=current[0].toLowerCase()===row.nft.toLowerCase()&&current[1].toString()===row.tokenId&&current[2].toLowerCase()===from.toLowerCase()&&current[3].toLowerCase()===row.paymentToken.toLowerCase()&&current[4].toString()===row.price;
+      listingQueue.push({...row,account:from,status:!current[5]?'終了済み':matches?'取消し候補':'出品内容変更：要確認',target:c.target});
+    }
+    $('listingStatus').textContent='売主: '+from+'\n選択した旧市場: '+c.target+'\n'+(listingQueue.length?listingQueue.map(r=>'NFT #'+r.tokenId+' / 出品ID '+r.listingId+' / '+ethers.formatUnits(r.price,18)+' JPYC：'+r.status).join('\n'):'このウォレットの台帳上の旧出品はありません。');
+  }
+  async function nextListing(){
+    const c=context(),from=await account();
+    const row=listingQueue.find(r=>r.status==='取消し候補'&&r.target.toLowerCase()===c.target.toLowerCase()&&r.account.toLowerCase()===from.toLowerCase());
+    if(c.modern||!row)throw Error('接続ウォレットと旧市場を確認し、旧出品を読み直してください。');
+    $('action').value='cancelListing';renderAction();$('itemId').value=String(row.listingId);
+    output('NFT #'+row.tokenId+' / 旧出品ID '+row.listingId+' を入力しました。\nこの操作を実行すると旧出品が取り消され、再出品まで販売できなくなります。');
+    $('itemId').scrollIntoView({block:'center'});
+  }
   function registrationKey(c,id){return 'jnc-origin-tx:'+c.d.chainId+':'+c.target.toLowerCase()+':'+id;}
   async function loadMigration(){
     const c=context();
@@ -100,6 +122,7 @@
     renderActions();
   }
   function renderActions() {
+    listingQueue=[];$('nextListing').disabled=true;$('listingStatus').textContent='旧出品は未読込みです。';
     const modern=$('generation').value==='new';
     $('action').replaceChildren();
     for(const [key,a] of Object.entries(actions)) {
@@ -249,12 +272,13 @@
     if(busy)return;busy=true;
     document.querySelectorAll('button,input,select').forEach(x=>x.disabled=true);
     try{await fn();}catch(e){output(e.shortMessage||e.message||String(e),true);}
-    finally{busy=false;document.querySelectorAll('button,input,select').forEach(x=>x.disabled=false);$('nextMigration').disabled=!migration.some(x=>x.status==='未登録');}
+    finally{busy=false;document.querySelectorAll('button,input,select').forEach(x=>x.disabled=false);$('nextMigration').disabled=!migration.some(x=>x.status==='未登録');$('nextListing').disabled=!listingQueue.some(x=>x.status==='取消し候補');}
   }
   $('chain').addEventListener('change',renderMarket);$('generation').addEventListener('change',renderActions);$('action').addEventListener('change',renderAction);
   $('connect').addEventListener('click',()=>run(()=>account(true)));
   $('inspect').addEventListener('click',()=>run(inspect));$('execute').addEventListener('click',()=>run(execute));
   $('loadMigration').addEventListener('click',()=>run(loadMigration));$('nextMigration').addEventListener('click',()=>run(async()=>nextMigration()));
+  $('loadListings').addEventListener('click',()=>run(loadListings));$('nextListing').addEventListener('click',()=>run(nextListing));
   const initial=new URLSearchParams(window.location.search);
   if(['polygon','bnb'].includes(initial.get('chain')))$('chain').value=initial.get('chain');
   renderMarket();

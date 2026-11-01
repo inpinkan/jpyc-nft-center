@@ -1,7 +1,7 @@
 // Local static preview only. APIs are blocked to prevent production writes.
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
-const files=new Set(['index.html','jnc_admin_center_v0.2.html','marketplace-tools.html','marketplace-tools.js','deployment-config.js','release.js','vendor/ethers.umd.min.js','migration/polygon-origins.json','migration/bnb-origins.json','jnc-og-image.png']);
+const files=new Set(['index.html','jnc_admin_center_v0.2.html','marketplace-tools.html','marketplace-tools.js','deployment-config.js','release.js','vendor/ethers.umd.min.js','migration/polygon-origins.json','migration/bnb-origins.json','migration/polygon-listings.json','jnc-og-image.png']);
 http.createServer((req,res)=>{
   if(req.method!=='GET'){res.writeHead(405).end();return;}
   const name=new URL(req.url,'http://localhost').pathname.slice(1)||'marketplace-tools.html';

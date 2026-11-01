@@ -66,10 +66,12 @@ ok('both entry points share deployment settings and preserve migration safeguard
     page.on('pageerror',e=>errors.push(e.message));
     await page.route('**/*',route=>{
       if(route.request().url()===url+'/deployment-config.js')return route.fulfill({contentType:'text/javascript',body:fixtureConfig()});
+      if(route.request().url()===url+'/migration/polygon-listings.json')return route.fulfill({json:{chainId:137,rows:[{marketplace:config.JNCRelease.entry('polygon').legacyMarketplaces[0],listingId:7,nft:token,tokenId:'15',seller:from,paymentToken:token,price:'500000000000000000000'}]}});
       if(route.request().url().startsWith(url))return route.continue();
       const request=route.request();
       if(request.method()==='POST') {
         let rpc={};try{rpc=JSON.parse(request.postData()||'{}');}catch{}
+        if(rpc.method==='eth_call'&&rpc.params?.[0]?.data?.startsWith('0xde74e57b'))return route.fulfill({json:{jsonrpc:'2.0',id:1,result:ethers.AbiCoder.defaultAbiCoder().encode(['address','uint256','address','address','uint256','bool'],[token,15,from,token,500000000000000000000n,true])}});
         const result=rpc.method==='eth_getTransactionReceipt'?{status:'0x1',logs:[]}:rpc.method==='eth_chainId'?'0x89':'0x'+'0'.repeat(64);
         return route.fulfill({json:{jsonrpc:'2.0',id:1,result}});
       }
@@ -105,6 +107,11 @@ ok('both entry points share deployment settings and preserve migration safeguard
     assert.equal(sent.data.slice(0,10),ethers.id('withdrawBidRefund(address)').slice(0,10));
     assert.equal(await page.evaluate(()=>window.__sends.length),1);
     ok('legacy refund sends exactly once to the selected old marketplace');
+    await page.click('#loadListings');await page.locator('#listingStatus').filter({hasText:'出品ID 7'}).waitFor();
+    await page.click('#nextListing');assert.equal(await page.inputValue('#itemId'),'7');assert.equal(await page.inputValue('#action'),'cancelListing');
+    assert.equal(await page.evaluate(()=>window.__sends.length),1);
+    await page.selectOption('#generation','1');assert(await page.locator('#nextListing').isDisabled());
+    ok('legacy listing queue verifies seller and current listing, fills the correct ID without sending, and clears on market switch');
     fs.mkdirSync(path.join(root,'test-results'),{recursive:true});
     await page.screenshot({path:path.join(root,'test-results/tools-desktop.png'),fullPage:true});
     await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(root,'test-results/tools-mobile.png'),fullPage:true});
