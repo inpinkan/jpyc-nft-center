@@ -3195,6 +3195,16 @@ async function createMarketState(walletSnapshot,creatorSnapshot,chainSnapshot=''
       if(Array.isArray(nft.offers))state.market.offers.push(...nft.offers.map(offer=>({...offer,nftId:nft.id})));
       if(nft.auction&&nft.auction.active)state.market.auctions.push({...nft.auction,nftId:nft.id});
     }
+    // Resolve cutover listings before the first paint, including NFTs outside the visible cards.
+    const cutoverNfts=state.nfts.filter(nft=>nft.tokenId&&isOnChainNFT(nft)&&
+      JNCRelease.read(getTargetChainKey(nft.contractAddress)).previousListingMarketplace);
+    for(let i=0;i<cutoverNfts.length;i+=8){
+      await Promise.all(cutoverNfts.slice(i,i+8).map(async nft=>{
+        const listing=await readMarketplaceStateForNFT(nft.contractAddress,nft.tokenId);
+        if(nft.auction?.active&&listing.status==='not_for_sale')return;
+        applyMarketplaceStateToNFT(state,nft,listing);
+      }));
+    }
     applyCollectionMedia(state);
     return state;
   }
@@ -3492,6 +3502,7 @@ function enqueueDemandMarketSync(ref,options={}){
   PNC_MARKET_SYNC_QUEUE.push({key,ref:nftReference(nft),reason:options.reason||'visible',force:!!options.force});
   pumpDemandMarketSyncQueue();
 }
+const PNC_MARKET_SYNC_DIRTY=new Map();
 function pumpDemandMarketSyncQueue(){
   while(PNC_MARKET_SYNC_ACTIVE<PNC_MARKET_SYNC_MAX_CONCURRENCY&&PNC_MARKET_SYNC_QUEUE.length){
     const job=PNC_MARKET_SYNC_QUEUE.shift();
@@ -3509,7 +3520,7 @@ function pumpDemandMarketSyncQueue(){
       const changed=before!==after;
       syncConfirmedNFTSnapshotIntoCreator(refreshed);
       if(changed){
-        renderNFTSurfaces(refreshed);
+        PNC_MARKET_SYNC_DIRTY.set(job.key,refreshed);
         scheduleDemandSyncSave();
         console.info('[JNC Demand Market Sync]',job.reason,job.key,'changed');
       }
@@ -3519,6 +3530,12 @@ function pumpDemandMarketSyncQueue(){
       PNC_MARKET_SYNC_INFLIGHT.delete(job.key);
       PNC_MARKET_SYNC_ACTIVE=Math.max(0,PNC_MARKET_SYNC_ACTIVE-1);
       pumpDemandMarketSyncQueue();
+      if(PNC_MARKET_SYNC_ACTIVE===0&&PNC_MARKET_SYNC_DIRTY.size){
+        const detailRef=$('nftDetailBox')?.dataset.nftRef;
+        const detail=Array.from(PNC_MARKET_SYNC_DIRTY.values()).find(nft=>nftReference(nft)===detailRef);
+        PNC_MARKET_SYNC_DIRTY.clear();
+        renderNFTSurfaces(detail);
+      }
     });
   }
 }
