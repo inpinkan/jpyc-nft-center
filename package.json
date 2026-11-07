@@ -3,7 +3,8 @@
   "version": "2.24.0",
   "private": true,
   "scripts": {
-    "test": "node test/marketplace.cjs && node test/ui.cjs",
+    "test": "node test/marketplace.cjs && node test/automatic-settlement.cjs && node test/ui.cjs",
+    "test:automatic": "node test/automatic-settlement.cjs",
     "build:contracts": "node scripts/build-contracts.cjs"
   },
   "devDependencies": {

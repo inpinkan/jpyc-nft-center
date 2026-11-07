@@ -21,13 +21,14 @@ function configContext(override) {
   vm.runInContext(read('release.js'),context);return context.window;
 }
 const stagedConfig=configContext();
-assert.equal(stagedConfig.JNCRelease.read('polygon').version,'2.24.0');
+assert.equal(stagedConfig.JNCRelease.read('polygon').version,'2.24.1');
+assert.equal(stagedConfig.JNCRelease.read('bnb').version,'2.24.0');
 assert.equal(stagedConfig.JNCRelease.read('polygon').live,true);
 assert.equal(stagedConfig.JNCRelease.read('bnb').live,true);
 assert.equal(stagedConfig.JNCRelease.requireLive('polygon').marketplace,stagedConfig.JNC_DEPLOYMENTS.polygon.newMarketplace);
 const paused=configContext(x=>{x.polygon.ready=false;});
 assert.throws(()=>paused.JNCRelease.requireLive('polygon'));
-const clearDeployments=x=>{for(const d of Object.values(x)){d.newMarketplace='';d.runtimeCodeHash='';d.ready=false;}};
+const clearDeployments=x=>{for(const d of Object.values(x)){d.newMarketplace='';d.runtimeCodeHash='';d.ready=false;if(d.version) { d.legacyMarketplaces.shift(); delete d.legacyVersions; } delete d.version;delete d.previousListingMarketplace;delete d.previousListingRuntimeHash;}};
 const config=configContext(clearDeployments);
 assert.equal(config.JNCRelease.read('polygon').version,'2.23.1');
 assert.throws(()=>config.JNCRelease.requireLive('polygon'));
@@ -166,10 +167,21 @@ ok('both entry points share deployment settings and preserve migration safeguard
     assert(pendingResult.includes('upgrade in progress'));
     assert.equal(await page.evaluate(()=>window.__sends.length),0);
     ok('public transaction engine refuses writes before release');
-    const modern=configContext(d=>{d.polygon.newMarketplace=newAddress;d.polygon.runtimeCodeHash=ethers.keccak256('0x6000');d.polygon.ready=true;});
+    const modern=configContext(d=>{d.polygon.version='2.24.0';d.polygon.newMarketplace=newAddress;d.polygon.runtimeCodeHash=ethers.keccak256('0x6000');d.polygon.ready=true;});
     await modern.JNCRelease.verify('polygon',newAddress,async({method})=>method==='eth_chainId'?'0x89':method==='eth_getCode'?'0x6000':'0x'+22400n.toString(16).padStart(64,'0'));
     await assert.rejects(()=>modern.JNCRelease.verify('polygon',newAddress,async({method})=>method==='eth_chainId'?'0x38':'0x6000'));
     await assert.rejects(()=>modern.JNCRelease.verify('polygon',newAddress,async({method})=>method==='eth_chainId'?'0x89':'0x6001'));
+    const automatic=configContext(d=>{
+      d.polygon.version='2.24.1';
+      d.polygon.ready=true;
+      d.polygon.newMarketplace=newAddress;
+      d.polygon.runtimeCodeHash=ethers.keccak256('0x6000');
+    });
+    const rpcVersion=version=>async({method})=>method==='eth_chainId'?'0x89':method==='eth_getCode'?'0x6000':'0x'+version.toString(16).padStart(64,'0');
+    await automatic.JNCRelease.verify('polygon',newAddress,rpcVersion(22401n));
+    await assert.rejects(()=>automatic.JNCRelease.verify('polygon',newAddress,rpcVersion(22400n)),/version mismatch/);
+    assert.match(automatic.JNCRelease.message('proceeds','polygon'),/automatically/);
+    assert.match(automatic.JNCRelease.message('proceeds','bnb'),/Withdraw/);
     ok('new marketplace verification requires correct chain, runtime hash and version');
     const staged=fixtureConfig(d=>{for(const key of ['polygon','bnb']){d[key].newMarketplace=newAddress;d[key].runtimeCodeHash=ethers.keccak256('0x6000');}});
     await page.route('**/deployment-config.js',route=>route.fulfill({contentType:'text/javascript',body:staged}));
@@ -196,6 +208,55 @@ ok('both entry points share deployment settings and preserve migration safeguard
     await page.click('#nextMigration');assert.equal(await page.inputValue('#itemId'),'1');assert.equal(await page.inputValue('#creator'),token);
     assert.equal(await page.evaluate(()=>window.__sends.length),1);
     ok('chain switch clears previous queue and BNB loads its own NFT without sending');
+    const cutover=fixtureConfig(d=>{
+      d.polygon.version='2.24.1';
+      d.polygon.ready=true;
+      d.polygon.legacyMarketplaces=[...stagedConfig.JNC_DEPLOYMENTS.polygon.legacyMarketplaces];
+      d.polygon.legacyVersions=['2.24.0','2.23.1'];
+      d.polygon.previousListingMarketplace=d.polygon.legacyMarketplaces[0];
+      d.polygon.previousListingRuntimeHash=ethers.keccak256('0x6001');
+      d.polygon.newMarketplace=newAddress;
+      d.polygon.runtimeCodeHash=ethers.keccak256('0x6000');
+    });
+    await page.unroute('**/deployment-config.js');
+    await page.route('**/deployment-config.js',route=>route.fulfill({contentType:'text/javascript',body:cutover}));
+    await page.goto(url+'/marketplace-tools.html?action=proceeds&paymentToken='+token);
+    assert.equal(await page.inputValue('#generation'),'0');
+    assert.equal(await page.inputValue('#action'),'proceeds');
+    assert.equal(await page.locator('#action option[value=claim]').count(),1);
+    await page.selectOption('#generation','new');
+    assert.equal(await page.locator('#action option[value=proceeds]').count(),0);
+    assert.equal(await page.locator('#action option[value=claim]').count(),0);
+    assert.equal(await page.locator('#action option[value=refund]').count(),1);
+    ok('automatic market keeps bid refunds while old claim links open the original market');
+    await page.goto(url+'/');
+    const listingTargets=await page.evaluate(async()=>{
+      const release=JNCRelease.read('polygon');
+      const old=release.previousListingMarketplace;
+      const current=release.marketplace;
+      const nft=release.nft;
+      const readId=readListingIdByNFT, readListing=readMarketplaceListing;
+      const route=resolveMarketplacePaymentRoute;
+      try{
+        readListingIdByNFT=async(_,id,market)=>market===current&&id!==21?'0':'1';
+        readMarketplaceListing=async(id,_,market)=>({listingId:id,nftContract:nft,tokenId:market===current?'21':'19',active:true});
+        const newListing=(await readMarketplaceStateForNFT(nft,21)).listing;
+        const oldListing=(await readMarketplaceStateForNFT(nft,19)).listing;
+        resolveMarketplacePaymentRoute=()=>({chain:{id:'polygon'},deployment:{contracts:{marketplace:current}}});
+        const buy=normalizeMarketplaceTransactionRequest({action:'buy',nft:{},from:nft,data:encodeBuyCall('1'),amount:500n,listingMarketplace:old});
+        const unlist=normalizeMarketplaceTransactionRequest({action:'unlist',nft:{},from:nft,data:encodeCancelListingCall('1'),listingMarketplace:old});
+        let rejectsWrongCode=false;
+        try{await JNCRelease.verifyPreviousListing('polygon',old,async({method})=>method==='eth_chainId'?'0x89':'0x6000');}
+        catch(error){rejectsWrongCode=error.message.includes('runtime mismatch');}
+        return {old,current,newListing,oldListing,buy:buy.to,unlist:unlist.to,rejectsWrongCode};
+      }finally{readListingIdByNFT=readId;readMarketplaceListing=readListing;resolveMarketplacePaymentRoute=route;}
+    });
+    assert.equal(listingTargets.newListing.marketplace,listingTargets.current);
+    assert.equal(listingTargets.oldListing.marketplace,listingTargets.old);
+    assert.equal(listingTargets.buy,listingTargets.old);
+    assert.equal(listingTargets.unlist,listingTargets.old);
+    assert(listingTargets.rejectsWrongCode);
+    ok('overlapping listing IDs route buy and cancellation to their own verified market');
     assert.equal(errors.length,0,errors.join('\n'));
     fs.writeFileSync(path.join(root,'test-results/ui.json'),JSON.stringify({passed:messages.length,checks:messages},null,2)+'\n');
   }finally{if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}

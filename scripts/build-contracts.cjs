@@ -4,10 +4,10 @@ const crypto=require('node:crypto');
 const solc=require('solc');
 const root=path.resolve(__dirname,'..');
 const file='contracts/JNCMarketplace_v2.24.0_VerifiedOrigin_ClaimSettlement.sol';
-function compile(extraSources={}) {
-  const source=fs.readFileSync(path.join(root,file),'utf8');
+function compile(extraSources={},sourceFile=file) {
+  const source=fs.readFileSync(path.join(root,sourceFile),'utf8');
   const settings={optimizer:{enabled:true,runs:200},evmVersion:'shanghai',outputSelection:{'*':{'*':['abi','evm.bytecode','evm.deployedBytecode']}}};
-  const input={language:'Solidity',sources:{[file]:{content:source},...extraSources},settings};
+  const input={language:'Solidity',sources:{[sourceFile]:{content:source},...extraSources},settings};
   const output=JSON.parse(solc.compile(JSON.stringify(input)));
   const errors=(output.errors||[]).filter(e=>e.severity==='error');
   if(errors.length)throw Error(errors.map(e=>e.formattedMessage).join('\n'));

@@ -5,6 +5,7 @@
     bnb: { chainId:56, chainHex:'0x38', name:'BNB Smart Chain', rpc:'https://bsc-dataseed.bnbchain.org', explorer:'https://bscscan.com', nft:'0x621AEECB9374E2A57F767564E1dc999478d440c7' }
   };
   const address = x => /^0x[0-9a-f]{40}$/i.test(x || '') && !/^0x0{40}$/i.test(x);
+  const versions = Object.freeze({'2.24.0':22400n,'2.24.1':22401n});
   const deployments = {};
   for (const [key, chain] of Object.entries(chains)) {
     const cfg = global.JNC_DEPLOYMENTS?.[key];
@@ -13,8 +14,16 @@
     if (new Set(cfg.legacyMarketplaces.map(x => x.toLowerCase())).size !== cfg.legacyMarketplaces.length) throw Error('Duplicate legacy marketplace');
     if (cfg.newMarketplace && (!address(cfg.newMarketplace) || cfg.legacyMarketplaces.some(x => x.toLowerCase() === cfg.newMarketplace.toLowerCase()))) throw Error('Invalid new marketplace');
     if (cfg.newMarketplace && !/^0x[0-9a-f]{64}$/i.test(cfg.runtimeCodeHash || '')) throw Error('Verified runtime hash required');
+    if (cfg.previousListingMarketplace && (
+      !address(cfg.previousListingMarketplace) ||
+      cfg.previousListingMarketplace.toLowerCase() !== cfg.legacyMarketplaces[0]?.toLowerCase() ||
+      !/^0x[0-9a-f]{64}$/i.test(cfg.previousListingRuntimeHash || '')
+    )) throw Error('Invalid previous listing marketplace');
     if (cfg.ready && !address(cfg.newMarketplace)) throw Error('Deployment is not ready');
-    deployments[key] = Object.freeze({ ...chain, ...cfg, legacyMarketplaces:Object.freeze([...cfg.legacyMarketplaces]) });
+    const version = cfg.version ?? '2.24.0';
+    if (!Object.hasOwn(versions, version)) throw Error('Unsupported Marketplace version');
+    const legacyVersions = cfg.legacyVersions ?? ['2.23.1'];
+    deployments[key] = Object.freeze({ ...chain, ...cfg, version, legacyVersions:Object.freeze([...legacyVersions]), legacyMarketplaces:Object.freeze([...cfg.legacyMarketplaces]) });
   }
   function entry(key) {
     if (!deployments[key]) throw Error('Unsupported chain');
@@ -23,7 +32,7 @@
   function read(key) {
     const d = entry(key), hasNew = address(d.newMarketplace);
     return Object.freeze({ ...d, marketplace:hasNew ? d.newMarketplace : d.legacyMarketplaces[0],
-      version:hasNew ? '2.24.0' : '2.23.1', previousMarketplace:hasNew ? d.legacyMarketplaces[0] : (d.legacyMarketplaces[1] || ''),
+      version:hasNew ? d.version : d.legacyVersions[0], previousMarketplace:hasNew ? d.legacyMarketplaces[0] : (d.legacyMarketplaces[1] || ''),
       live:d.ready === true && hasNew });
   }
   function requireLive(key) {
@@ -63,8 +72,31 @@
       finalizeConfirm:'Finalize auction rights? The beneficiary will claim the NFT separately. Sale proceeds, fees and royalties are withdrawn individually.'
     }
   };
-  function message(key) {
+  const automaticText = {
+    ja: {
+      proceeds:'売上・手数料・ロイヤリティは決済時に自動で分配されます。',
+      cancelled:'オークションを取り消し、NFTを出品者に返しました。Auction ID: ',
+      finalized:'オークションの決済が完了しました。Auction ID: ',
+      cancelConfirm:'オークションを取り消してNFTを出品者に戻しますか？',
+      finalizeConfirm:'オークションを終了しますか？落札時はNFTの引渡しと代金の分配を同時に行い、入札がない場合はNFTを出品者に戻します。'
+    },
+    en: {
+      proceeds:'Sale proceeds, fees and royalties are distributed automatically at settlement.',
+      cancelled:'Auction cancelled. The NFT was returned to the seller. Auction ID: ',
+      finalized:'Auction settlement completed. Auction ID: ',
+      cancelConfirm:'Cancel this auction and return the NFT to the seller?',
+      finalizeConfirm:'Finalize this auction? Settlement delivers the NFT and distributes payment, or returns the NFT to the seller if there were no bids.'
+    }
+  };
+  function message(key, chainKey) {
     const language=typeof document!=='undefined'&&document.documentElement.lang.toLowerCase().startsWith('ja')?'ja':'en';
+    const automatic = chainKey
+      ? read(chainKey).version === '2.24.1'
+      : Object.values(deployments).every(d => d.version === '2.24.1');
+    if (automatic && automaticText[language][key]) return automaticText[language][key];
+    if (!chainKey && key === 'proceeds' && Object.values(deployments).some(d => d.version === '2.24.1')) {
+      return language === 'ja' ? '決済方法はチェーンごとの市場によって異なります。' : 'Settlement depends on the marketplace used on each chain.';
+    }
     return text[language][key]||text.en[key]||key;
   }
   async function verify(key, target, request, allowUnreleased = false) {
@@ -76,8 +108,19 @@
     if (!code || code === '0x' || global.ethers.keccak256(code).toLowerCase() !== d.runtimeCodeHash.toLowerCase()) throw Error('Marketplace実行コードが確認済みのものと一致しません。');
     const abi = new global.ethers.Interface(['function marketplaceVersion() view returns(uint256)']);
     const result = await request({ method:'eth_call', params:[{ to:target, data:abi.encodeFunctionData('marketplaceVersion') }, 'latest'] });
-    if (abi.decodeFunctionResult('marketplaceVersion', result)[0] !== 22400n) throw Error('Marketplace version mismatch');
+    if (abi.decodeFunctionResult('marketplaceVersion', result)[0] !== versions[d.version]) throw Error('Marketplace version mismatch');
     return d;
+  }
+  async function verifyPreviousListing(key, target, request) {
+    const d = requireLive(key);
+    if (!d.previousListingMarketplace || target.toLowerCase() !== d.previousListingMarketplace.toLowerCase()) {
+      throw Error('Unexpected previous listing marketplace');
+    }
+    if (BigInt(await request({method:'eth_chainId'})) !== BigInt(d.chainId)) throw Error('Wrong chain');
+    const code = await request({method:'eth_getCode',params:[target,'latest']});
+    if (!code || code === '0x' || global.ethers.keccak256(code).toLowerCase() !== d.previousListingRuntimeHash.toLowerCase()) {
+      throw Error('Previous marketplace runtime mismatch');
+    }
   }
   function banner(parent = document.body) {
     const box = document.createElement('aside');
@@ -89,5 +132,5 @@
     update();new MutationObserver(update).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
     box.append(span, link); parent.prepend(box);
   }
-  global.JNCRelease = Object.freeze({ version:'2.24.0', deployments:Object.freeze(deployments), entry, read, requireLive, verify, banner, message });
+  global.JNCRelease = Object.freeze({ version:'2.24.0', deployments:Object.freeze(deployments), entry, read, requireLive, verify, verifyPreviousListing, banner, message });
 })(window);

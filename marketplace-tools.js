@@ -30,9 +30,9 @@
   const nftIface = new ethers.Interface(['event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)']);
   const tokenIface = new ethers.Interface(['function decimals() view returns(uint8)']);
   const actions = {
-    proceeds: { title:'売上・ロイヤリティ・手数料を引き出す', modern:true, token:true, recipient:true, note:'売買成立時に記録された、接続ウォレットの残高を引き出します。' },
-    claim: { title:'確定したオークションNFTを受け取る', modern:true, id:true, recipient:true, note:'権利者本人が受取先を指定します。受取りに失敗しても権利は残ります。' },
-    refund: { title:'旧入札の返金を引き出す', token:true, recipient:true, note:'旧市場では返金先は入札者本人です。新市場では本人が別の受取先を指定できます。' },
+    proceeds: { title:'売上・ロイヤリティ・手数料を引き出す', claims:true, token:true, recipient:true, note:'売買成立時に記録された、接続ウォレットの残高を引き出します。' },
+    claim: { title:'確定したオークションNFTを受け取る', claims:true, id:true, recipient:true, note:'権利者本人が受取先を指定します。受取りに失敗しても権利は残ります。' },
+    refund: { title:'入札の返金を引き出す', token:true, recipient:true, note:'旧市場では返金先は入札者本人です。新市場では本人が別の受取先を指定できます。' },
     cancelOffer: { title:'自分のオファーを取消し・返金', id:true, recipient:true },
     cancelListing: { title:'自分の出品を取り消す', id:true },
     cancelAuction: { title:'入札のない自分のオークションを取り消す', id:true, note:'新市場では取消し後、NFTの受取りを別途実行してください。' },
@@ -108,7 +108,8 @@
     const modern=generation==='new';
     const target=modern?d.newMarketplace:d.legacyMarketplaces[Number(generation)];
     if (!ethers.isAddress(target || '') || target===ethers.ZeroAddress) throw Error('新Marketplaceはまだ配置されていません。');
-    return { key, d, target, modern };
+    const version=modern?d.version:d.legacyVersions[Number(generation)];
+    return { key, d, target, modern, claims:version==='2.24.0' };
   }
   function renderMarket() {
     const d=JNCRelease.entry($('chain').value);
@@ -117,16 +118,18 @@
     $('migrationIntro').textContent=d.name+'の既存NFT（'+($('chain').value==='polygon'?'38':'1')+'件）を確認し、未登録の1件を入力します。読込みだけでは送信しません。登録は運営ウォレットで1件ずつ承認してください。';
     $('generation').replaceChildren();
     const add=(value,title)=>{const o=document.createElement('option');o.value=value;o.textContent=title;$('generation').append(o);};
-    add('new',d.newMarketplace?'新市場 v2.24.0':'新市場：配置待ち');
-    d.legacyMarketplaces.forEach((_,i)=>add(String(i),i===0?'旧市場 v2.23.1':'さらに前の市場 '+i));
+    add('new',d.newMarketplace?'新市場 v'+d.version:'新市場：配置待ち');
+    d.legacyMarketplaces.forEach((_,i)=>add(String(i),d.legacyVersions[i]?'旧市場 v'+d.legacyVersions[i]:'さらに前の市場 '+i));
     renderActions();
   }
   function renderActions() {
     listingQueue=[];$('nextListing').disabled=true;$('listingStatus').textContent='旧出品は未読込みです。';
     const modern=$('generation').value==='new';
+    let claims=false;
+    try { claims=context().claims; } catch {}
     $('action').replaceChildren();
     for(const [key,a] of Object.entries(actions)) {
-      if(a.modern&&!modern)continue;
+      if((a.modern&&!modern)||(a.claims&&!claims))continue;
       const o=document.createElement('option');o.value=key;o.textContent=a.title;$('action').append(o);
     }
     try { const c=context();$('target').textContent=c.d.name+' / '+(c.modern?'新市場':'旧市場')+'\n'+c.target; }
@@ -138,7 +141,12 @@
     for(const [id,key] of [['tokenField','token'],['idField','id'],['recipientField','recipient'],['originFields','origin'],['tokenConfigFields','tokenConfig'],['feeField','fee'],['amountField','amount']])$(id).hidden=!a[key];
     $('amountLabel').textContent=$('action').value==='updateMinimum'?'新しい最低価格':'新しい最低入札増加額';
     $('idLabel').textContent=a.origin?'NFTのToken ID':a.id?'取引ID':'ID';
-    $('actionNote').textContent=a.note||'';
+    let note=a.note||'';
+    let claims=false;
+    try { claims=context().claims; } catch {}
+    if($('action').value==='cancelAuction')note=claims?'取消し後、NFTの受取りを別途実行してください。':'取消し時にNFTが出品者へ戻ります。';
+    if($('action').value==='finalize')note=claims?'確定後、権利者がNFTを別途受け取ります。':'終了確定時にNFTの引渡しと代金の分配を行います。入札がなければNFTが出品者へ戻ります。';
+    $('actionNote').textContent=note;
     output('操作するチェーン・市場・取引IDを確認してください。');
   }
   function output(message,error=false) { $('result').textContent=message; if(error)$('result').setAttribute('role','alert');else $('result').removeAttribute('role'); }
@@ -258,7 +266,7 @@
       const receipt=await read(c,'eth_getTransactionReceipt',[hash]);
       if(receipt) {
         if(BigInt(receipt.status)!==1n){output('取引が失敗しました。tx: '+hash,true);return;}
-        output('取引が成功しました。\n'+hash+'\n状態を再確認してください。'+(['cancelAuction','finalize'].includes($('action').value)&&c.modern?'\nNFTは権利者が「確定したオークションNFTを受け取る」で受け取ってください。':''));
+        output('取引が成功しました。\n'+hash+'\n状態を再確認してください。'+(['cancelAuction','finalize'].includes($('action').value)&&c.claims?'\nNFTは権利者が「確定したオークションNFTを受け取る」で受け取ってください。':''));
         return;
       }
       await new Promise(resolve=>setTimeout(resolve,2000));
@@ -282,6 +290,10 @@
   const initial=new URLSearchParams(window.location.search);
   if(['polygon','bnb'].includes(initial.get('chain')))$('chain').value=initial.get('chain');
   renderMarket();
+  if(actions[initial.get('action')]?.claims && JNCRelease.entry($('chain').value).version !== '2.24.0') {
+    const legacyIndex=JNCRelease.entry($('chain').value).legacyVersions.indexOf('2.24.0');
+    if(legacyIndex>=0){$('generation').value=String(legacyIndex);renderActions();}
+  }
   if(actions[initial.get('action')]&&$('action').querySelector('option[value="'+initial.get('action')+'"]')){
     $('action').value=initial.get('action');renderAction();
   }

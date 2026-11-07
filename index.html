@@ -1539,7 +1539,11 @@ function normalizeMarketplaceTransactionRequest(request={}){
   const profileSource=request.nft||request.paymentProfile||null;
   const route=profileSource?resolveMarketplacePaymentRoute(profileSource):null;
   if(Object.prototype.hasOwnProperty.call(request,'payment')&&request.payment!==payment)throw new Error(`Marketplace payment mode mismatch for action: ${action}`);
-  const target=String((route?.deployment||architecture.deployment).contracts[definition.contractRole]||'').trim();
+  const release=route&&JNCRelease.read(route.chain.id);
+  const previousListing=(action==='buy'||action==='unlist')&&release?.previousListingMarketplace&&
+    lc(request.listingMarketplace)===lc(release.previousListingMarketplace);
+  const target=String(previousListing?release.previousListingMarketplace:(route?.deployment||architecture.deployment).contracts[definition.contractRole]||'').trim();
+  if(request.listingMarketplace&&lc(request.listingMarketplace)!==lc(target))throw new Error(t('dataError.listingMismatch'));
   if(!isValidEvmAddress(from))throw new Error('Marketplace sender is invalid.');
   if(!isValidEvmAddress(target))throw new Error(`Marketplace contract role is invalid: ${definition.contractRole}`);
   if(!isValidCalldata(data)||data.length<10)throw new Error('Marketplace calldata is invalid.');
@@ -1547,7 +1551,7 @@ function normalizeMarketplaceTransactionRequest(request={}){
   if(payment&&amount<=0n)throw new Error('Marketplace payment amount must be greater than zero.');
   if(payment&&!route)throw new Error('Marketplace payment action requires an NFT Payment Profile.');
   if(definition.minimumRule&&amount>0n&&!route)validateMarketplaceMinimum(action,amount);
-  return Object.freeze({action,definition,from,to:target,data,label,amount,payment,architecture,route,profileSource});
+  return Object.freeze({action,definition,from,to:target,data,label,amount,payment,architecture,route,profileSource,previousListing});
 }
 async function executeMarketplaceTransaction(request={}){
   const releaseRoute=request.nft?resolveMarketplacePaymentRoute(request.nft):null;
@@ -1557,7 +1561,10 @@ async function executeMarketplaceTransaction(request={}){
   assertProductionArchitectureAudit();
   const tx=normalizeMarketplaceTransactionRequest(request);
   await switchToConfiguredChain(tx.route?.chain||tx.architecture.chain);
-  if(tx.route){
+  if(tx.previousListing){
+    await JNCRelease.verifyPreviousListing(tx.route.chain.id,tx.to,args=>ethereum.request(args));
+  }
+  if(tx.route&&!tx.previousListing){
     const tokenGate=await assertMarketplacePaymentTokenEnabled(tx.profileSource);
     if(tx.definition.minimumRule&&tx.amount>0n&&BigInt(tx.amount)<BigInt(tokenGate.config.minimumPaymentAmount||'0')){
       const error=new Error(`Marketplace ${tx.action} amount is below the configured ${tx.route.symbol} minimum.`);
@@ -1567,6 +1574,9 @@ async function executeMarketplaceTransaction(request={}){
   }
   const accounts=await ethereum.request({method:'eth_accounts'});
   if(!accounts?.[0]||lc(accounts[0])!==lc(tx.from))throw new Error(t('systemTx.walletChanged'));
+  if(tx.payment&&tx.previousListing){
+    return payERC20(tx,{...tx.route,deployment:{contracts:{marketplace:tx.to}}});
+  }
   if(tx.payment)return executeMarketplacePayment({from:tx.from,to:tx.to,data:tx.data,amount:tx.amount,label:tx.label},tx.profileSource);
   const txHash=await sendTx({from:tx.from,to:tx.to,data:tx.data,chainKey:(tx.route?.chain||tx.architecture.chain).id});
   return Object.freeze({engine:'transaction',txHash,approval:null,action:tx.action,contractRole:tx.definition.contractRole,paymentProfile:tx.route?.profile||null});
@@ -2463,7 +2473,7 @@ function renderNFTMedia(item,mode='card'){
 function currencyUnit(nftOrProfile=null){const profile=nftOrProfile?getMarketplacePaymentProfile(nftOrProfile):null;return profile?.paymentToken?.displaySymbol||profile?.paymentToken?.symbol||PNC_CONFIG.currency.activeSymbol||'JPYC';}
 function toHex(n){return'0x'+BigInt(n).toString(16).padStart(64,'0');}function addrWord(a){return String(a).toLowerCase().replace(/^0x/,'').padStart(64,'0');}function decodeAddress(hex){return hex&&hex!=='0x'?'0x'+hex.slice(-40):'';}function decodeUint(hex){return hex&&hex!=='0x'?BigInt(hex).toString():'0';}function words(hex){const h=String(hex||'').replace(/^0x/,'');return h?h.match(/.{1,64}/g)||[]:[];}
 function sig4(signature){return{'ownerOf(uint256)':'0x6352211e','tokenURI(uint256)':'0xc87b56dd','mint(address,string)':'0xd0def521','approve(address,uint256)':'0x095ea7b3','safeTransferFrom(address,address,uint256)':'0x42842e0e','getApproved(uint256)':'0x081812fc','createListing(address,uint256,uint256,address)':'0x0bb50032','buy(uint256)':'0xd96a094a','cancelListing(uint256)':'0x305a67a8','listingIdByNFT(address,uint256)':'0x762b511a','listings(uint256)':'0xde74e57b','originRegistered(address,uint256)':'0xec95f0b8','primarySaleCompleted(address,uint256)':'0x5195dbc5','registerNFTOrigin(address,uint256,address,bool)':'0xb2251fbe','registerNFTOriginByOwner(address,uint256)':'0xa5c27c93','createOffer(address,uint256,uint256,uint64,address)':'0x7c22453a','cancelOffer(uint256)':'0xef706adf','acceptOffer(uint256)':'0xc815729d','getActiveOfferIdsByNFT(address,uint256)':'0x96973359','offers(uint256)':'0x8a72ea6a','createAuction(address,uint256,uint256,uint256,uint64,uint32,address)':'0xea9d2b65','buyNowAuction(uint256)':'0xe324bd1f','bid(uint256,uint256)':'0x598647f8','withdrawBidRefund(address)':'0x2954e1f4','cancelAuction(uint256)':'0x96b5a755','finalizeAuction(uint256)':'0xe8083863','isAuctionEnded(uint256)':'0x998f1b87','getAuctionCore(uint256)':'0x46a0d9b9','getAuctionBidState(uint256)':'0x97bdebd7','auctionIdByNFT(address,uint256)':'0xbccaff48','pendingBidRefunds(address,address)':'0x0cf8a407','paymentTokenConfigs(address)':'0xcf120c6a','decimals()':'0x313ce567'}[signature];}
-function utf8ToHex(str){return Array.from(new TextEncoder().encode(String(str||''))).map(b=>b.toString(16).padStart(2,'0')).join('');}function encodeAbiStringWord(str){const hex=utf8ToHex(str);const len=(hex.length/2).toString(16).padStart(64,'0');return len+hex.padEnd(Math.ceil(hex.length/64)*64,'0');}function encodeMintCall(to,uri){return sig4('mint(address,string)')+addrWord(to)+'40'.padStart(64,'0')+encodeAbiStringWord(uri);}function encodeApproveCall(to,tokenId){return sig4('approve(address,uint256)')+addrWord(to)+toHex(tokenId).slice(2);}function encodeSafeTransferFromCall(from,to,tokenId){return sig4('safeTransferFrom(address,address,uint256)')+addrWord(from)+addrWord(to)+toHex(tokenId).slice(2);}function encodeCreateListingCall(nftContract,tokenId,priceWei,paymentToken){return sig4('createListing(address,uint256,uint256,address)')+addrWord(nftContract)+toHex(tokenId).slice(2)+toHex(priceWei).slice(2)+addrWord(paymentToken);}function encodeBuyCall(listingId){return sig4('buy(uint256)')+toHex(listingId).slice(2);}function encodeCancelListingCall(listingId){return sig4('cancelListing(uint256)')+toHex(listingId).slice(2);}function encodeRegisterNFTOriginCall(nftContract,tokenId,creator,primarySaleAlreadyCompleted){return sig4('registerNFTOrigin(address,uint256,address,bool)')+addrWord(nftContract)+toHex(tokenId).slice(2)+addrWord(creator)+(primarySaleAlreadyCompleted?'1':'0').padStart(64,'0');}function encodeRegisterNFTOriginByOwnerCall(nftContract,tokenId){return sig4('registerNFTOriginByOwner(address,uint256)')+addrWord(nftContract)+toHex(tokenId).slice(2);}function encodeCreateOfferCall(nftContract,tokenId,amount,expiresAt,paymentToken){return sig4('createOffer(address,uint256,uint256,uint64,address)')+addrWord(nftContract)+toHex(tokenId).slice(2)+toHex(amount).slice(2)+toHex(expiresAt).slice(2)+addrWord(paymentToken);}function encodeCancelOfferCall(offerId){return sig4('cancelOffer(uint256)')+toHex(offerId).slice(2);}function encodeAcceptOfferCall(offerId){return sig4('acceptOffer(uint256)')+toHex(offerId).slice(2);}function encodeCreateAuctionCall(nftContract,tokenId,reserveWei,buyNowWei,startAt,durationDays,paymentToken){return sig4('createAuction(address,uint256,uint256,uint256,uint64,uint32,address)')+addrWord(nftContract)+toHex(tokenId).slice(2)+toHex(reserveWei).slice(2)+toHex(buyNowWei).slice(2)+toHex(startAt).slice(2)+toHex(durationDays).slice(2)+addrWord(paymentToken);}function encodeBidCall(auctionId,amount){return sig4('bid(uint256,uint256)')+toHex(auctionId).slice(2)+toHex(amount).slice(2);}function encodeBuyNowAuctionCall(auctionId){return sig4('buyNowAuction(uint256)')+toHex(auctionId).slice(2);}function encodeCancelAuctionCall(auctionId){return sig4('cancelAuction(uint256)')+toHex(auctionId).slice(2);}function encodeFinalizeAuctionCall(auctionId){return sig4('finalizeAuction(uint256)')+toHex(auctionId).slice(2);}function encodeWithdrawBidRefundCall(paymentToken){return sig4('withdrawBidRefund(address)')+addrWord(paymentToken);}function decodeBool(hex){return !!(hex&&hex!=='0x'&&BigInt(hex)!==0n);}function decodeUintArray(hex){const w=words(hex);if(w.length<2)return[];const offset=Number(BigInt('0x'+w[0])/32n),length=Number(BigInt('0x'+w[offset]));return w.slice(offset+1,offset+1+length).map(x=>BigInt('0x'+x).toString());}
+function utf8ToHex(str){return Array.from(new TextEncoder().encode(String(str||''))).map(b=>b.toString(16).padStart(2,'0')).join('');}function encodeAbiStringWord(str){const hex=utf8ToHex(str);const len=(hex.length/2).toString(16).padStart(64,'0');return len+hex.padEnd(Math.ceil(hex.length/64)*64,'0');}function encodeMintCall(to,uri){return sig4('mint(address,string)')+addrWord(to)+'40'.padStart(64,'0')+encodeAbiStringWord(uri);}function encodeApproveCall(to,tokenId){return sig4('approve(address,uint256)')+addrWord(to)+toHex(tokenId).slice(2);}function encodeSafeTransferFromCall(from,to,tokenId){return sig4('safeTransferFrom(address,address,uint256)')+addrWord(from)+addrWord(to)+toHex(tokenId).slice(2);}function encodeCreateListingCall(nftContract,tokenId,priceWei,paymentToken){return sig4('createListing(address,uint256,uint256,address)')+addrWord(nftContract)+toHex(tokenId).slice(2)+toHex(priceWei).slice(2)+addrWord(paymentToken);}function encodeBuyCall(listingId){return sig4('buy(uint256)')+toHex(listingId).slice(2);}function encodeCancelListingCall(listingId){return sig4('cancelListing(uint256)')+toHex(listingId).slice(2);}function encodeCreateOfferCall(nftContract,tokenId,amount,expiresAt,paymentToken){return sig4('createOffer(address,uint256,uint256,uint64,address)')+addrWord(nftContract)+toHex(tokenId).slice(2)+toHex(amount).slice(2)+toHex(expiresAt).slice(2)+addrWord(paymentToken);}function encodeCancelOfferCall(offerId){return sig4('cancelOffer(uint256)')+toHex(offerId).slice(2);}function encodeAcceptOfferCall(offerId){return sig4('acceptOffer(uint256)')+toHex(offerId).slice(2);}function encodeCreateAuctionCall(nftContract,tokenId,reserveWei,buyNowWei,startAt,durationDays,paymentToken){return sig4('createAuction(address,uint256,uint256,uint256,uint64,uint32,address)')+addrWord(nftContract)+toHex(tokenId).slice(2)+toHex(reserveWei).slice(2)+toHex(buyNowWei).slice(2)+toHex(startAt).slice(2)+toHex(durationDays).slice(2)+addrWord(paymentToken);}function encodeBidCall(auctionId,amount){return sig4('bid(uint256,uint256)')+toHex(auctionId).slice(2)+toHex(amount).slice(2);}function encodeBuyNowAuctionCall(auctionId){return sig4('buyNowAuction(uint256)')+toHex(auctionId).slice(2);}function encodeCancelAuctionCall(auctionId){return sig4('cancelAuction(uint256)')+toHex(auctionId).slice(2);}function encodeFinalizeAuctionCall(auctionId){return sig4('finalizeAuction(uint256)')+toHex(auctionId).slice(2);}function encodeWithdrawBidRefundCall(paymentToken){return sig4('withdrawBidRefund(address)')+addrWord(paymentToken);}function decodeBool(hex){return !!(hex&&hex!=='0x'&&BigInt(hex)!==0n);}function decodeUintArray(hex){const w=words(hex);if(w.length<2)return[];const offset=Number(BigInt('0x'+w[0])/32n),length=Number(BigInt('0x'+w[offset]));return w.slice(offset+1,offset+1+length).map(x=>BigInt('0x'+x).toString());}
 function normalizeChainId(value){const raw=String(value||'').toLowerCase();if(!raw)return'';try{return'0x'+BigInt(raw).toString(16);}catch(e){return raw;}}
 async function getActiveChainId(){if(!window.ethereum)return'';return normalizeChainId(await ethereum.request({method:'eth_chainId'}));}
 function chainConfigFrom(value){
@@ -2544,6 +2554,11 @@ async function assertTransactionPreflight(tx){
   Object.values(JNC_DEPLOYMENT_REGISTRY).filter(item=>item.enabled).forEach(deployment=>allowedTargets.push(deployment.contracts.nft,deployment.contracts.marketplace));
   getAdminPaymentTokenRegistry().forEach(profile=>allowedTargets.push(profile?.paymentToken?.address));
   allowedTargets.push(JNC_DEFAULT_SHOP_PAYMENT_PROFILE.paymentToken.address);
+  if(release.previousListingMarketplace&&lc(tx?.to)===lc(release.previousListingMarketplace)&&
+    [sig4('buy(uint256)'),sig4('cancelListing(uint256)')].includes(String(tx.data).slice(0,10))){
+    await JNCRelease.verifyPreviousListing(releaseChain,tx.to,args=>ethereum.request(args));
+    allowedTargets.push(release.previousListingMarketplace);
+  }
   const allowed=allowedTargets.filter(isValidEvmAddress).map(lc);
   if(!tx||!allowed.includes(lc(tx.to)))throw new Error(t('systemTx.transactionTargetInvalid'));
   const rpcTx={from:tx.from,to:tx.to,data:tx.data};
@@ -2662,14 +2677,14 @@ function marketplaceForNftContract(nftContract){
   if(!deployment)throw new Error('No JNC deployment is registered for this NFT contract.');
   return deployment.contracts.marketplace;
 }
-async function readListingIdByNFT(nftContract,tokenId){
+async function readListingIdByNFT(nftContract,tokenId,marketplace=marketplaceForNftContract(nftContract)){
   const data=sig4('listingIdByNFT(address,uint256)')+addrWord(nftContract)+toHex(tokenId).slice(2);
-  const raw=await ethCall(marketplaceForNftContract(nftContract),data);
+  const raw=await ethCall(marketplace,data,getTargetChainKey(nftContract));
   if(!raw||raw==='0x')throw new Error(t('dataError.listingIdEmpty'));
   return decodeUint(raw);
 }
-async function readMarketplaceListing(listingId,nftContract){
-  const raw=await ethCall(marketplaceForNftContract(nftContract),sig4('listings(uint256)')+toHex(listingId).slice(2));
+async function readMarketplaceListing(listingId,nftContract,marketplace=marketplaceForNftContract(nftContract)){
+  const raw=await ethCall(marketplace,sig4('listings(uint256)')+toHex(listingId).slice(2),getTargetChainKey(nftContract));
   const w=words(raw);
   if(w.length<6)throw new Error(t('dataError.listingMalformed'));
   return{
@@ -2830,13 +2845,17 @@ async function readAuctionForNFT(nftContract,tokenId){
 }
 async function readMarketplaceStateForNFT(nftContract,tokenId){
   try{
-    const listingId=await readListingIdByNFT(nftContract,tokenId);
-    if(listingId==='0')return{status:'not_for_sale'};
-    const listing=await readMarketplaceListing(listingId,nftContract);
-    if(lc(listing.nftContract)!==lc(nftContract)||String(listing.tokenId)!==String(tokenId)){
-      throw new Error(t('dataError.listingMismatch'));
+    const release=JNCRelease.read(getTargetChainKey(nftContract));
+    for(const marketplace of [release.marketplace,release.previousListingMarketplace].filter(Boolean)){
+      const listingId=await readListingIdByNFT(nftContract,tokenId,marketplace);
+      if(listingId==='0')continue;
+      const listing=await readMarketplaceListing(listingId,nftContract,marketplace);
+      if(lc(listing.nftContract)!==lc(nftContract)||String(listing.tokenId)!==String(tokenId)){
+        throw new Error(t('dataError.listingMismatch'));
+      }
+      if(listing.active)return{status:'listed',listing:{...listing,marketplace}};
     }
-    return listing.active?{status:'listed',listing}:{status:'not_for_sale'};
+    return{status:'not_for_sale'};
   }catch(e){
     return{status:'read_error',error:e&&e.message?e.message:String(e)};
   }
@@ -2845,6 +2864,7 @@ function applyMarketplaceStateToNFT(state,nft,result){
   if(!nft)return;
   state.market.listings=state.market.listings.filter(x=>x.nftId!==nft.id);
   delete nft.marketReadError;
+  delete nft.listingMarketplace;
   if(result&&result.status!=='read_error')nft.marketplaceSnapshotAddress=getDeploymentByNftContract(nft.contractAddress)?.contracts?.marketplace||'';
   if(result&&result.status==='listed'&&result.listing){
     const listing=result.listing;
@@ -2853,6 +2873,7 @@ function applyMarketplaceStateToNFT(state,nft,result){
     nft.priceEth=baseUnitsToTokenAmount(listing.priceWei,nft);
     nft.seller=listing.seller;
     nft.listingId=String(listing.listingId);
+    nft.listingMarketplace=listing.marketplace;
     state.market.listings.push({listingId:nft.listingId,nftId:nft.id,priceWei:nft.priceWei,seller:nft.seller});
     return;
   }
@@ -3108,6 +3129,7 @@ function normalizeMintedNFT(n){
     auction:n.auction&&typeof n.auction==='object'?structuredCopy(n.auction):null,
     marketStateSyncedAt:Number(n.marketStateSyncedAt||0)||null,
     marketplaceSnapshotAddress:String(n.marketplaceSnapshotAddress||''),
+    listingMarketplace:String(n.listingMarketplace||''),
     source:n.source||'creator-mint',pinata:n.pinata||null,mintedAt:Number(n.mintedAt||0)||null
   };
 }
@@ -3444,7 +3466,7 @@ function invalidateForeignMarketplaceState(nft){
   if(!target||lc(nft.marketplaceSnapshotAddress)===lc(target))return false;
   nft.status='not_for_sale';nft.listingId='0';nft.seller='';nft.offers=[];nft.auction=null;
   nft.originRegistered=false;nft.primarySaleCompleted=false;nft.bidRefundWei='0';
-  delete nft.priceWei;delete nft.priceEth;nft.marketStateSyncedAt=0;
+  delete nft.priceWei;delete nft.priceEth;delete nft.listingMarketplace;nft.marketStateSyncedAt=0;
   return true;
 }
 function shouldDemandSyncNFT(nft,options={}){
@@ -4068,7 +4090,7 @@ async function handleAcceptOffer(id,offerId){
     const refreshed=await refreshNFT(n);
     if(!refreshed||lc(refreshed.owner)!==lc(offer.buyer))throw new Error(t('marketTx.offerAcceptOwnerVerifyFailed'));
     await persistConfirmedNFTSnapshot(refreshed,'accept-offer');
-    alert(t('marketTx.offerAccepted')+'\n'+JNCRelease.message('proceeds'));
+    alert(t('marketTx.offerAccepted')+'\n'+JNCRelease.message('proceeds',resolveMarketplacePaymentRoute(n).chain.id));
   }catch(e){
     console.warn(e);
     reportTransactionOutcome(e,transactionConfirmed,'handleAcceptOffer');
@@ -4245,7 +4267,7 @@ async function handleBuyNowAuction(id){
     const refreshed=await refreshNFT(n);
     if(!refreshed||lc(refreshed.owner)!==lc(PNC_STATE.wallet))throw new Error(t('marketTx.buyNowOwnerVerifyFailed'));
     await persistConfirmedNFTSnapshot(refreshed,'auction-buy-now');
-    alert(t('marketTx.auctionBuyNow')+'\n'+JNCRelease.message('proceeds'));
+    alert(t('marketTx.auctionBuyNow')+'\n'+JNCRelease.message('proceeds',resolveMarketplacePaymentRoute(n).chain.id));
   }catch(e){
     console.warn(e);
     reportTransactionOutcome(e,transactionConfirmed,'handleBuyNowAuction');
@@ -4290,14 +4312,14 @@ async function handleCancelAuction(id){
     if(lc(a.seller)!==lc(PNC_STATE.wallet)){alert(t('marketTx.auctionSellerOnlyCancel'));return;}
     if(lc(a.highestBidder)!=='0x0000000000000000000000000000000000000000'){alert(t('marketTx.auctionWithBidCannotCancel'));return;}
     await assertAuctionEscrowCustody(n,a);
-    if(!confirm(JNCRelease.message('cancelConfirm')))return;
+    if(!confirm(JNCRelease.message('cancelConfirm',resolveMarketplacePaymentRoute(n).chain.id)))return;
     const txHash=(await executeMarketplaceTransaction({action:'cancelAuction',from:PNC_STATE.wallet,nft:n,data:encodeCancelAuctionCall(a.auctionId),label:'Cancel auction'})).txHash;
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Cancel auction transaction');transactionConfirmed=true;
     const remainingAuctionId=await readAuctionIdByNFT(n.contractAddress,n.tokenId);
     if(remainingAuctionId!=='0')throw new Error(t('marketTx.auctionCancelVerifyFailed'));
     const refreshed=await refreshNFT(n,{closeDetail:true});
     if(refreshed)await persistConfirmedNFTSnapshot(refreshed,'cancel-auction');
-    alert(JNCRelease.message('cancelled')+a.auctionId);
+    alert(JNCRelease.message('cancelled',resolveMarketplacePaymentRoute(n).chain.id)+a.auctionId);
   }catch(e){
     console.warn(e);
     reportTransactionOutcome(e,transactionConfirmed,'handleCancelAuction');
@@ -4314,7 +4336,7 @@ async function handleFinalizeAuction(id){
     if(!a.ended){alert(t('marketTx.auctionNotEnded'));return;}
     const route=resolveMarketplacePaymentRoute(n);
     if(lc(a.paymentToken)!==lc(route.tokenAddress))throw new Error('Auction payment token does not match this NFT Payment Profile.');
-    if(!confirm(JNCRelease.message('finalizeConfirm')))return;
+    if(!confirm(JNCRelease.message('finalizeConfirm',resolveMarketplacePaymentRoute(n).chain.id)))return;
     const winner=a.highestBidder;
     const txHash=(await executeMarketplaceTransaction({action:'finalizeAuction',from:PNC_STATE.wallet,nft:n,data:encodeFinalizeAuctionCall(a.auctionId),label:'Finalize auction'})).txHash;
     assertSuccessfulReceipt(await waitForReceipt(txHash),'Finalize auction transaction');transactionConfirmed=true;
@@ -4322,7 +4344,7 @@ async function handleFinalizeAuction(id){
     if(refreshed&&refreshed.auction&&refreshed.auction.active)throw new Error(t('marketTx.finalizeVerifyFailed'));
 
     if(refreshed)await persistConfirmedNFTSnapshot(refreshed,'finalize-auction');
-    alert(JNCRelease.message('finalized')+a.auctionId);
+    alert(JNCRelease.message('finalized',resolveMarketplacePaymentRoute(n).chain.id)+a.auctionId);
   }catch(e){
     console.warn(e);
     reportTransactionOutcome(e,transactionConfirmed,'handleFinalizeAuction');
@@ -4429,10 +4451,16 @@ async function handleUnlist(id){
   const nftKeyAtSubmit=nftKey(n);
   let transactionConfirmed=false;
   try{
+    const {listing}=await readMarketplaceStateForNFT(n.contractAddress,n.tokenId);
+    if(!listing||listing.listingId!==String(n.listingId)||lc(listing.seller)!==lc(walletAtSubmit)||
+      lc(listing.marketplace)!==lc(n.listingMarketplace||marketplaceForNftContract(n.contractAddress))){
+      throw new Error(t('dataError.listingMismatch'));
+    }
     const txHash=(await executeMarketplaceTransaction({
       action:'unlist',
       from:walletAtSubmit,
       nft:n,
+      listingMarketplace:listing.marketplace,
       data:encodeCancelListingCall(n.listingId),
       label:'Unlist'
     })).txHash;
@@ -4474,11 +4502,10 @@ async function handleUnlist(id){
 async function prepareActiveBuyListing(nft){
   if(!nft||!isOnChainNFT(nft))throw new Error(t('marketTx.notListed'));
   await switchToConfiguredChain(resolveMarketplacePaymentRoute(nft).chain);
-  const listingId=await readListingIdByNFT(nft.contractAddress,nft.tokenId);
-  if(!listingId||listingId==='0')throw new Error(t('marketTx.notListed'));
-  const listing=await readMarketplaceListing(listingId,nft.contractAddress);
-  if(!listing.active)throw new Error(t('marketTx.notListed'));
-  if(lc(listing.nftContract)!==lc(nft.contractAddress)||String(listing.tokenId)!==String(nft.tokenId)){
+  const {listing}=await readMarketplaceStateForNFT(nft.contractAddress,nft.tokenId);
+  if(!listing)throw new Error(t('marketTx.notListed'));
+  if(String(nft.listingId)!==listing.listingId||String(nft.priceWei)!==listing.priceWei||
+    lc(nft.listingMarketplace||marketplaceForNftContract(nft.contractAddress))!==lc(listing.marketplace)){
     throw new Error(t('dataError.listingMismatch'));
   }
   const route=resolveMarketplacePaymentRoute(nft);
@@ -4488,7 +4515,7 @@ async function prepareActiveBuyListing(nft){
   if(lc(owner)!==lc(listing.seller))throw new Error(t('dataError.listingMismatch'));
   const amount=BigInt(listing.priceWei||'0');
   if(amount<=0n)throw new Error(t('marketTx.minimumPrice'));
-  return Object.freeze({listingId:String(listing.listingId),priceWei:amount.toString(),seller:listing.seller,owner});
+  return Object.freeze({listingId:String(listing.listingId),priceWei:amount.toString(),seller:listing.seller,owner,marketplace:listing.marketplace});
 }
 async function handleBuy(id){
   if(!requireWallet())return;
@@ -4507,6 +4534,7 @@ async function handleBuy(id){
       action:'buy',
       from:walletAtSubmit,
       nft:n,
+      listingMarketplace:activeListing.marketplace,
       data:encodeBuyCall(activeListing.listingId),
       amount:activeListing.priceWei,
       label:'Buy'
@@ -4527,7 +4555,7 @@ async function handleBuy(id){
     }else if(refreshed&&refreshedOwnerConfirmed){
       await persistConfirmedNFTSnapshot(refreshed,'buy');
     }
-    alert(t('marketTx.buyComplete')+'\n'+JNCRelease.message('proceeds'));
+    alert(t('marketTx.buyComplete')+'\n'+JNCRelease.message('proceeds',resolveMarketplacePaymentRoute(n).chain.id));
   }catch(e){
     console.warn('BUY recovery transaction failed:',e);
     reportTransactionOutcome(e,transactionConfirmed,'handleBuy');
@@ -4538,6 +4566,9 @@ function marketplaceNextStepsHtml(n){
   const token=route.tokenAddress;
   const proceeds=base+'&action=proceeds'+(/^0x[0-9a-f]{40}$/i.test(token)?'&paymentToken='+encodeURIComponent(token):'');
   const origin=!n.originRegistered?'<p>'+esc(JNCRelease.message('creatorPending'))+' <a href="'+base+'&action=registerOrigin&tokenId='+encodeURIComponent(n.tokenId)+'">'+esc(JNCRelease.message('creatorReview'))+'</a></p>':'';
+  const release=JNCRelease.read(route.chain.id);
+  const onPreviousMarket=release.previousListingMarketplace&&lc(n.listingMarketplace)===lc(release.previousListingMarketplace);
+  if(release.version==='2.24.1'&&!onPreviousMarket)return origin?'<div class="note" style="margin-top:10px">'+origin+'</div>':'';
   return '<div class="note" style="margin-top:10px">'+origin+'<a href="'+proceeds+'">'+esc(JNCRelease.message('proceedsLink'))+'</a></div>';
 }
 function detailActionButtons(n){const wallet=lc(PNC_STATE.wallet),auctionActive=!!(n.auction&&n.auction.active),isAuctionSeller=auctionActive&&wallet&&lc(n.auction.seller)===wallet,isOwner=wallet&&lc(n.owner)===wallet,canBuy=canBuyNFT(n),canList=canListNFT(n),canUnlist=canUnlistNFT(n),canEnableOffers=canEnableOffersNFT(n),canOffer=canOfferNFT(n),canAuction=canAuctionNFT(n),isLegacyResaleMigration=!n.originRegistered,canRegisterOrigin=wallet===lc((getDeploymentByNftContract(n.contractAddress)||getActiveDeployment()).contracts.feeWallet)&&isLegacyResaleMigration&&!auctionActive;return`<div class="detail-actions"><button class="small-btn buy-btn" ${canBuy?'':'disabled'} onclick="event.stopPropagation();handleBuy('${esc(nftReference(n))}')">${esc(t('marketUi.buy'))}</button><button class="small-btn sell-btn" ${canList?'':'disabled'} onclick="event.stopPropagation();handleList('${esc(nftReference(n))}')">${esc(t('marketUi.list'))}</button><button class="small-btn delete-btn" ${canUnlist?'':'disabled'} onclick="event.stopPropagation();handleUnlist('${esc(nftReference(n))}')">${esc(t('marketUi.unlist'))}</button>${canEnableOffers?`<button class="small-btn ghost-btn" onclick="event.stopPropagation();handleEnableOffers('${esc(nftReference(n))}')">${esc(t('marketUi.enableOffers'))}</button>`:''}<button class="small-btn ghost-btn" ${canOffer?'':'disabled'} onclick="event.stopPropagation();handleCreateOffer('${esc(nftReference(n))}')">${esc(t('marketUi.makeOffer'))}</button><button class="small-btn sell-btn" ${canAuction?'':'disabled'} onclick="event.stopPropagation();handleCreateAuction('${esc(nftReference(n))}')">${esc(t('marketUi.startAuction'))}</button>${canRegisterOrigin?`<button class="small-btn ghost-btn" onclick="event.stopPropagation();registerLegacyResaleOrigin('${esc(nftReference(n))}')">${esc(t('marketUi.registerResaleOrigin'))}</button>`:''}<button class="small-btn delete-btn" onclick="event.stopPropagation();closeNftDetail();">${esc(t('marketUi.close'))}</button></div>${marketplaceNextStepsHtml(n)}<div class="note" style="margin-top:10px">${esc(t('marketUi.auctionRestriction'))}</div>`;}

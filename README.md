@@ -1,7 +1,7 @@
 # Journey NFT Center
 
-Marketplace 2.24.0 / 公開画面2.8.0 / Admin Center1.2.0の更新候補です。
-**PolygonとBNBの新契約は配置・コード照合・決済設定の同期が完了し、Creator移行もPolygon38枚・BNB1枚の全39枚を照合済みです。両市場の受付開始を本人の操作後に読み取り確認し、公開設定はready=trueです。旧出品23枚の取消し・新市場での再出品は別途必要です。** 詳細は [Polygon配置後の確認](docs/POLYGON-STAGING.md) と [BNB配置後の確認](docs/BNB-STAGING.md) を参照してください。
+Marketplace 2.24.0 / 公開画面2.8.0 / Admin Center1.2.0の公開中の版です。
+**PolygonとBNBの新契約は配置・コード照合・決済設定の同期が完了し、Creator移行もPolygon38枚・BNB1枚の全39枚を照合済みです。両市場の受付開始を本人の操作後に読み取り確認し、公開設定はready=trueです。旧市場からの再出品は進行中です。個別承認が新市場へ切り替わるため、旧出品の取消しは新出品の前提条件ではありません。** 詳細は [Polygon配置後の確認](docs/POLYGON-STAGING.md) と [BNB配置後の確認](docs/BNB-STAGING.md) を参照してください。
 
 ## 更新内容
 
@@ -30,10 +30,10 @@ npm test
 
 Solidity0.8.24、optimizer有効・runs200、Shanghai。ブラウザテストはインストール済みEdgeをheadlessで使用します。別の環境では `JNC_BROWSER` にChromium系ブラウザの実行ファイルを指定してください。結果は `test-results/`、コンパイル成果物は `artifacts/` に出力します。GanacheのµWS警告はJavaScript実装へのfallbackで、テスト結果とは区別します。
 
-## 公開前に必要な作業
+## 配置・公開の記録
 
 [デプロイと切替](docs/DEPLOYMENT.md) を参照してください。
-`deployment-config.js` の新アドレス・実行コードhashは未入力、両チェーンの `ready` はfalseです。既存の旧アドレスを新欄へ入れて再開することはできません。
+`deployment-config.js` は両チェーンとも配置済みの新アドレス・実行コードhashを設定済みで、`ready` はtrueです。配置時の手順と現在状態を混同しないよう、各文書の日付を確認してください。
 
 本体のURLは `/`、管理画面の既存URLは `/jnc_admin_center_v0.2.html` を維持します。旧ファイル名でも内容はAdmin Center1.2.0です。
 `/vendor/ethers.umd.min.js` はethers6.15.0のMITライセンス配布物です。同ディレクトリにライセンスを同梱しています。
